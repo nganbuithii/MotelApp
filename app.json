@@ -1,0 +1,11 @@
+{
+  "expo": {
+    "name": "MotelApp",
+    "slug": "MotelApp",
+    "version": "1.0.0",
+    "assetBundlePatterns": [
+      "**/*"
+    ]
+  },
+  "name": "MotelApp"
+}
