@@ -6,7 +6,8 @@ export default StyleSheet.create({
         width:'100%',
         flex:1,
         justifyContent:"center",
-        alignItems:"center"
+        alignItems:"center",
+        backgroundColor:"white"
     },
     textHead:{
         color:COLOR.PRIMARY,
