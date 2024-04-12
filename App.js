@@ -8,6 +8,7 @@ import Slider from './src/components/Intro/Slider';
 import Register from './src/components/Auth/Register';
 import Register2 from './src/components/Auth/Register2';
 import TermService from './src/components/Auth/TermService';
+import UploadImg from './src/components/Auth/UploadImg';
 //Điều hướng kiểu stack
 const Stack = createStackNavigator();
 
@@ -39,6 +40,11 @@ export default function App() {
         component={TermService}
         options={{ headerTitle: 'Điều Khoản và Dịch Vụ' }}
         />
+        <Stack.Screen 
+        name="UploadImg" 
+        component={UploadImg}
+        options={{ headerShown: false }}/>
+        
       </Stack.Navigator>
     </NavigationContainer>
   );

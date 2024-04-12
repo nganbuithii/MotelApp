@@ -46,7 +46,7 @@ const Register2 = ({ navigation }) => {
                     </Text>
                 </TouchableOpacity>
             </View>
-            <ButtonAuth title="Đăng kí"/>
+            <ButtonAuth onPress={() => navigation.navigate("UploadImg")} title="Đăng kí"/>
             
             <View style={[MyStyles.flex, MyStyles.mt20]}>
                 <Text style={MyStyles.textNormal2}>Bạn đã có tài khoản?</Text>
