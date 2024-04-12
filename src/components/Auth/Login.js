@@ -30,7 +30,7 @@ const Login = () => {
         >
             <View style={[AuthStyles.formContainer, AuthStyles.mt15, AuthStyles.flex]}>
                 <Text style={MyStyles.textHead}>ĐĂNG NHẬP TÀI KHOẢN</Text>
-                <InputField label="Email"/>
+                <InputField label="Tên đăng nhập"/>
                 <InputPassword />
                 <ButtonAuth title="Đăng nhập" />
 

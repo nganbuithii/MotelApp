@@ -13,10 +13,7 @@ const SliderItem = ({ items,navigation  }) => {
         <Text style={IntroStyles.title}>{items.title}</Text>
         <Text style={IntroStyles.description}>{items.description}</Text>
         </View>
-        <View style={IntroStyles.buttonStart}>
-            {items.id == 4 ? <Start navigation={navigation}/> : <>
-            </>}
-        </View>
+        <View style={IntroStyles.buttonStart}>{items.id == 4 ? <Start navigation={navigation}/> : <></>}</View>
     </View>
     );
 };

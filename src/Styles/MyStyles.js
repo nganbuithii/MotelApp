@@ -7,7 +7,7 @@ export default StyleSheet.create({
         flex:1,
         justifyContent:"center",
         alignItems:"center",
-        backgroundColor:"white"
+        backgroundColor:"white",
     },
     textHead:{
         color:COLOR.PRIMARY,
@@ -15,6 +15,12 @@ export default StyleSheet.create({
         fontSize:20,
         padding:20,
         textAlign:"center"
+    },
+    textSmall:{
+        color:COLOR.PRIMARY,
+        fontWeight:"500",
+        textAlign:"center",
+        fontSize:20
     },
     row:{
         flexDirection:"row"
@@ -39,6 +45,7 @@ export default StyleSheet.create({
     flex: {
         flexDirection: 'row',
         alignItems: 'center',
+        justifyContent:"center"
     },
     link:{
         color:COLOR.secondary,
@@ -46,6 +53,15 @@ export default StyleSheet.create({
     },
     mt20:{
         marginTop:20
+    },
+    pd10:{
+        padding:10
+    },
+    txtCenter:{
+        textAlign:"center",
+        fontSize:16
     }
-    
+    ,mb20:{
+        marginBottom:20
+    }
 })

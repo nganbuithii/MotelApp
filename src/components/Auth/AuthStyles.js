@@ -40,5 +40,26 @@ export default StyleSheet.create({
     },
     flex: {
         width:"100%"
+    },
+    textHead:{
+        fontSize:29,
+        color:COLOR.PRIMARY,
+        fontWeight:"500", 
+        marginBottom:30
+    },
+    containerRegister: {
+        width: "95%",
+        justifyContent: 'center',
+        alignItems: 'center',
+        backgroundColor: COLOR.offWhite,
+        paddingBottom: 30,
+        paddingTop: 40,
+
+        borderRadius: 15, // Bo góc
+        ...SHADOWS.medium
+
+    },
+    bgC:{
+        backgroundColor:COLOR.color5
     }
 })  

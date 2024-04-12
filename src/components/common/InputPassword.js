@@ -9,7 +9,7 @@ const InputPassword = () => {
     return (
         <TextInput 
             style={[styles.input]}
-            label="Password"
+            label="Mật khẩu"
             selectionColor={COLOR.PRIMARY}
             secureTextEntry
             right={<TextInput.Icon icon="eye" />}
