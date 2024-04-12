@@ -8,7 +8,7 @@ import ButtonAuth from "../common/ButtonAuth";
 // import { IconButton } from "react-native-paper";
 // import Icon from 'react-native-vector-icons/FontAwesome';
 
-const Login = () => {
+const Login = ({navigation}) => {
   // const [email, setEmail] = useState('');
   // const [password, setPassword] = useStateState('');
 
@@ -48,10 +48,10 @@ const Login = () => {
                 
                 <View style={[MyStyles.flex, MyStyles.mt20]}>
                     <Text style={MyStyles.textNormal2}>Bạn chưa có tài khoản?</Text>
-                    <TouchableOpacity>
-                    <Text style={[MyStyles.textNormal2, MyStyles.link]}>
-                        Tạo tài khoản
-                    </Text>
+                    <TouchableOpacity onPress={() => navigation.navigate("Register")}>
+                        <Text style={[MyStyles.textNormal2, MyStyles.link]} >
+                            Tạo tài khoản
+                        </Text>
                     </TouchableOpacity>
                 </View>
             </View>
