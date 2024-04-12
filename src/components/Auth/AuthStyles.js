@@ -72,5 +72,11 @@ export default StyleSheet.create({
         fontSize:25,
         marginBottom:10,
         color:COLOR.secondary
+    },
+    txtLeft:{
+        textAlign:"left",
+        fontWeight:"500",
+        color:COLOR.PRIMARY
     }
+    
 })  

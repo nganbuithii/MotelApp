@@ -32,7 +32,12 @@ const Login = ({navigation}) => {
                 <Text style={MyStyles.textHead}>ĐĂNG NHẬP TÀI KHOẢN</Text>
                 <InputField label="Tên đăng nhập"/>
                 <InputPassword />
+
+                <Text style={AuthStyles.txtLeft}>Quên mật khẩu?</Text>
+
+
                 <ButtonAuth title="Đăng nhập" />
+            
 
                 <Text style={AuthStyles.mt15}>OR</Text>
 

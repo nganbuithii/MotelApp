@@ -23,5 +23,6 @@ const styles = StyleSheet.create({
     fontWeight: '500',
     fontSize:18
     },
+    
 })
 export default ButtonAuth;
