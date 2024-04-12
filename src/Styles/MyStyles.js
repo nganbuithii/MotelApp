@@ -63,5 +63,6 @@ export default StyleSheet.create({
     }
     ,mb20:{
         marginBottom:20
-    }
+    },
+
 })

@@ -12,16 +12,16 @@ const styles = StyleSheet.create({
     button: {
         backgroundColor: COLOR.color_1,
         width: '80%',
-        height: 40,
+        height: 45,
         justifyContent: 'center',
         alignItems: 'center',
         borderRadius: 5,
-        marginTop: 20,
+        marginTop: 15,
     },
     buttonText: {
     color: COLOR.offWhite,
     fontWeight: '500',
-    fontSize:16
+    fontSize:18
     },
 })
 export default ButtonAuth;

@@ -47,6 +47,7 @@ export default StyleSheet.create({
         fontWeight:"500", 
         marginBottom:30
     },
+    // Ddăng kí1
     containerRegister: {
         width: "95%",
         justifyContent: 'center',
@@ -61,5 +62,15 @@ export default StyleSheet.create({
     },
     bgC:{
         backgroundColor:COLOR.color5
+    },
+    //Đăng kí 2
+    text: {
+        fontSize:16
+    },
+    textHead2:{
+        fontWeight:"500",
+        fontSize:25,
+        marginBottom:10,
+        color:COLOR.secondary
     }
 })  
