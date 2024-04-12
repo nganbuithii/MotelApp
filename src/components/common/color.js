@@ -4,7 +4,7 @@ const COLOR = {
     secondary: "#16D26B",
     finally:"#0EBD5D",
     color_1:"#3CB371",
-    color2:"#00FA9A",
+    // color2:"#00FA9A",
     color3:"#98FB98",
     color4:"#00FF7F",
     color5:"#4DDF57",
@@ -19,6 +19,9 @@ const COLOR = {
     green: "#46d160",
     offWhite: "#F3F4F8",
     gray_100: "#f3f4f6",
+    color6:"#9FFA84",
+    color7:"#73FF00"
+
 };
 const SHADOWS = {
     small: {

@@ -33,7 +33,9 @@ const Login = () => {
                 <InputField label="Email"/>
                 <InputPassword />
                 <ButtonAuth title="Đăng nhập" />
+
                 <Text style={AuthStyles.mt15}>OR</Text>
+
                 <TouchableOpacity style={AuthStyles.mt15}>
                     <View style={[MyStyles.flex, AuthStyles.buttonGG]}>
                     <Image
@@ -43,6 +45,7 @@ const Login = () => {
                     <Text style={MyStyles.textNormal}>Đăng nhập với google</Text>
                     </View>
                 </TouchableOpacity>
+                
                 <View style={[MyStyles.flex, MyStyles.mt20]}>
                     <Text style={MyStyles.textNormal2}>Bạn chưa có tài khoản?</Text>
                     <TouchableOpacity>

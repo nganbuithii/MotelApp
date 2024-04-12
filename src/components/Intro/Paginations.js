@@ -1,50 +1,40 @@
-import { StyleSheet, Text, View,Dimensions,Animated } from 'react-native'
-import React from 'react'
+    import React from 'react';
+    import { StyleSheet, View, Dimensions, Animated } from 'react-native';
+import { COLOR } from '../common/color';
+import IntroStyles from './IntroStyles';
 
-const {width} = Dimensions.get("screen")
-const Pagination = ({data,scrollX}) => {
+    const { width } = Dimensions.get('window');
+    const DOT_SIZE = 13;
+    const DOT_SPACING = 15; // KHOẢNG CÁCH các chấm
+
+    const Pagination = ({ data, scrollX }) => {
     return (
-    <View style={styles.container}> 
-        {
-            data.map((_, idx) =>{
-                const inputRange = [(idx - 1) * width, idx * width, (idx + 1)* width];
-                const opacity = scrollX.interpolate({
-                    inputRange,
-                    outputRange:[0.5,1,0.5],
-                    extrapolate:'clamp'
-                })
-                const dotwidth = scrollX.interpolate({
-                    inputRange,
-                    outputRange: [12, 30, 12],
-                    extrapolate:'clamp'
-                });
+        <View style={IntroStyles.containerDot}>
+            {data.map((_, index) => {
+                const inputRange = [(index - 1) * width, index * width, (index + 1) * width];
                 const backgroundColor = scrollX.interpolate({
                     inputRange,
-                    outputRange: ["#ccc","#000", "#ccc"],
-                    extrapolate:'clamp'
-                })
-                return <Animated.View key={idx.toString()} style={[styles.dot,{width:dotwidth,backgroundColor,opacity}]}/>
-            } )
-        }
-    </View>
-    )
-}
+                    outputRange: [COLOR.bg_color1, COLOR.color7, COLOR.bg_color1],
+                    extrapolate: 'clamp',
+                });
+                return (
+                    <Animated.View
+                        key={index.toString()}
+                        style={[styles.dot, { backgroundColor }]}
+                    />
+                );
+            })}
+        </View>
+    );
+    };
 
-export default Pagination
-
-const styles = StyleSheet.create({
-    container:{
-        position: "absolute",
-        bottom:30,
-        flexDirection:"row",
-        justifyContent:'center',
-        width:"100%"
+    const styles = StyleSheet.create({
+    dot: {
+        width: DOT_SIZE,
+        height: DOT_SIZE,
+        borderRadius: DOT_SIZE / 2,
+        margin: DOT_SPACING / 2,
     },
-    dot:{
-        width:12,
-        height:12,
-        borderRadius:6,
-        backgroundColor:"#ccc",
-        margin:10
-    }
-})
+    });
+
+    export default Pagination;
