@@ -14,7 +14,7 @@ import IntroStyles from './IntroStyles';
                 const inputRange = [(index - 1) * width, index * width, (index + 1) * width];
                 const backgroundColor = scrollX.interpolate({
                     inputRange,
-                    outputRange: [COLOR.bg_color1, COLOR.color7, COLOR.bg_color1],
+                    outputRange: [COLOR.bg_color1, COLOR.PRIMARY, COLOR.bg_color1],
                     extrapolate: 'clamp',
                 });
                 return (

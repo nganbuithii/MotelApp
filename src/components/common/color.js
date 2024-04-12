@@ -20,7 +20,8 @@ const COLOR = {
     offWhite: "#F3F4F8",
     gray_100: "#f3f4f6",
     color6:"#9FFA84",
-    color7:"#73FF00"
+    color7:"#73FF00",
+    bgslider:"#E7EBE4"
 
 };
 const SHADOWS = {

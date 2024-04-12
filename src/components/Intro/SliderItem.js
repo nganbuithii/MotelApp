@@ -1,52 +1,26 @@
 import {StyleSheet, Text,View,Image,Dimensions,Animated,Easing} from "react-native";
 import React, { useRef } from "react";
 import Start from "./Start";
-
+import {COLOR} from '../common/color'
 const { width, height } = Dimensions.get("screen");
+import IntroStyles from "./IntroStyles";
 
 const SliderItem = ({ items,navigation  }) => {
     return (
-    <View style={styles.container}>
-        <Image source={items.image} resizeMode="contain" style={styles.image} />
-        <View style={styles.content}>
-        <Text style={styles.title}>{items.title}</Text>
-        <Text style={styles.description}>{items.description}</Text>
+    <View style={IntroStyles.containerItem}>
+        <Image source={items.image} resizeMode="contain" style={IntroStyles.image} />
+        <View style={IntroStyles.content}>
+        <Text style={IntroStyles.title}>{items.title}</Text>
+        <Text style={IntroStyles.description}>{items.description}</Text>
         </View>
-        <View style={styles.button}>{items.id == 4 ? <Start navigation={navigation}/> : <></>}</View>
+        <View style={IntroStyles.buttonStart}>
+            {items.id == 4 ? <Start navigation={navigation}/> : <>
+            </>}
+        </View>
     </View>
     );
 };
 
 export default SliderItem;
-
-const styles = StyleSheet.create({
-    container: {
-        width,
-        height,
-        alignItems: "center",
-        backgroundColor: "#fff",
-    },
-    image: {
-        flex: 0.8,
-        width: "100%",
-    },
-    content: {
-        flex: 0.4,
-        alignItems: "center",
-        width: "80%",
-    },
-    title: {
-        fontSize: 24,
-        fontWeight: "bold",
-        color: "#333",
-    },
-    description: {
-        fontSize: 18,
-        marginVertical: 20,
-        color: "#333",
-        textAlign: "center",
-    },
-    button: {
     
-    },
-});
+
