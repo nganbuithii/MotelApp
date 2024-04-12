@@ -40,7 +40,7 @@ const Register2 = ({ navigation }) => {
             <View style={[MyStyles.flex, MyStyles.mt20]}>
                 <CheckBox />
                 <Text style={MyStyles.textNormal2}>Bạn đồng ý với </Text>
-                <TouchableOpacity onPress={() => navigation.navigate("Login")}>
+                <TouchableOpacity onPress={() => navigation.navigate("TermService")}>
                     <Text style={[MyStyles.textNormal2, MyStyles.link]}>
                         Điều khoản & Chính sách
                     </Text>

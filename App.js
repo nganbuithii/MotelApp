@@ -7,30 +7,40 @@ import Login from './src/components/Auth/Login';
 import Slider from './src/components/Intro/Slider';
 import Register from './src/components/Auth/Register';
 import Register2 from './src/components/Auth/Register2';
+import TermService from './src/components/Auth/TermService';
 //Điều hướng kiểu stack
 const Stack = createStackNavigator();
 
 export default function App() {
   return (
-    <Register2/>
-    // <NavigationContainer>
-    //   <Stack.Navigator initialRouteName="Slider">
-    //   <Stack.Screen
-    //       name="Slider"
-    //       component={Slider}
-    //       options={{ headerShown: false }} // Tắt header cho màn hình Slider
-    //     />
-    //     <Stack.Screen
-    //       name="Login"
-    //       component={Login}
-    //       options={{ headerShown: false }} // Tắt header cho màn hình Login
-    //     />
-    //     <Stack.Screen 
-    //     name="Register" 
-    //     component={Register}
-    //     options={{ headerShown: false }}/>
-    //   </Stack.Navigator>
-    // </NavigationContainer>
+    
+    <NavigationContainer>
+      <Stack.Navigator initialRouteName="Slider">
+      <Stack.Screen
+          name="Slider"
+          component={Slider}
+          options={{ headerShown: false }} // Tắt header cho màn hình Slider
+        />
+        <Stack.Screen
+          name="Login"
+          component={Login}
+          options={{ headerShown: false }} // Tắt header cho màn hình Login
+        />
+        <Stack.Screen 
+        name="Register" 
+        component={Register}
+        options={{ headerShown: false }}/>
+        <Stack.Screen 
+        name="Register2" 
+        component={Register2}
+        options={{ headerShown: false }}/>
+        <Stack.Screen 
+        name="TermService" 
+        component={TermService}
+        options={{ headerTitle: 'Điều Khoản và Dịch Vụ' }}
+        />
+      </Stack.Navigator>
+    </NavigationContainer>
   );
 }
 

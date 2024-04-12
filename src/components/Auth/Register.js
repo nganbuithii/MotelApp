@@ -52,7 +52,8 @@ const Register = ({ navigation }) => {
 
                 </View>
 
-                <ButtonAuth title="Tiếp tục" />
+                <ButtonAuth onPress={() => navigation.navigate("Register2")} title="Tiếp tục" />
+
                 <View style={[MyStyles.flex, MyStyles.mt20]}>
                     <Text style={MyStyles.textNormal2}>Bạn đã có tài khoản?</Text>
                     <TouchableOpacity onPress={() => navigation.navigate("Login")}>
