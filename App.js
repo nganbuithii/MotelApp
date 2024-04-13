@@ -13,6 +13,7 @@ import Home from './src/components/Home/Home';
 import MyUserReducer from './reducer/MyUserReducer';
 import MyContext from './src/configs/MyContext';
 import ProfileDetail from './src/components/Home/ProfileDetail';
+import SearchFilter from './src/components/Home/SearchFilter';
 //Điều hướng kiểu stack
 const Stack = createStackNavigator();
 
@@ -23,8 +24,7 @@ export default function App() {
     <MyContext.Provider value={[user, dispatch]}>
       <NavigationContainer>
         <Stack.Navigator initialRouteName="Slider">
-          <Stack.Screen name="ProfileDetail" component={ProfileDetail} 
-                      options={{ headerTitle: 'Tài khoản của bạn' }} />
+          
           <Stack.Screen
               name="Slider"
               component={Slider}
@@ -36,7 +36,10 @@ export default function App() {
               options={{ headerShown: false }} // Tắt header cho màn hình Login
               />
           
-
+          <Stack.Screen name="ProfileDetail" component={ProfileDetail} 
+                      options={{ headerTitle: 'Tài khoản của bạn' }} />
+          <Stack.Screen name="SearchFilter" component={SearchFilter} 
+                      options={{ headerTitle: 'Lọc kết quả tìm kiếm' }} />
           <Stack.Screen
               name="Home" 
               component={Home} 

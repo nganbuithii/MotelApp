@@ -1,10 +1,8 @@
 import React from 'react';
 import { View, Text, Image, TouchableOpacity, StyleSheet } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
-import { COLOR, SHADOWS } from '../common/color';
 import { AntDesign } from '@expo/vector-icons';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
-import MyStyles from '../../Styles/MyStyles';
 import { useNavigation } from '@react-navigation/native';
 import HomeStyles from './HomeStyles';
 
