@@ -1,33 +1,26 @@
 import * as React from 'react';
 import { View } from 'react-native';
 import { BottomNavigation, Text } from 'react-native-paper';
-import { Ionicons } from '@expo/vector-icons';
+import { COLOR } from '../common/color';
+import { HomeIcon, SearchIcon, ChatIcon, NotificationIcon, ProfileIcon } from '../common/Icon'
 
-import { Fontisto } from '@expo/vector-icons';
-import { Feather } from '@expo/vector-icons';
 import Mucsic from './Mucsic';
 
 const AlbumsRoute = () => (
     <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
         <Text>Albums</Text>
-        <Feather name="users" size={24} color="black" />
+    
 
     </View>
     );
-const Icon1=() => (
-    <Feather name="users" size={24} color="black" />
-)
-const Icon2=() => (
-    <Fontisto name="hipchat" size={24} color="black" />
-)
-const IconChat = () => (
-    <Ionicons name="chatbubble-ellipses-outline" size={24} color="black" />
-)
-const IconChat2 = () => (
-    <Ionicons name="chatbubble-ellipses-sharp" size={24} color="black" />
-)
 
-const RecentsRoute = () => (
+
+const SearchRoute = () => (
+    <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+        <Text>Recents</Text>
+    </View>
+    );
+const ChatRoute = () => (
     <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
         <Text>Recents</Text>
     </View>
@@ -38,24 +31,32 @@ const NotificationsRoute = () => (
         <Text>Notifications</Text>
     </View>
     );
+const ProfileRole  = () => (
+    <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+        <Text>Notifications</Text>
+    </View>
+    );
 
 const Home = () => {
     const [index, setIndex] = React.useState(0);
     const [routes] = React.useState([
-        { key: 'home', title: 'HOME', focusedIcon: 'home', unfocusedIcon: 'home-outline'},
-        { key: 'search', title: 'Tìm kiếm', focusedIcon: 'magnify' },
-        { key: 'chat', title: 'Chat', focusedIcon: IconChat2, unfocusedIcon: IconChat },
-        { key: 'notification', title: 'Thông báo', focusedIcon: 'bell', unfocusedIcon: 'bell-outline' },
-        { key: 'profile', title: 'Profile',focusedIcon: Icon1, unfocusedIcon: Icon1 },
+        { key: 'home', title: 'Home', focusedIcon: HomeIcon, unfocusedIcon: HomeIcon },
+        { key: 'search', title: 'Tìm kiếm', focusedIcon: SearchIcon, unfocusedIcon: SearchIcon },
+        { key: 'chat', title: 'Chat', focusedIcon: ChatIcon, unfocusedIcon: ChatIcon },
+        { key: 'notification', title: 'Thông báo', focusedIcon: NotificationIcon, unfocusedIcon: NotificationIcon },
+        { key: 'profile', title: 'Profile', focusedIcon: ProfileIcon, unfocusedIcon: ProfileIcon },
 ]); 
-
+// const customTabStyle = ({ focused }) => {
+//     return {
+//         backgroundColor: focused ? COLOR.color11 : 'transparent', // Tùy chỉnh màu nền khi icon được chọn
+//     };
+// };
 const renderScene = BottomNavigation.SceneMap({
         home: Mucsic,
-        search: AlbumsRoute,
-        chat: RecentsRoute,
+        search: SearchRoute,
+        chat: ChatRoute,
         notification: NotificationsRoute,
-        profile:NotificationsRoute
-        
+        profile:ProfileRole
     });
 
     return (
@@ -65,6 +66,10 @@ const renderScene = BottomNavigation.SceneMap({
                 navigationState={{ index, routes }}
                 onIndexChange={setIndex}
                 renderScene={renderScene}
+                barStyle={{ backgroundColor: COLOR.color8 }}
+                // tabStyle={customTabStyle}
+                activeColor="white" 
+                labelStyle={{ fontSize: 20 }} // Đặt kích thước font chữ
             />
     </View>
     

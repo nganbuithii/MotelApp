@@ -21,7 +21,9 @@ const COLOR = {
     gray_100: "#f3f4f6",
     color6:"#9FFA84",
     color7:"#73FF00",
-    bgslider:"#E7EBE4"
+    color8:"#11C964",
+    bgslider:"#E7EBE4",
+    color11:"#DEF4E0"
 
 };
 const SHADOWS = {
