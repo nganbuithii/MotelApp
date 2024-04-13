@@ -8,6 +8,7 @@ import ChatSc from './ChatSc';
 import SearchSc from './SearchSc';
 import ProfileSc from './ProfileSc';
 import NotificationsSc from './NotificationsSc';
+import ProfileDetail from './ProfileDetail';
 
 
 const Home = () => {
@@ -25,7 +26,7 @@ const renderScene = BottomNavigation.SceneMap({
         search: SearchSc,
         chat: ChatSc,
         notification: NotificationsSc,
-        profile:ProfileSc
+        profile:ProfileSc,
     });
 
     return (

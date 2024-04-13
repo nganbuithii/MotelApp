@@ -1,4 +1,5 @@
-    import { StyleSheet } from "react-native";
+import { StyleSheet } from "react-native";
+import { SHADOWS, COLOR } from "../common/color";
 
 export default StyleSheet.create({
         flex:{
@@ -44,5 +45,50 @@ export default StyleSheet.create({
             flex:1,
             flexDirection: 'row',
             alignItems: 'center',
+        },
+        // ProfileScreen
+        profileContainer: {
+            flexDirection: 'row',
+            alignItems: 'center',
+            padding: 10,
+            backgroundColor: '#ffffff',
+            borderRadius: 5,
+            elevation: 3,
+            width:"100%",
+            ...SHADOWS.medium
+        },
+        profileInfo: {
+            flex: 1,
+        },
+        profileName: {
+            fontSize: 18,
+            fontWeight: 'bold',
+            color: COLOR.color_1,
+        },
+        detailLink: {
+            color: COLOR.input_default,
+        },
+        iconContainer: {
+            padding:15,
+            marginLeft: 'auto', 
+        },
+        txtSmall:{
+            marginRight:"auto",
+            marginHorizontal:20,
+            marginVertical:10,
+            color:COLOR.color_1,
+            fontWeight:"bold"
+        },
+        // ProfileDetail
+        imageProfile:{
+            width:"300",
+            height:"300"
+        },
+        userContainer:{
+            flex:1,
+            alignItems: 'center',
+            justifyContent: 'center',
+            width:"100%"
         }
+
     })

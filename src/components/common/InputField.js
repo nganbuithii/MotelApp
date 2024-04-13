@@ -3,7 +3,7 @@ import { StyleSheet } from 'react-native';
 import { TextInput } from 'react-native-paper';
 import { COLOR, SHADOWS } from './color';
 
-const InputField= ({label, newStyle}) => {
+const InputField= ({label, newStyle, value}) => {
     const [text, setText] = React.useState("");
 
     return (

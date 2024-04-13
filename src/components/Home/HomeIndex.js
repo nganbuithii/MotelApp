@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { View, Text , Image, StyleSheet, TextInput } from 'react-native';
-import TitleApp from '../common/TitleApp';
 import MyStyles from '../../Styles/MyStyles'
 import { ScrollView, TouchableOpacity } from 'react-native-gesture-handler';
 import { AntDesign } from '@expo/vector-icons';
