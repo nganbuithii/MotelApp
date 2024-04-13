@@ -36,7 +36,7 @@ const Login = ({navigation}) => {
                 <Text style={AuthStyles.txtLeft}>Quên mật khẩu?</Text>
 
 
-                <ButtonAuth title="Đăng nhập" />
+                <ButtonAuth title="Đăng nhập" onPress={() => navigation.navigate('Home')}/>
             
 
                 <Text style={AuthStyles.mt15}>OR</Text>
