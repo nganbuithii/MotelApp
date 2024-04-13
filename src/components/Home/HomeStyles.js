@@ -1,7 +1,9 @@
     import { StyleSheet } from "react-native";
 
 export default StyleSheet.create({
-
+        flex:{
+            flex:1,
+        },
         container: {
             flex: 1,
             alignItems: 'center',
@@ -38,4 +40,9 @@ export default StyleSheet.create({
             resizeMode: 'cover', // Chế độ hiển thị của ảnh
             marginRight: 10,
         },
+        flexInput: {
+            flex:1,
+            flexDirection: 'row',
+            alignItems: 'center',
+        }
     })
