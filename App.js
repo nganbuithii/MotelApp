@@ -22,11 +22,11 @@ export default function App() {
             name="Home" 
             component={Home} 
             options={{ headerShown: false }}/>
-        {/* <Stack.Screen
+        <Stack.Screen
             name="Slider"
             component={Slider}
             options={{ headerShown: false }} // Tắt header cho màn hình Slider
-          /> */}
+          />
           <Stack.Screen
             name="Login"
             component={Login}
