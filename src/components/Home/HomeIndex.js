@@ -5,6 +5,7 @@ import MyStyles from '../../Styles/MyStyles'
 import { ScrollView, TouchableOpacity } from 'react-native-gesture-handler';
 import { AntDesign } from '@expo/vector-icons';
 import HomeStyles from './HomeStyles';
+import Logout from '../Auth/Logout';
 
 const HomeIndex = () => {
   const [postContent, setPostContent] = useState('');
@@ -17,7 +18,7 @@ const HomeIndex = () => {
     <View style={MyStyles.container}>
       <Text>Trang chủ</Text>
 
-
+        <Logout />
         {/* Thanh đăng bài nằm ngang */}
         <View style={HomeStyles.postBar}>
           <Image
