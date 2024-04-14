@@ -15,7 +15,7 @@ import { useRoute } from '@react-navigation/native';
 const Register2 = ({ navigation }) => {
     const route = useRoute();
     const { role } = route.params;
-    const [agree, setAgree] = useState(false);
+    const [agree, setAgree] = useState();
     const [error, setError] = useState({
         firstName: '',
         lastName: '',
@@ -98,9 +98,16 @@ const Register2 = ({ navigation }) => {
             } else if (!passwordsMatch(formData.password, formData.confirmPassword)) {
                 newErrors.confirmPassword = 'Mật khẩu không khớp';
             }
+            
             setError(newErrors);
-            if (Object.keys(newErrors).length === 0) {
+            if (Object.keys(newErrors).length === 0 && agree) {
+                // Nếu không có lỗi và chưa đồng ý điều khoản, hiển thị cảnh báo
+                Alert.alert("Cảnh báo", "Bạn chưa đồng ý với Điều khoản & Chính sách");
+                return;
+            }
+            else if(Object.keys(newErrors).length === 0 && !agree){
                 navigation.navigate("UploadImg", { formData });
+                console.log(formData)
             }
         }catch(ex)
         {
@@ -165,7 +172,7 @@ const Register2 = ({ navigation }) => {
                 <InputPassword title="Xác nhận mật khẩu" onChangeText={text => handleChangeText('confirmPassword', text)}/>
 
                 <View style={[MyStyles.flex, MyStyles.mt20]}>
-                <CheckBox value={agree} onValueChange={handleCheckBox} />
+                <CheckBox value={agree} onPress={handleCheckBox} />
                     <Text style={MyStyles.textNormal2}>Bạn đồng ý với </Text>
                     <TouchableOpacity onPress={() => navigation.navigate("TermService")}>
                         <Text style={[MyStyles.textNormal2, MyStyles.link]}>
