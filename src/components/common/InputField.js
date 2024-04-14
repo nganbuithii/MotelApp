@@ -3,18 +3,18 @@ import { StyleSheet } from 'react-native';
 import { TextInput } from 'react-native-paper';
 import { COLOR, SHADOWS } from './color';
 
-const InputField= ({label, newStyle, value}) => {
-    const [text, setText] = React.useState("");
-
+const InputField= ({ label, value, onChangeText, newStyle }) => {
     return (
-        <TextInput  style={StyleSheet.flatten([styles.input, newStyle])}
-        label={label}
-        value={text}
-        onChangeText={text => setText(text)}
-        theme={{ colors: { primary: COLOR.PRIMARY}}}
+        <TextInput
+            style={StyleSheet.flatten([styles.input, newStyle])}
+            label={label}
+            value={value}
+            onChangeText={onChangeText}
+            theme={{ colors: { primary: COLOR.PRIMARY } }}
         />
     );
 };
+
 const styles = StyleSheet.create({
     input: {
         backgroundColor: 'transparent',

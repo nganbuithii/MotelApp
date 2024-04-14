@@ -3,25 +3,23 @@ import { StyleSheet } from 'react-native';
 import { TextInput } from 'react-native-paper';
 import { COLOR } from './color';
 
-const InputPassword = () => {
-    
-    const [text, setText] = React.useState('');
-    // set trạng thái hiện pass = false là ẩn
+const InputPassword = ({ value, onChangeText }) => {
     const [isPasswordVisible, setPasswordVisible] = React.useState(false);
+    
     return (
         <TextInput 
             style={[styles.input]}
             label="Mật khẩu"
+            value={value}
+            onChangeText={onChangeText}
             selectionColor={COLOR.PRIMARY}
-            // prop secure là ẩn pass nếu prop là true(ẩn) -> is pass là true
             secureTextEntry={!isPasswordVisible}
-            right={<TextInput.Icon icon={isPasswordVisible ? 'eye' : 'eye-off'}
-            onPress={() => setPasswordVisible(!isPasswordVisible)} />}
-
-            theme={{ colors: { primary: COLOR.PRIMARY}}} // Thiết lập màu chính cho TextInput
+            right={<TextInput.Icon icon={isPasswordVisible ? 'eye' : 'eye-off'} onPress={() => setPasswordVisible(!isPasswordVisible)} />}
+            theme={{ colors: { primary: COLOR.PRIMARY}}}
         />
     );
 };
+
 
 const styles = StyleSheet.create({
     input: {

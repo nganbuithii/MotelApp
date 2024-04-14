@@ -1,23 +1,23 @@
 import axios from "axios";
 
+const HOST ="https://motel.pythonanywhere.com";
+
 export const endpoints = {
-
-    'login': '/o/token/',
-    'current-user': '/users/current-user/',
-    'register': '/users/',
-
-
+    'current-user':'/users/current_user/',
+    login: "/o/token/", // Đây là đường dẫn tới endpoint để đăng nhập
+    // Các endpoints khác có thể được định nghĩa tại đây
 };
-export const authApi = (accessToken) =>
-axios.create({
-    // baseURL: "http:// 192.168.1.6:5000/",
-    baseURL:"https://thanhduong.pythonanywhere.com/",
-    headers: {
-    Authorization: `bearer ${accessToken}`,
-    },
-});
 
+// Tạo một phiên bản axios với các cài đặt đã được cung cấp
+export const authApi = (accessToken) =>
+    axios.create({
+        baseURL: HOST,
+        headers: {
+            Authorization: `Bearer ${accessToken}`,
+        },
+    });
+
+// Xuất một phiên bản axios với cài đặt mặc định
 export default axios.create({
-    // baseURL: "http:// 192.168.1.6:5000/",
-    baseURL:"https://thanhduong.pythonanywhere.com/",
+    baseURL: HOST
 });

@@ -30,22 +30,22 @@ export default function App() {
               component={Slider}
               options={{ headerShown: false }} // Tắt header cho màn hình Slider
             />
-          <Stack.Screen
+          {/* <Stack.Screen
               name="Login"
               component={Login}
               options={{ headerShown: false }} // Tắt header cho màn hình Login
-              />
+              /> */}
           
           <Stack.Screen name="ProfileDetail" component={ProfileDetail} 
                       options={{ headerTitle: 'Tài khoản của bạn' }} />
           <Stack.Screen name="SearchFilter" component={SearchFilter} 
                       options={{ headerTitle: 'Lọc kết quả tìm kiếm' }} />
-          <Stack.Screen
+          {/* <Stack.Screen
               name="Home" 
               component={Home} 
-              options={{ headerShown: false }}/>
+              options={{ headerShown: false }}/> */}
             
-            {/* {user=== null?
+            {user=== null?
               <> 
               <Stack.Screen
               name="Login"
@@ -59,7 +59,7 @@ export default function App() {
               component={Home} 
               options={{ headerShown: false }}/>
             </>
-            } */}
+            }
           
             <Stack.Screen 
             name="Register" 

@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { View, Text, TouchableOpacity, Image, ScrollView } from "react-native";
+import { View, Text, TouchableOpacity, Image, ScrollView, Alert } from "react-native";
 import React from "react";
 import InputField from "../common/InputField";
 import InputPassword from "../common/InputPassword";
@@ -8,38 +8,59 @@ import MyStyles from "../../Styles/MyStyles"
 import ButtonAuth from "../common/ButtonAuth";
 import MyContext from '../../configs/MyContext';
 import axios from "axios";
+import API from "../../configs/API";
+import { endpoints } from "../../configs/API";
+import { ActivityIndicator } from "react-native-paper";
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const Login = ({ navigation }) => {
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
     const [user, dispatch] = React.useContext(MyContext);
+    const [loading, setLoading] = useState(false);
+    const loginApp = async () => {
+        setLoading(true);
+        try {
+            let header = {
+                'Content-Type': 'application/x-www-form-urlencoded' // Change Content-Type
+            };
+            let data = {
+                username: username,
+                password: password,
+                client_id: "8OdjuOvhjzLFCigIbuw3mbDAlhWTirzeM7s1W1g2",
+                client_secret:
+                    "8pj5yZzwnH0vN3hflMrJJ7QBENDCsMKfIUlGQ15Gyg9GPTRCFXsIxm7iiF7xmcPf2IOz5uIXmfD9TjXJI3mKWHIQQ1HStaY3duHkIrSc4GWJGcyg1ZQgKtYIOxRksXia",
+                grant_type: "password",
+            };
+            let res = await API.post(endpoints["login"], data, { headers: header });
+            //await AsyncStorage.setItem("access-token", res.data.access_token);
+            dispatch({
+                type: "login",
+                payload: res.data, // Lưu lại dữ liệu trả về từ server
+            });
+            navigation.navigate("Home");
+            console.log(res.data);
+            await AsyncStorage.setItem("access-token", res.data.access_token);
+        } catch (ex) {
+            if (ex.response) {
+                // Server trả về phản hồi có lỗi
+                console.error("Server error:", ex.response.data);
+                Alert.alert("Server error:", ex.response.data);
+            } else if (ex.request) {
+                // Không nhận được phản hồi từ server
+                console.error("No response received from server");
+                Alert.alert("No response received from server");
+            } else {
+                // Lỗi xảy ra khi thiết lập yêu cầu
+                console.error("Error setting up request:", ex.message);
+                Alert.alert("Error setting up request:", ex.message);
+            }
+        } finally {
+            setLoading(false);
+        }
+    };
 
-    // Xử lý đăng nhập
-    // const login = async () => {
-    //     try {
-    //         const response = await axios.post('https://jsonplaceholder.typicode.com/posts', {
-    //             username: "admin",
-    //             password: "123",
-    //             // Thêm các thông tin khác nếu cần (ví dụ: grant_type, client_id, client_secret)
-    //         });
-    //         // Nếu đăng nhập thành công, lưu thông tin user vào context và chuyển về trang Home
-    //         if (response.data.access_token) {
-    //             dispatch({
-    //                 type: "login",
-    //                 payload: {
-    //                     username: username
-    //                 }
-    //             });
-    //             navigation.navigate("Home");
-    //         } else {
-    //             // Xử lý trường hợp đăng nhập thất bại (ví dụ: hiển thị thông báo lỗi)
-    //             console.error("Đăng nhập thất bại:", response.data);
-    //         }
-    //     } catch (error) {
-    //         // Xử lý lỗi từ việc gửi yêu cầu đăng nhập
-    //         console.error("Lỗi đăng nhập:", error);
-    //     }
-    // }
+
 
     return (
         <View style={MyStyles.container}>
@@ -59,12 +80,15 @@ const Login = ({ navigation }) => {
             >
                 <View style={[AuthStyles.formContainer, AuthStyles.mt15, AuthStyles.flex]}>
                     <Text style={MyStyles.textHead}>ĐĂNG NHẬP TÀI KHOẢN</Text>
-                    <InputField value={username} onChangeText={t => setUsername(t)} label="Tên đăng nhập" />
-                    <InputPassword value={password} onChangeText={t => setPassword(t)} />
+                    <InputField value={username} onChangeText={text => setUsername(text)} label="Tên đăng nhập" />
+                    <InputPassword value={password} onChangeText={text => setPassword(text)} />
+
 
                     <Text style={AuthStyles.txtLeft}>Quên mật khẩu?</Text>
 
-                    <ButtonAuth title="Đăng nhập" onPress={() => navigation.navigate("Home")} />
+                    {loading ? (<ActivityIndicator />) : (
+                        <ButtonAuth title="Đăng nhập" onPress={loginApp} />)}
+
 
                     <Text style={AuthStyles.mt15}>OR</Text>
 
