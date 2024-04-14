@@ -26,7 +26,7 @@ const Register2 = ({ navigation }) => {
         password: '',
         confirmPassword: '',
     });
-    const [formData, setFormData] = useState({
+    const [user, setUser] = useState({
         firstName: '',
         lastName: '',
         gender: '',
@@ -65,49 +65,49 @@ const Register2 = ({ navigation }) => {
         try{
             const newErrors = {};
             // Kiểm tra từng trường và gán thông báo lỗi tương ứng
-            if (!formData.firstName) {
+            if (!user.firstName) {
                 newErrors.firstName = "Vui lòng nhập họ của bạn";
             }
-            if (!formData.lastName) {
+            if (!user.lastName) {
                 newErrors.lastName = "Vui lòng nhập tên của bạn";
             }
-            if (!formData.gender) {
+            if (!user.gender) {
                 newErrors.gender = "Vui lòng chọn giới tính";
             }
-            if (!formData.email) {
+            if (!user.email) {
                 newErrors.email = "Vui lòng nhập email";
-            } else if (!isValidEmail(formData.email)) {
+            } else if (!isValidEmail(user.email)) {
                 newErrors.email = 'Email không hợp lệ';
             }
-            if (!formData.phoneNumber) {
+            if (!user.phoneNumber) {
                 newErrors.phoneNumber = "Vui lòng nhập số điện thoại";
-            } else if (!isValidPhoneNumber(formData.phoneNumber)) {
+            } else if (!isValidPhoneNumber(user.phoneNumber)) {
                 newErrors.phoneNumber = 'Số điện thoại không hợp lệ';
             }
-            if (!formData.username) {
+            if (!user.username) {
                 newErrors.username = "Vui lòng nhập tên đăng nhập";
             }
-            if (!formData.password) {
+            if (!user.password) {
                 newErrors.password = "Vui lòng nhập mật khẩu";
-            } else if (!isValidPassword(formData.password)) {
+            } else if (!isValidPassword(user.password)) {
                 newErrors.password = "Mật khẩu không mạnh."
                 newErrors.password ="Mật khẩu phải chứa chữ hoa, chữ thường, kí tự và số"
             }
-            if (!formData.confirmPassword) {
+            if (!user.confirmPassword) {
                 newErrors.confirmPassword = "Vui lòng nhập mật khẩu";
-            } else if (!passwordsMatch(formData.password, formData.confirmPassword)) {
+            } else if (!passwordsMatch(user.password, user.confirmPassword)) {
                 newErrors.confirmPassword = 'Mật khẩu không khớp';
             }
             
             setError(newErrors);
-            if (Object.keys(newErrors).length === 0 && agree) {
+            if (Object.keys(newErrors).length === 0 && !agree) {
                 // Nếu không có lỗi và chưa đồng ý điều khoản, hiển thị cảnh báo
                 Alert.alert("Cảnh báo", "Bạn chưa đồng ý với Điều khoản & Chính sách");
                 return;
             }
-            else if(Object.keys(newErrors).length === 0 && !agree){
-                navigation.navigate("UploadImg", { formData });
-                console.log(formData)
+            else if(Object.keys(newErrors).length === 0 && agree){
+                navigation.navigate("UploadImg", { user });
+                console.log(user)
             }
         }catch(ex)
         {
@@ -117,7 +117,7 @@ const Register2 = ({ navigation }) => {
 
     // Hàm để cập nhật formData khi người dùng thay đổi giá trị trên các trường nhập liệu
     const handleChangeText = (field, value) => {
-        setFormData(prevState => ({
+        setUser(prevState => ({
             ...prevState,
             [field]: value,
         }));
@@ -144,14 +144,14 @@ const Register2 = ({ navigation }) => {
                         theme={{ colors: { primary: COLOR.finally}}}
                         label="Nữ" 
                         value="Nữ" 
-                        status={formData.gender === 'Nữ' ? 'checked' : 'unchecked'} // Sử dụng giá trị của trạng thái giới tính
+                        status={user.gender === 'Nữ' ? 'checked' : 'unchecked'} // Sử dụng giá trị của trạng thái giới tính
                         onPress={() => handleChangeText('gender', 'Nữ')} // Cập nhật trạng thái giới tính khi người dùng chọn giới tính
                     />
                     <RadioButton.Item 
                         theme={{ colors: { primary: COLOR.finally}}}
                         label="Nam" 
                         value="Nam" 
-                        status={formData.gender === 'Nam' ? 'checked' : 'unchecked'}
+                        status={user.gender === 'Nam' ? 'checked' : 'unchecked'}
                         onPress={() => handleChangeText('gender', 'Nam')}
                     />
                 </View>

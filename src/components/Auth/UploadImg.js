@@ -1,15 +1,17 @@
 import React, { useState, useEffect } from "react";
-import { Image, View, TouchableOpacity, Text, StyleSheet } from "react-native";
+import { Image, View, TouchableOpacity, Text, StyleSheet, Alert } from "react-native";
 import { AntDesign } from "@expo/vector-icons";
 import * as ImagePicker from "expo-image-picker";
 import ButtonAuth from "../common/ButtonAuth";
 import MyStyles from "../../Styles/MyStyles";
 import { COLOR } from "../common/color";
 import defaultImage from "../../assets/images/avt.gif"; // Import ảnh mặc định
+import API from "../../configs/API";
 
 const UploadImg = () => {
     const [image, setImage] = useState(null);
     const [uploadButtonText, setUploadButtonText] = useState("Upload Image");
+    const [register, setRegister] = useState(null);
 
     const checkForCameraRollPermission = async () => {
         const { status } = await ImagePicker.getMediaLibraryPermissionsAsync();
@@ -40,6 +42,17 @@ const UploadImg = () => {
         }
     };
 
+    // Chưa chọn ảnh
+    const handleSave =() => {
+        if (!image) {
+            Alert.alert(
+                "Bạn chưa có up ảnh đại diện",
+                "Hãy chọn ảnh trước khi lưu",
+                [{ text: "OK", onPress: () => console.log("OK Pressed") }]
+            );
+            return;
+        } 
+    }
     return (
         <View style={MyStyles.container}>
             <Text style={MyStyles.textHead}> Chọn ảnh đại diện</Text>
@@ -60,7 +73,7 @@ const UploadImg = () => {
                     </TouchableOpacity>
                 </View>
             </View>
-            <ButtonAuth title="Lưu" />
+            <ButtonAuth  onPress={handleSave} title="Lưu" />
         </View>
     );
 };

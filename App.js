@@ -14,6 +14,7 @@ import MyUserReducer from './reducer/MyUserReducer';
 import MyContext from './src/configs/MyContext';
 import ProfileDetail from './src/components/Home/ProfileDetail';
 import SearchFilter from './src/components/Home/SearchFilter';
+import RegisterHouse from './src/components/Auth/RegisterHouse';
 //Điều hướng kiểu stack
 const Stack = createStackNavigator();
 
@@ -24,61 +25,66 @@ export default function App() {
     <MyContext.Provider value={[user, dispatch]}>
       <NavigationContainer>
         <Stack.Navigator initialRouteName="Slider">
-          
+
           <Stack.Screen
-              name="Slider"
-              component={Slider}
-              options={{ headerShown: false }} // Tắt header cho màn hình Slider
-            />
+            name="Slider"
+            component={Slider}
+            options={{ headerShown: false }} // Tắt header cho màn hình Slider
+          />
           {/* <Stack.Screen
               name="Login"
               component={Login}
               options={{ headerShown: false }} // Tắt header cho màn hình Login
               /> */}
-          
-          <Stack.Screen name="ProfileDetail" component={ProfileDetail} 
-                      options={{ headerTitle: 'Tài khoản của bạn' }} />
-          <Stack.Screen name="SearchFilter" component={SearchFilter} 
-                      options={{ headerTitle: 'Lọc kết quả tìm kiếm' }} />
+
+          <Stack.Screen name="ProfileDetail" component={ProfileDetail}
+            options={{ headerTitle: 'Tài khoản của bạn' }} />
+          <Stack.Screen name="SearchFilter" component={SearchFilter}
+            options={{ headerTitle: 'Lọc kết quả tìm kiếm' }} />
+          <Stack.Screen
+            name="RegisterHouse"
+            component={RegisterHouse}
+            options={{ headerShown: false }} // Tắt header cho màn hình Slider
+          />
           {/* <Stack.Screen
               name="Home" 
               component={Home} 
               options={{ headerShown: false }}/> */}
-            
-            {user=== null?
-              <> 
-              <Stack.Screen
-              name="Login"
-              component={Login}
-              options={{ headerShown: false }} // Tắt header cho màn hình Login
-              />
-            </>:
+
+          {user === null ?
             <>
-            <Stack.Screen
-              name="Home" 
-              component={Home} 
-              options={{ headerShown: false }}/>
+              <Stack.Screen
+                name="Login"
+                component={Login}
+                options={{ headerShown: false }} // Tắt header cho màn hình Login
+              />
+            </> :
+            <>
+              <Stack.Screen
+                name="Home"
+                component={Home}
+                options={{ headerShown: false }} />
             </>
-            }
-          
-            <Stack.Screen 
-            name="Register" 
+          }
+
+          <Stack.Screen
+            name="Register"
             component={Register}
-            options={{ headerShown: false }}/>
-            <Stack.Screen 
-            name="Register2" 
+            options={{ headerShown: false }} />
+          <Stack.Screen
+            name="Register2"
             component={Register2}
-            options={{ headerShown: false }}/>
-            <Stack.Screen 
-            name="TermService" 
+            options={{ headerShown: false }} />
+          <Stack.Screen
+            name="TermService"
             component={TermService}
             options={{ headerTitle: 'Điều Khoản và Dịch Vụ' }}
-            />
-            <Stack.Screen 
-            name="UploadImg" 
+          />
+          <Stack.Screen
+            name="UploadImg"
             component={UploadImg}
-            options={{ headerShown: false }}/>
-            
+            options={{ headerShown: false }} />
+
         </Stack.Navigator>
       </NavigationContainer>
     </MyContext.Provider>
