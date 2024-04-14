@@ -7,14 +7,14 @@ import ButtonAuth from '../common/ButtonAuth';
 import { COLOR } from '../common/color';
 const Register = ({ navigation }) => {
     const [selectedRole, setSelectedRole] = useState(null);
-
-    const handleNextPress = () => {
+    
+    const handleNext = () => {
         if (!selectedRole) {
-            Alert.alert('Error', 'Please select your role.');
+            Alert.alert('Lỗi', 'Bạn phải nhập loại người dùng');
             return;
         }
-
-        navigation.navigate('Step2', { role: selectedRole });
+        console.log(selectedRole);
+        navigation.navigate('Register2', { role: selectedRole });
     };
 
     return (
@@ -52,7 +52,7 @@ const Register = ({ navigation }) => {
 
                 </View>
 
-                <ButtonAuth onPress={() => navigation.navigate("Register2")} title="Tiếp tục" />
+                <ButtonAuth onPress={handleNext} title="Tiếp tục" />
 
                 <View style={[MyStyles.flex, MyStyles.mt20]}>
                     <Text style={MyStyles.textNormal2}>Bạn đã có tài khoản?</Text>

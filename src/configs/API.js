@@ -6,6 +6,7 @@ export const endpoints = {
     'current-user':'/users/current_user/',
     login: "/o/token/", // Đây là đường dẫn tới endpoint để đăng nhập
     // Các endpoints khác có thể được định nghĩa tại đây
+    register:"/user/"
 };
 
 // Tạo một phiên bản axios với các cài đặt đã được cung cấp
