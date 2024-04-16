@@ -1,12 +1,5 @@
 import React, { useState } from "react";
-import {
-    View,
-    Text,
-    TextInput,
-    TouchableOpacity,
-    StyleSheet,
-    ScrollView,
-    Image,
+import { View,Text,TextInput,TouchableOpacity,StyleSheet,ScrollView,Image,
 } from "react-native";
 import { COLOR, SHADOWS } from "../common/color";
 import RNPickerSelect from "react-native-picker-select";
@@ -15,7 +8,7 @@ import { MaterialIcons } from "@expo/vector-icons";
 import { Entypo } from "@expo/vector-icons";
 import { Ionicons } from "@expo/vector-icons";
 import ButtonAuth from "../common/ButtonAuth";
-import MyStyles from "../../Styles/MyStyles";
+import DataXaPhuong from "../../assets/data/DataXaPhuong";
 
 const RegisterMotel = () => {
     const [houseInfo, setHouseInfo] = useState({
@@ -111,12 +104,9 @@ const RegisterMotel = () => {
                         style={styles}
                         onValueChange={(value) => handleChangeText("quanhuyen", value)}
                         placeholder={{ label: "Chọn quận/huyện", value: null }}
-                        items={[
-                            { label: "Quận/Huyện 1", value: "Quanhuyen1" },
-                            { label: "Quận/Huyện 2", value: "Quanhuyen2" },
-                            { label: "Quận/Huyện 3", value: "Quanhuyen3" },
-                            // Thêm các xã/phường khác vào đây
-                        ]}
+                        
+                        items={DataXaPhuong["Thành phố Hồ Chí Minh"]["Quận 1"]} 
+                        
                     />
                 </View>
 
