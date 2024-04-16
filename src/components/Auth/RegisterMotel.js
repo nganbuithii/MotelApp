@@ -10,7 +10,7 @@ import { Ionicons } from "@expo/vector-icons";
 import ButtonAuth from "../common/ButtonAuth";
 import DataXaPhuong from "../../assets/data/DataXaPhuong";
 
-const RegisterMotel = () => {
+const RegisterMotel = ({navigation}) => {
     const [houseInfo, setHouseInfo] = useState({
         id: "",
         giathue: "",
@@ -125,7 +125,7 @@ const RegisterMotel = () => {
                 </View>
 
                 <View style={styles.buttonContainer}>
-                    <ButtonAuth title="Đăng kí nhà trọ" />
+                    <ButtonAuth title="Đăng kí nhà trọ" onPress={() => navigation.navigate("UploadImgHouse")}/>
                 </View>
             </ScrollView>
         </View>

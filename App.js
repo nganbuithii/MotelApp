@@ -15,6 +15,7 @@ import MyContext from './src/configs/MyContext';
 import ProfileDetail from './src/components/Home/ProfileDetail';
 import SearchFilter from './src/components/Home/SearchFilter';
 import RegisterMotel from './src/components/Auth/RegisterMotel';
+import UploadImgHouse from './src/components/Auth/UploadImgHouse';
 //Điều hướng kiểu stack
 const Stack = createStackNavigator();
 
@@ -44,6 +45,11 @@ export default function App() {
           <Stack.Screen
             name="RegisterMotel"
             component={RegisterMotel}
+            options={{ headerShown: false }} // Tắt header cho màn hình Slider
+          />
+          <Stack.Screen
+            name="UploadImgHouse"
+            component={UploadImgHouse}
             options={{ headerShown: false }} // Tắt header cho màn hình Slider
           />
           {/* <Stack.Screen

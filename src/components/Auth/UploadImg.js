@@ -7,7 +7,7 @@ import MyStyles from "../../Styles/MyStyles";
 import { COLOR } from "../common/color";
 import API, { endpoints } from "../../configs/API";
 import { ActivityIndicator } from "react-native-paper";
-import axios from "axios";
+
 
 const UploadImg = ({ navigation, route }) => {
     const [image, setImage] = useState(null);
@@ -82,7 +82,7 @@ const UploadImg = ({ navigation, route }) => {
         }
 
         setLoading(true);
-        if(user.role=="MOTEL_OWNER"){
+        if (user.role == "MOTEL_OWNER") {
             navigation.navigate("RegisterHouse");
         }
 
@@ -95,11 +95,11 @@ const UploadImg = ({ navigation, route }) => {
             console.info("res.data", response.data);
             console.log("Thành công");
             // Kiểm tra vai trò và chuyển hướng người dùng
-        if (user.role === "MOTEL_OWNER") {
-            navigation.navigate("RegisterHouse");
-        } else {
-            navigation.navigate("Login");
-        }
+            if (user.role === "MOTEL_OWNER") {
+                navigation.navigate("RegisterHouse");
+            } else {
+                navigation.navigate("Login");
+            }
         } catch (ex) {
             Alert.alert("Lỗi", "Đã có lỗi xảy ra khi đăng ký. Vui lòng thử lại sau.");
             console.error(ex.message);
@@ -115,12 +115,12 @@ const UploadImg = ({ navigation, route }) => {
     return (
         <View style={MyStyles.container}>
             <Text style={MyStyles.textHead}> Chọn ảnh đại diện</Text>
-            <View style={imageUploaderStyles.container}>
+            <View style={Styles.container}>
                 <Image source={avatar} style={{ flex: 1, aspectRatio: 1 }} />
-                <View style={imageUploaderStyles.uploadBtnContainer}>
+                <View style={Styles.uploadBtnContainer}>
                     <TouchableOpacity
                         onPress={addImage}
-                        style={imageUploaderStyles.uploadBtn}
+                        style={Styles.uploadBtn}
                     >
                         <Text>{uploadButtonText}</Text>
                         <AntDesign name="camera" size={20} color="black" />
@@ -133,7 +133,7 @@ const UploadImg = ({ navigation, route }) => {
     );
 };
 
-const imageUploaderStyles = StyleSheet.create({
+const Styles = StyleSheet.create({
     container: {
         elevation: 2,
         height: 200,
