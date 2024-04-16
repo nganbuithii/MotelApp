@@ -9,7 +9,7 @@ const Start = ({ navigation }) => {
 return (
     <View style={IntroStyles.containerStart}>
         <TouchableOpacity>
-            <Text style={IntroStyles.text} onPress={() => navigation.navigate("Home")}>
+            <Text style={IntroStyles.text} onPress={() => navigation.navigate("Login")}>
             BẮT ĐẦU
             </Text>
         </TouchableOpacity>

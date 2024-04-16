@@ -3,9 +3,8 @@ import axios from "axios";
 const HOST ="https://motel.pythonanywhere.com";
 
 export const endpoints = {
-    'current-user':'/users/current_user/',
-    login: "/o/token/", // Đây là đường dẫn tới endpoint để đăng nhập
-    // Các endpoints khác có thể được định nghĩa tại đây
+    current_user:'/user/current_user/',
+    login: "/o/token/", 
     register:"/user/"
 };
 

@@ -9,7 +9,7 @@ import ButtonAuth from "../common/ButtonAuth";
 import MyContext from '../../configs/MyContext';
 import axios from "axios";
 import API from "../../configs/API";
-import { endpoints } from "../../configs/API";
+import { endpoints, authApi } from "../../configs/API";
 import { ActivityIndicator } from "react-native-paper";
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
@@ -33,28 +33,27 @@ const Login = ({ navigation }) => {
                 grant_type: "password",
             };
             let res = await API.post(endpoints["login"], data, { headers: header });
-            //await AsyncStorage.setItem("access-token", res.data.access_token);
+
+            // Lưu access token vào AsyncStorage
+            await AsyncStorage.setItem("access-token", res.data.access_token);
+
+            // Gửi yêu cầu GET để lấy thông tin người dùng
+            let userRes = await authApi(res.data.access_token).get(endpoints["current_user"]);
+            let userData = userRes.data;
+
+            // Lưu thông tin người dùng vào Context hoặc State
             dispatch({
                 type: "login",
-                payload: res.data, // Lưu lại dữ liệu trả về từ server
+                payload: userData,
             });
+
+            // Điều hướng đến màn hình chính
             navigation.navigate("Home");
-            console.log(res.data);
-            await AsyncStorage.setItem("access-token", res.data.access_token);
+
+            console.log(userData); // Log thông tin người dùng
         } catch (ex) {
-            if (ex.response) {
-                // Server trả về phản hồi có lỗi
-                console.error("Server error:", ex.response.data);
-                Alert.alert("Server error:", ex.response.data);
-            } else if (ex.request) {
-                // Không nhận được phản hồi từ server
-                console.error("No response received from server");
-                Alert.alert("No response received from server");
-            } else {
-                // Lỗi xảy ra khi thiết lập yêu cầu
-                console.error("Error setting up request:", ex.message);
-                Alert.alert("Error setting up request:", ex.message);
-            }
+            console.error(ex);
+
         } finally {
             setLoading(false);
         }
