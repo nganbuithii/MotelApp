@@ -143,16 +143,16 @@ const Register2 = ({ navigation }) => {
                     <RadioButton.Item 
                         theme={{ colors: { primary: COLOR.finally}}}
                         label="Nữ" 
-                        value="Nữ" 
-                        status={user.gender === 'Nữ' ? 'checked' : 'unchecked'} // Sử dụng giá trị của trạng thái giới tính
-                        onPress={() => handleChangeText('gender', 'Nữ')} // Cập nhật trạng thái giới tính khi người dùng chọn giới tính
+                        value="FEMALE" 
+                        status={user.gender === 'FEMALE' ? 'checked' : 'unchecked'} // Sử dụng giá trị của trạng thái giới tính
+                        onPress={() => handleChangeText('gender', 'FEMALE')} // Cập nhật trạng thái giới tính khi người dùng chọn giới tính
                     />
                     <RadioButton.Item 
                         theme={{ colors: { primary: COLOR.finally}}}
                         label="Nam" 
-                        value="Nam" 
-                        status={user.gender === 'Nam' ? 'checked' : 'unchecked'}
-                        onPress={() => handleChangeText('gender', 'Nam')}
+                        value="MALE" 
+                        status={user.gender === 'MALE' ? 'checked' : 'unchecked'}
+                        onPress={() => handleChangeText('gender', 'MALE')}
                     />
                 </View>
 

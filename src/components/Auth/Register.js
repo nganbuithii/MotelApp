@@ -37,17 +37,17 @@ const Register = ({ navigation }) => {
                 <View style={[MyStyles.flex, MyStyles.mt20]}>
                     <RadioButton.Item 
                         theme={{ colors: { primary: COLOR.finally}}}
-                        status={selectedRole === "Chủ nhà trọ" ? 'checked' : 'unchecked'}
-                        onPress={() => setSelectedRole("Chủ nhà trọ")}
+                        status={selectedRole === "MOTEL_OWNER" ? 'checked' : 'unchecked'}
+                        onPress={() => setSelectedRole("MOTEL_OWNER")}
                         label="Chủ nhà trọ" 
-                        value="Chủ nhà trọ" 
+                        value="MOTEL_OWNER" 
                     />
                     <RadioButton.Item 
                         theme={{ colors: { primary: COLOR.finally}}}
                         label="Người thuê nhà" 
-                        value="Người thuê nhà" 
-                        status={selectedRole === "Người thuê nhà" ? 'checked' : 'unchecked'}
-                        onPress={() => setSelectedRole("Người thuê nhà")}
+                        value="TENANT" 
+                        status={selectedRole === "TENANT" ? 'checked' : 'unchecked'}
+                        onPress={() => setSelectedRole("TENANT")}
                     />
 
                 </View>

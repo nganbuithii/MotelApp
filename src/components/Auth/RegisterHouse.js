@@ -5,6 +5,7 @@ const RegisterHouse = () => {
     return (
         <View>
             <Text> Đăng kí nhà trọ của bạn</Text>
+            
         </View>
     )
 
