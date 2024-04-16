@@ -56,7 +56,10 @@ export default function App() {
               name="Home" 
               component={Home} 
               options={{ headerShown: false }}/> */}
-
+          <Stack.Screen
+                name="Home"
+                component={Home}
+                options={{ headerShown: false }} />
           {user === null ?
             <>
               <Stack.Screen

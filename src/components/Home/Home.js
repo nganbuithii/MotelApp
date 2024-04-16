@@ -10,37 +10,36 @@ import ProfileSc from './ProfileSc';
 import NotificationsSc from './NotificationsSc';
 import ProfileDetail from './ProfileDetail';
 
-
 const Home = () => {
     const [index, setIndex] = React.useState(0);
     const [routes] = React.useState([
-        { key: 'home', title: 'Home', focusedIcon: HomeIcon, unfocusedIcon: HomeIcon },
-        { key: 'search', title: 'Tìm kiếm', focusedIcon: SearchIcon, unfocusedIcon: SearchIcon },
-        { key: 'chat', title: 'Chat', focusedIcon: ChatIcon, unfocusedIcon: ChatIcon },
-        { key: 'notification', title: 'Thông báo', focusedIcon: NotificationIcon, unfocusedIcon: NotificationIcon },
-        { key: 'profile', title: 'Profile', focusedIcon: ProfileIcon, unfocusedIcon: ProfileIcon },
-]); 
+        { key: 'home', focusedIcon: HomeIcon, unfocusedIcon: HomeIcon },
+        { key: 'search', focusedIcon: SearchIcon, unfocusedIcon: SearchIcon },
+        { key: 'chat', focusedIcon: ChatIcon, unfocusedIcon: ChatIcon },
+        { key: 'notification', focusedIcon: NotificationIcon, unfocusedIcon: NotificationIcon },
+        { key: 'profile', focusedIcon: ProfileIcon, unfocusedIcon: ProfileIcon },
+    ]);
 
-const renderScene = BottomNavigation.SceneMap({
+    const renderScene = BottomNavigation.SceneMap({
         home: HomeIndex,
         search: SearchSc,
         chat: ChatSc,
         notification: NotificationsSc,
-        profile:ProfileSc,
+        profile: ProfileSc,
     });
 
     return (
         <View style={{ flex: 1 }}>
-        
             <BottomNavigation
                 navigationState={{ index, routes }}
                 onIndexChange={setIndex}
                 renderScene={renderScene}
-                barStyle={{ backgroundColor: COLOR.color8 }}
-                activeColor="white" 
+                barStyle={{ backgroundColor: COLOR.color4, height: '8%' }}
+                activeColor="black"
+                inactiveColor={COLOR.PRIMARY} // Màu trắng cho icon không active
             />
-    </View>
-    
+
+        </View>
     );
 };
 
