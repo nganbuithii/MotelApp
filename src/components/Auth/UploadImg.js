@@ -35,7 +35,7 @@ const UploadImg = ({ navigation, route }) => {
     const addImage = async () => {
         let image = await ImagePicker.launchImageLibraryAsync({
             mediaTypes: ImagePicker.MediaTypeOptions.Images,
-            allowsEditing: false,
+            allowsEditing: true,
             aspect: [4, 3],
             quality: 1,
         });
@@ -67,8 +67,8 @@ const UploadImg = ({ navigation, route }) => {
         formRegister.append('password', user.password);
         formRegister.append('phone', user.phoneNumber);
         formRegister.append('gender', user.gender);
+        formRegister.append('user_role', user.role);
 
-        // const fileType = imageFileName.split('.').pop();
         const uriParts = image.split('.');
         const fileType = uriParts[uriParts.length - 1];
         const avatar = {
@@ -82,80 +82,83 @@ const UploadImg = ({ navigation, route }) => {
         }
 
         setLoading(true);
-        
+        if(user.role=="MOTEL_OWNER"){
+            navigation.navigate("RegisterHouse");
+        }
 
-        try {const response = await axios.post('https://motel.pythonanywhere.com//user/', formRegister, {
-            headers: {
-                'Content-Type': 'multipart/form-data',
-            },
-        });
-        console.info("res.data", user);
-        console.log("Thành công");
-        navigation.navigate("Login");
-    } catch (ex) {
-        Alert.alert("Lỗi", "Đã có lỗi xảy ra khi đăng ký. Vui lòng thử lại sau.");
-        console.error(ex.message);
-        console.log(firstName, user)
-        // if (error.response && error.response.data && error.response.data.username) {
-        //     const errorMessage = error.response.data.username[0];
-        //     Alert.alert("Lỗi", errorMessage);
-        // } else {
-        //     Alert.alert("Lỗi", "Đã có lỗi xảy ra khi đăng ký. Vui lòng thử lại sau.");
-        // }
+        try {
+            const response = await API.post(endpoints['register'], formRegister, {
+                headers: {
+                    'Content-Type': 'multipart/form-data',
+                },
+            });
+            console.info("res.data", response.data);
+            console.log("Thành công");
+            // Kiểm tra vai trò và chuyển hướng người dùng
+        if (user.role === "MOTEL_OWNER") {
+            navigation.navigate("RegisterHouse");
+        } else {
+            navigation.navigate("Login");
+        }
+        } catch (ex) {
+            Alert.alert("Lỗi", "Đã có lỗi xảy ra khi đăng ký. Vui lòng thử lại sau.");
+            console.error(ex.message);
+            console.log(firstName, user)
+
+            setLoading(false);
+        }
+
         setLoading(false);
-    }
-
-    setLoading(false);
-};
+    };
 
 
-return (
-    <View style={MyStyles.container}>
-        <Text style={MyStyles.textHead}> Chọn ảnh đại diện</Text>
-        <View style={imageUploaderStyles.container}>
-            <Image source={avatar} style={{ flex: 1, aspectRatio: 1 }} />
-            <View style={imageUploaderStyles.uploadBtnContainer}>
-                <TouchableOpacity
-                    onPress={addImage}
-                    style={imageUploaderStyles.uploadBtn}
-                >
-                    <Text>{uploadButtonText}</Text>
-                    <AntDesign name="camera" size={20} color="black" />
-                </TouchableOpacity>
+    return (
+        <View style={MyStyles.container}>
+            <Text style={MyStyles.textHead}> Chọn ảnh đại diện</Text>
+            <View style={imageUploaderStyles.container}>
+                <Image source={avatar} style={{ flex: 1, aspectRatio: 1 }} />
+                <View style={imageUploaderStyles.uploadBtnContainer}>
+                    <TouchableOpacity
+                        onPress={addImage}
+                        style={imageUploaderStyles.uploadBtn}
+                    >
+                        <Text>{uploadButtonText}</Text>
+                        <AntDesign name="camera" size={20} color="black" />
+                    </TouchableOpacity>
+                </View>
             </View>
+            {loading ? (<ActivityIndicator />) : (
+                <ButtonAuth onPress={handleSave} title="Lưu" />)}
         </View>
-        {loading ? (<ActivityIndicator />) : (
-            <ButtonAuth onPress={handleSave} title="Lưu" />)}
-    </View>
-);
+    );
 };
 
 const imageUploaderStyles = StyleSheet.create({
-container: {
-    elevation: 2,
-    height: 200,
-    width: 200,
-    backgroundColor: "#efefef",
-    position: "relative",
-    borderRadius: 999,
-    overflow: "hidden",
-    marginBottom: 20,
-    marginTop: 20,
-},
-uploadBtnContainer: {
-    opacity: 0.7,
-    position: "absolute",
-    right: 0,
-    bottom: 0,
-    backgroundColor: COLOR.gray,
-    width: "100%",
-    height: "50%",
-},
-uploadBtn: {
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-},
+    container: {
+        elevation: 2,
+        height: 200,
+        width: 200,
+        backgroundColor: "#efefef",
+        position: "relative",
+        borderRadius: 999,
+        overflow: "hidden",
+        marginBottom: 20,
+        marginTop: 20,
+    },
+    uploadBtnContainer: {
+        opacity: 0.7,
+        position: "absolute",
+        right: 0,
+        bottom: 0,
+        backgroundColor: COLOR.gray,
+        width: "100%",
+        height: "50%",
+    },
+    uploadBtn: {
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+    },
 });
 
 export default UploadImg;

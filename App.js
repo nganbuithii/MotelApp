@@ -14,7 +14,7 @@ import MyUserReducer from './reducer/MyUserReducer';
 import MyContext from './src/configs/MyContext';
 import ProfileDetail from './src/components/Home/ProfileDetail';
 import SearchFilter from './src/components/Home/SearchFilter';
-import RegisterHouse from './src/components/Auth/RegisterHouse';
+import RegisterMotel from './src/components/Auth/RegisterMotel';
 //Điều hướng kiểu stack
 const Stack = createStackNavigator();
 
@@ -42,8 +42,8 @@ export default function App() {
           <Stack.Screen name="SearchFilter" component={SearchFilter}
             options={{ headerTitle: 'Lọc kết quả tìm kiếm' }} />
           <Stack.Screen
-            name="RegisterHouse"
-            component={RegisterHouse}
+            name="RegisterMotel"
+            component={RegisterMotel}
             options={{ headerShown: false }} // Tắt header cho màn hình Slider
           />
           {/* <Stack.Screen
