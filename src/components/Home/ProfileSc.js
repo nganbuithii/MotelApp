@@ -5,9 +5,12 @@ import { AntDesign } from '@expo/vector-icons';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import HomeStyles from './HomeStyles';
+import MyContext from '../../configs/MyContext';
 
 const ProfileScreen = () => {
   const navigation = useNavigation();
+  const [user, dispatch] = React.useContext(MyContext); // Lấy thông tin người dùng từ context
+
   const goToProfileDetail = () => {
     navigation.navigate('ProfileDetail'); // Điều hướng đến màn hình ProfileDetail
   };
@@ -21,11 +24,11 @@ const ProfileScreen = () => {
     {/* Ô thông tin user */}
     <TouchableOpacity style={HomeStyles.profileContainer} onPress={goToProfileDetail} >
       <Image
-        source={require('../../assets/images/avt.png')} // Thay đổi đường dẫn của ảnh mặc định
+        source={{uri:user.avatar}} // Thay đổi đường dẫn của ảnh mặc định
         style={HomeStyles.image}
       />
       <View style={HomeStyles.flex}>
-        <Text style={[HomeStyles.profileName]}>Bùi Thị Ngân</Text>
+        <Text style={[HomeStyles.profileName]}>{user.username}</Text>
         <Text style={HomeStyles.detailLink}> Xem chi tiết </Text>
       </View>
       <View>
