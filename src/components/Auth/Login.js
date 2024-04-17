@@ -33,7 +33,7 @@ const Login = ({ navigation }) => {
                 grant_type: "password",
             };
             let res = await API.post(endpoints["login"], data, { headers: header });
-
+            console.log(res.data);
             // Lưu access token vào AsyncStorage
             await AsyncStorage.setItem("access-token", res.data.access_token);
 

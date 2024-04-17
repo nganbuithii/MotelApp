@@ -96,7 +96,7 @@ const UploadImg = ({ navigation, route }) => {
             console.log("Thành công");
             // Kiểm tra vai trò và chuyển hướng người dùng
             if (user.role === "MOTEL_OWNER") {
-                navigation.navigate("RegisterHouse");
+                navigation.navigate("RegisterMotel");
             } else {
                 navigation.navigate("Login");
             }

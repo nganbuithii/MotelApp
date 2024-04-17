@@ -1,13 +1,15 @@
-import React, { useState } from 'react';
+import React, { useContext, useState } from 'react';
 import { View, Text , Image, StyleSheet, TextInput } from 'react-native';
 import MyStyles from '../../Styles/MyStyles'
 import { ScrollView, TouchableOpacity } from 'react-native-gesture-handler';
 import { AntDesign } from '@expo/vector-icons';
 import HomeStyles from './HomeStyles';
 import Logout from '../Auth/Logout';
+import MyContext from '../../configs/MyContext';
 
 const HomeIndex = () => {
   const [postContent, setPostContent] = useState('');
+  const [user,dispatch] = useContext(MyContext);
 
   const handlePostChange = (text) => {
     setPostContent(text);
@@ -21,7 +23,7 @@ const HomeIndex = () => {
         {/* Thanh đăng bài nằm ngang */}
         <View style={HomeStyles.postBar}>
           <Image
-            source={require('../../assets/images/avt.png')} // Thay đổi đường dẫn của ảnh mặc định
+            source={{uri:user.avatar}} // Thay đổi đường dẫn của ảnh mặc định
             style={HomeStyles.image}
           />
           <View style={[HomeStyles.postInputContainer,MyStyles.flex]}>

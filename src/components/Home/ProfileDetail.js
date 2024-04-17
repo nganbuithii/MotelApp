@@ -1,18 +1,26 @@
-import React, { useState, useEffect } from 'react';
-import { View, Text, Image, StyleSheet, TextInput, TouchableOpacity } from 'react-native';
+import React, { useState, useEffect, useContext } from 'react';
+import { View, Text, Image, StyleSheet, TextInput, TouchableOpacity, Alert } from 'react-native';
 import { AntDesign } from '@expo/vector-icons';
 import * as ImagePicker from 'expo-image-picker';
-import MyStyles from '../../Styles/MyStyles';
 import { COLOR } from '../common/color';
 import ButtonAuth from '../common/ButtonAuth';
+import MyContext from '../../configs/MyContext';
+import API, { authApi, endpoints } from '../../configs/API';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import Toast from 'react-native-toast-message';
 
 const ProfileDetail = () => {
-    const [image, setImage] = useState(null);
-    const [defaultImage, setDefaultImage] = useState(require('../../assets/images/avt.png'));
-    const [name, setName] = useState('Bùi Ngân');
-    const [email, setEmail] = useState('ngan@gmail.com');
-    const [phoneNumber, setPhoneNumber] = useState('0774617027');
+    const [user, dispatch] = useContext(MyContext);
 
+    const [upuser, setUpuser] = useState(user);
+    const [image, setImage] = useState(null);
+    const [avatar, setAvatar] = useState(user.avatar ? { uri: user.avatar } : require('../../assets/images/avt.png'));
+
+    const [lastname, setLastName] = useState(user.last_name);
+    const [email, setEmail] = useState(user.email);
+    const [username, setUsername] = useState(user.username);
+    const [phoneNumber, setPhoneNumber] = useState(user.phone);
+    
     useEffect(() => {
         // Kiểm tra quyền truy cập thư viện ảnh khi component được render lần đầu tiên
         (async () => {
@@ -31,16 +39,50 @@ const ProfileDetail = () => {
             quality: 1,
         });
         console.log(JSON.stringify(_image));
-        if (!_image.cancelled) {
+        if (!_image.canceled) {
             setImage(_image.uri);
         }
     };
 
+    const handleUpdate = async () => {
+        try {
+            // Xây dựng object chứa thông tin cập nhật
+            const updateData = {
+                name: lastname,
+                email: email,
+                username: username,
+                phone: phoneNumber,
+                // Trong trường hợp image đã được chọn, truyền uri của hình ảnh
+            };
+            let token = await AsyncStorage.getItem("access-token");
+            console.log(token);
+            console.log(user.id);
+            let res = await authApi(token).patch(endpoints['update_user'](user.id), updateData);
+
+            console.log("RESDATA",res.data);
+            // Cập nhật thông tin người dùng toàn cục
+            dispatch({ type: 'update_user', payload: res.data });
+        } catch (ex) {
+            Alert.alert("Lỗi", "Lỗi cập nhật thông tin hồ sơ!")
+            console.error(ex);
+        }
+    }
+
+    // Sử dụng useEffect để theo dõi sự thay đổi của thông tin người dùng toàn cục
+    useEffect(() => {
+        setUpuser(user);
+        // Cập nhật giá trị cho các ô input dựa trên thông tin người dùng toàn cục mới
+        setLastName(user.last_name);
+        setEmail(user.email);
+        setUsername(user.username);
+        setPhoneNumber(user.phone);
+    }, [user]);
+
     return (
         <View style={styles.containerDetail}>
-            <TouchableOpacity onPress={addImage}>
+            <TouchableOpacity onPress={addImage} >
                 <Image
-                    source={image ? { uri: image } : defaultImage}
+                    source={image ? { uri: image } : avatar}
                     style={styles.avatar}
                 />
                 <AntDesign name="camera" style={styles.iconCam} size={35} color={COLOR.PRIMARY} />
@@ -48,9 +90,19 @@ const ProfileDetail = () => {
             <View style={styles.inputContainer}>
                 <Text style={styles.label}>Tên</Text>
                 <TextInput
+                    
                     style={styles.inputDetail}
-                    value={name}
-                    onChangeText={setName}
+                    value={lastname}
+                    onChangeText={(text) => setLastName(text)}
+                />
+            </View>
+            <View style={styles.inputContainer}>
+                <Text style={styles.label}>Username</Text>
+                <TextInput
+                    
+                    style={styles.inputDetail}
+                    value={username}
+                    onChangeText={(text) => setUsername(text)}
                 />
             </View>
             <View style={styles.inputContainer}>
@@ -58,7 +110,7 @@ const ProfileDetail = () => {
                 <TextInput
                     style={styles.inputDetail}
                     value={email}
-                    onChangeText={setEmail}
+                    onChangeText={(text) => setEmail(text)}
                 />
             </View>
             <View style={styles.inputContainer}>
@@ -66,10 +118,10 @@ const ProfileDetail = () => {
                 <TextInput
                     style={styles.inputDetail}
                     value={phoneNumber}
-                    onChangeText={setPhoneNumber}
+                    onChangeText={(text) => setPhoneNumber(text)}
                 />
             </View>
-            <ButtonAuth title="Lưu thay đổi" />
+            <ButtonAuth onPress={handleUpdate} title="Lưu thay đổi" />
         </View>
     );
 };
@@ -86,7 +138,7 @@ const styles = StyleSheet.create({
         width: 200,
         height: 200,
         marginBottom: 20,
-        borderRadius: 100,
+        borderRadius: 100, // Đặt borderRadius thành nửa chiều rộng (200 / 2 = 100)
         borderWidth: 10,
         borderColor: COLOR.color3,
         position: 'relative',
@@ -99,6 +151,7 @@ const styles = StyleSheet.create({
         marginBottom: 5,
         fontSize: 16,
         fontWeight: 'bold',
+        color: COLOR.PRIMARY
     },
     inputDetail: {
         height: 40,
