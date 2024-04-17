@@ -2,12 +2,13 @@ import React, { useState, useEffect, useContext } from 'react';
 import { View, Text, Image, StyleSheet, TextInput, TouchableOpacity, Alert } from 'react-native';
 import { AntDesign } from '@expo/vector-icons';
 import * as ImagePicker from 'expo-image-picker';
-import { COLOR } from '../common/color';
+import { COLOR, SHADOWS } from '../common/color';
 import ButtonAuth from '../common/ButtonAuth';
 import MyContext from '../../configs/MyContext';
 import API, { authApi, endpoints } from '../../configs/API';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Toast from 'react-native-toast-message';
+import MyStyles from '../../Styles/MyStyles';
 
 const ProfileDetail = () => {
     const [user, dispatch] = useContext(MyContext);
@@ -20,7 +21,7 @@ const ProfileDetail = () => {
     const [email, setEmail] = useState(user.email);
     const [username, setUsername] = useState(user.username);
     const [phoneNumber, setPhoneNumber] = useState(user.phone);
-    
+    const [isInfoChanged, setIsInfoChanged] = useState(false); // Thêm state để kiểm tra xem thông tin có thay đổi hay không
     useEffect(() => {
         // Kiểm tra quyền truy cập thư viện ảnh khi component được render lần đầu tiên
         (async () => {
@@ -59,7 +60,7 @@ const ProfileDetail = () => {
             console.log(user.id);
             let res = await authApi(token).patch(endpoints['update_user'](user.id), updateData);
 
-            console.log("RESDATA",res.data);
+            console.log("RESDATA", res.data);
             // Cập nhật thông tin người dùng toàn cục
             dispatch({ type: 'update_user', payload: res.data });
         } catch (ex) {
@@ -80,17 +81,33 @@ const ProfileDetail = () => {
 
     return (
         <View style={styles.containerDetail}>
-            <TouchableOpacity onPress={addImage} >
-                <Image
-                    source={image ? { uri: image } : avatar}
-                    style={styles.avatar}
-                />
-                <AntDesign name="camera" style={styles.iconCam} size={35} color={COLOR.PRIMARY} />
-            </TouchableOpacity>
+            
+                <TouchableOpacity onPress={addImage} >
+                    <Image
+                        source={image ? { uri: image } : avatar}
+                        style={styles.avatar}
+                    />
+                    <AntDesign name="camera" style={styles.iconCam} size={35} color={COLOR.PRIMARY} />
+                </TouchableOpacity>
+                
+                <View style={MyStyles.flex}>
+                    <View style={styles.badgeContainer}>
+                    <Text style={styles.badgeText}>{user.follower_count}</Text>
+                    <Text style={styles.badgeLabel}>Người theo dõi</Text>
+                </View>
+                <View style={styles.badgeContainer}>
+                    <Text style={styles.badgeText}>{user.following_count}</Text>
+                    <Text style={styles.badgeLabel}>Đang theo dõi</Text>
+                </View>
+                </View>
+                
+
+        
+
             <View style={styles.inputContainer}>
                 <Text style={styles.label}>Tên</Text>
                 <TextInput
-                    
+
                     style={styles.inputDetail}
                     value={lastname}
                     onChangeText={(text) => setLastName(text)}
@@ -99,7 +116,7 @@ const ProfileDetail = () => {
             <View style={styles.inputContainer}>
                 <Text style={styles.label}>Username</Text>
                 <TextInput
-                    
+
                     style={styles.inputDetail}
                     value={username}
                     onChangeText={(text) => setUsername(text)}
@@ -133,6 +150,7 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         paddingHorizontal: 20,
         width: '100%',
+        backgroundColor: "#FFF"
     },
     avatar: {
         width: 200,
@@ -142,6 +160,7 @@ const styles = StyleSheet.create({
         borderWidth: 10,
         borderColor: COLOR.color3,
         position: 'relative',
+        aspectRatio: 1, // Đảm bảo tỷ lệ khung hình là 1:1
     },
     inputContainer: {
         marginBottom: 15,
@@ -167,6 +186,33 @@ const styles = StyleSheet.create({
         right: 20,
         color: COLOR.PRIMARY,
     },
+    badgeContainer: {
+        backgroundColor: COLOR.offWhite, // Màu nền của badge
+        borderRadius: 20, // Độ cong của badge
+        marginVertical: 5,
+        alignItems: 'center',
+        justifyContent: 'center',
+        marginLeft:20,
+        padding:5,
+        width:"40%",
+        // borderColor:COLOR.color4,
+        // borderWidth: 1, // Độ dày của viền
+        ...SHADOWS.medium,
+        flexDirection:"row"
+        
+    },
+    badgeText: {
+        color: "black", // Màu chữ của badge
+        fontWeight: 'bold',
+        fontSize:20,
+        marginRight:10
+    },
+    badgeLabel: {
+        color: COLOR.color12, // Màu chữ của badge
+        // fontWeight: 'bold',
+        fontSize:12
+    },
 });
+
 
 export default ProfileDetail;

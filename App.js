@@ -16,7 +16,8 @@ import ProfileDetail from './src/components/Home/ProfileDetail';
 import SearchFilter from './src/components/Home/SearchFilter';
 import RegisterMotel from './src/components/Auth/RegisterMotel';
 import UploadImgHouse from './src/components/Auth/UploadImgHouse';
-import Toast from 'react-native-toast-message';
+
+
 //Điều hướng kiểu stack
 const Stack = createStackNavigator();
 
@@ -70,7 +71,11 @@ export default function App() {
               <Stack.Screen
                 name="Home"
                 component={Home}
-                options={{ headerShown: false }} />
+                options={{ 
+                  headerLeft: null, // Tắt icon back
+                  headerShown: false ,
+                  headerTitle: "NACA",
+                  }} />
             </>
           }
 
@@ -98,4 +103,10 @@ export default function App() {
   );
 }
 
+const styleTitle = {
+  fontSize: 20,
+  fontWeight: 'bold',
+  color: 'blue',
+  // Các thuộc tính khác tùy chọn
+};
 

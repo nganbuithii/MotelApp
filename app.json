@@ -7,5 +7,10 @@
       "**/*"
     ]
   },
-  "name": "MotelApp"
+  "name": "MotelApp",
+  "fonts": {
+    "fontHead": {
+      "asset": "./src/assets/font/NotoSerif-MediumItalic.ttf"
+    }
+  }
 }

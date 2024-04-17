@@ -8,7 +8,7 @@ import ChatSc from './ChatSc';
 import SearchSc from './SearchSc';
 import ProfileSc from './ProfileSc';
 import NotificationsSc from './NotificationsSc';
-import ProfileDetail from './ProfileDetail';
+
 
 const Home = () => {
     const [index, setIndex] = React.useState(0);
@@ -34,9 +34,9 @@ const Home = () => {
                 navigationState={{ index, routes }}
                 onIndexChange={setIndex}
                 renderScene={renderScene}
-                barStyle={{ backgroundColor: COLOR.color4, height: '8%' }}
-                activeColor="black"
-                inactiveColor={COLOR.PRIMARY} // Màu trắng cho icon không active
+                barStyle={{ backgroundColor: COLOR.color12, height: '7%' }}
+                activeColor={COLOR.finally}
+                inactiveColor="#fff" // Màu trắng cho icon không active
             />
 
         </View>

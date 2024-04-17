@@ -2,7 +2,7 @@
 const COLOR = {
     PRIMARY: "#1FCB6D",
     secondary: "#16D26B",
-    finally:"#0EBD5D",
+    finally:"#09742B",
     color_1:"#3CB371",
     // color2:"#00FA9A",
     color3:"#98FB98",
@@ -23,7 +23,8 @@ const COLOR = {
     color7:"#73FF00",
     color8:"#11C964",
     bgslider:"#E7EBE4",
-    color11:"#DEF4E0"
+    color11:"#DEF4E0",
+    color12:"#64E883"
 
 };
 const SHADOWS = {

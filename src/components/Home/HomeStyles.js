@@ -11,6 +11,7 @@ export default StyleSheet.create({
             justifyContent: 'center',
         },
         postBar: {
+            marginTop:35,
             flexDirection: 'row',
             alignItems: 'center',
             justifyContent: 'space-between',
