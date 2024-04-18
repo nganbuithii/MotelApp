@@ -47,6 +47,11 @@ export default StyleSheet.create({
         alignItems: 'center',
         justifyContent:"center"
     },
+    flexN:{
+        flexDirection:"row",
+        alignItems: 'center',// căn dọc
+        justifyContent:"flex-start"
+    },
     link:{
         color:COLOR.secondary,
         fontWeight:"500",

@@ -12,6 +12,8 @@ import { Fontisto } from '@expo/vector-icons';
 import { COLOR, SHADOWS } from '../common/color';
 import { FontAwesome6 } from '@expo/vector-icons';
 import { MaterialIcons } from '@expo/vector-icons';
+import { useNavigation } from '@react-navigation/native';
+
 
 const images = [
   { id: '1', uri: require('../../assets/images/2.png') },
@@ -21,6 +23,8 @@ const images = [
 const HomeIndex = () => {
   const [postContent, setPostContent] = useState('');
   const [user, dispatch] = useContext(MyContext);
+  const navigation = useNavigation();
+
 
   const handlePostChange = (text) => {
     setPostContent(text);
@@ -54,6 +58,8 @@ const HomeIndex = () => {
             source={{ uri: user.avatar }} // Thay đổi đường dẫn của ảnh mặc định
             style={HomeStyles.image}
           />
+
+
           <View style={[HomeStyles.postInputContainer, MyStyles.flex]}>
             <TextInput
               style={HomeStyles.postInput}
@@ -75,10 +81,13 @@ const HomeIndex = () => {
           <View style={styles.postContainer}>
             {/* Phần hiển thị ảnh, tên và icon */}
             <View style={styles.userInfoContainer}>
-              <Image
-                source={{ uri: user.avatar }}
-                style={styles.userAvatar}
-              />
+              <TouchableOpacity onPress={() => navigation.navigate("DetailOwner")}>
+                <Image
+                  source={{ uri: user.avatar }}
+                  style={styles.userAvatar}
+                />
+              </TouchableOpacity>
+
 
               <Text style={styles.userName}>{user.username}</Text>
             </View>
@@ -89,32 +98,32 @@ const HomeIndex = () => {
           </View>
           <View>
             <View style={MyStyles.flex}>
-              <FontAwesome6 style={styles.iconPost} name="location-dot" size={18} color="gray" />
+              <FontAwesome6 style={HomeStyles.iconPost} name="location-dot" size={18} color="gray" />
               <Text>371 Nguyễn Kiệm, Phú Nhuận, TP. Hồ Chí Minh</Text>
             </View>
             <View style={MyStyles.flex}>
-              <MaterialCommunityIcons style={styles.iconPost} name="city-variant-outline" size={18} color="gray" />
+              <MaterialCommunityIcons style={HomeStyles.iconPost} name="city-variant-outline" size={18} color="gray" />
               <Text>100000 mét vuông</Text>
             </View>
             <View style={MyStyles.flex}>
-            <MaterialIcons style={styles.iconPost} name="attach-money" size={18} color="gray" />
+              <MaterialIcons style={HomeStyles.iconPost} name="attach-money" size={18} color="gray" />
               <Text>100000 VNĐ</Text>
             </View>
           </View>
           {/* Mô tả */}
-          <TouchableWithoutFeedback>
+          <TouchableWithoutFeedback onPress={() => navigation.navigate("PostDetail")}>
             <View>
-            <Text style={styles.desc}>gềuhfiqlffhliqwfhilgfuqgfqlliqfwhfiqlffhliqwfhilgfuqgfqlliqfwkhfiqlffhliqwfhilgfuqgfqlliqfwkhfiqlffhliqwfhilgfuqgfqlliqfwkkuwgu</Text>
-            {/* img post */}
-            <FlatList
-              data={images}
-              renderItem={renderItem}
-              keyExtractor={(item) => item.id}
-              horizontal // Hiển thị ngang
-              pagingEnabled // Cuộn trang theo trang
-              showsHorizontalScrollIndicator={false} // Ẩn thanh trượt ngang
-              onViewableItemsChanged={onViewableItemsChanged}
-            /></View>
+              <Text style={styles.desc}>gềuhfiqlffhliqwfhilgfuqgfqlliqfwhfiqlffhliqwfhilgfuqgfqlliqfwkhfiqlffhliqwfhilgfuqgfqlliqfwkhfiqlffhliqwfhilgfuqgfqlliqfwkkuwgu</Text>
+              {/* img post */}
+              <FlatList
+                data={images}
+                renderItem={renderItem}
+                keyExtractor={(item) => item.id}
+                horizontal // Hiển thị ngang
+                pagingEnabled // Cuộn trang theo trang
+                showsHorizontalScrollIndicator={false} // Ẩn thanh trượt ngang
+                onViewableItemsChanged={onViewableItemsChanged}
+              /></View>
           </TouchableWithoutFeedback>
           {/* Hiển thị badge */}
           <View style={styles.badgeContainer}>
@@ -124,8 +133,8 @@ const HomeIndex = () => {
           {/* icon */}
           <View style={styles.iconContainer}>
             <View style={MyStyles.flex}>
-              <Feather style={styles.iconPost} name="heart" size={24} color="black" />
-              <Feather style={styles.iconPost} name="message-circle" size={24} color="black" />
+              <Feather style={HomeStyles.iconPost} name="heart" size={24} color="black" />
+              <Feather style={HomeStyles.iconPost} name="message-circle" size={24} color="black" />
               <Feather name="send" size={24} color="black" />
             </View>
 
