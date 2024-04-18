@@ -34,6 +34,7 @@ const Login = ({ navigation }) => {
             };
             let res = await API.post(endpoints["login"], data, { headers: header });
             console.log(res.data);
+            
             // Lưu access token vào AsyncStorage
             await AsyncStorage.setItem("access-token", res.data.access_token);
 
@@ -56,9 +57,16 @@ const Login = ({ navigation }) => {
             
 
             console.log(userData); // Log thông tin người dùng
-        } catch (ex) {
-            console.error(ex);
-
+        } catch (error) {
+            setLoading(false);
+    
+            if (error.response) {
+                // Trích xuất thông báo lỗi từ phản hồi
+                let errorMessage = error.response.data.error_description || 'Có lỗi xảy ra. Vui lòng thử lại sau.';
+    
+                // Hiển thị thông báo lỗi
+                Alert.alert('Lỗi', errorMessage);
+            } 
         } finally {
             setLoading(false);
         }
