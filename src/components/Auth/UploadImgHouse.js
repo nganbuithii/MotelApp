@@ -1,12 +1,16 @@
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import { View, Text, StyleSheet, Image, TouchableOpacity, FlatList, Dimensions, Alert, ImageBackground } from "react-native";
 import * as ImagePicker from "expo-image-picker";
 import { AntDesign } from "@expo/vector-icons";
 import { COLOR, SHADOWS } from "../common/color";
-import ButtonAuth from "../common/ButtonAuth";
-import CustomAlert from "../common/Alert";
+import MyContext from '../../configs/MyContext';
+import API, { authApi, endpoints } from "../../configs/API";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
-const UploadImgHouse = ({navigation}) => {
+const UploadImgHouse = ({navigation, route}) => {
+    const { idMotel } = route.params;
+    const [user, dispatch] = useContext(MyContext);
+    const [loading, setLoading] = useState(false);
     const [images, setImages] = useState([]);
     const [showButton, setButton] = useState(false);
     const handleAddImage = async () => {
@@ -18,7 +22,7 @@ const UploadImgHouse = ({navigation}) => {
                 quality: 1,
                 multiple: true,
             });
-
+            //console.log(JSON.stringify(selectedImages));
             if (!selectedImages.canceled) {
                 setImages([...images, ...selectedImages.assets]);
                 // khi có ảnh hiện nút 
@@ -35,9 +39,45 @@ const UploadImgHouse = ({navigation}) => {
             style={styles.image}
         />
     );
-    const handleComplete = () => {
-        // Xử lý khi nhấn hoàn tất ở đây
-        // Ví dụ: Gửi hình ảnh đến máy chủ, chuyển đến màn hình tiếp theo, vv.
+    // Khi ấn submit
+    const handleComplete = async() => {
+        try{
+            const formData = new FormData();
+            images.forEach((image, index) => {
+                // console.log(`image_${index}:`, image);
+                formData.append(`images`, {
+                    uri: image.uri,
+                    type: 'image/jpeg',
+                    name: `image_${index}.jpg`,
+                });
+            });
+            if (images.length < 3) {
+                Alert.alert("Lỗi", "Vui lòng chọn ít nhất 3 ảnh trước khi hoàn tất");
+                return;
+            }
+            // console.log("images", images)
+            let token = await AsyncStorage.getItem("access-token");
+            // console.log(idMotel);
+            // console.log(formData);
+
+        
+            let res = await authApi(token).post(endpoints['upImgMotel'](idMotel), formData, {
+                headers: {
+                    'Content-Type': 'multipart/form-data',
+                },
+            });
+            // console.log("RESDATA IMG:", res.data);
+            console.log("Up ảnh thành công");
+            navigation.navigate("Home");
+            
+            
+        }catch(ex)
+        {
+            Alert.alert("Lỗi","Tải ảnh nhà trọ của bạn thất bại")
+            console.error(ex);
+        }finally {
+            setLoading(false);
+        }
     };
     const handleExit = () => {
         Alert.alert(
@@ -83,9 +123,10 @@ const UploadImgHouse = ({navigation}) => {
                     <TouchableOpacity onPress={handleExit} style={styles.ExitButton}>
                         <Text style={{ color: "#fff", textAlign: "center" }}>Thoát</Text>
                     </TouchableOpacity>
+                    {loading ? (<ActivityIndicator />) : (
                     <TouchableOpacity onPress={handleComplete} style={styles.completeButton}>
                         <Text style={{ color: "#fff", textAlign: "center" }}>Hoàn tất</Text>
-                    </TouchableOpacity>
+                    </TouchableOpacity>)}
                 </View>
 
 

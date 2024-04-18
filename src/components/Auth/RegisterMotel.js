@@ -93,7 +93,9 @@ const RegisterMotel = ({ navigation }) => {
                     },
                 });
                 console.info("TRỌ RES DATA", res.data);
-                console.log("Thành công tạo trọ")
+                console.log("Thành công tạo trọ");
+                navigation.navigate("UploadImgHouse", { idMotel: res.data.id });
+
 
             } catch (ex) {
                 Alert.alert("lỗi", "Tạo trọ không thành công")
