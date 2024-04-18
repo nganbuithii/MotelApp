@@ -6,11 +6,9 @@ export const endpoints = {
     current_user:'/user/current_user/',
     login: "/o/token/", 
     register:"/user/",
-    // /user/id
-    update_user: (id) =>`/user/${id}/`,
     postMotel:"/motels/",
     upImgMotel:(idMotel) => `/motels/${idMotel}/images/`,  //POST
-    updateUser:"/user/current_user/"  //PATCH
+    updateUser:"/user/current_user/",  //PATCH
 };
 
 // Tạo một phiên bản axios với các cài đặt đã được cung cấp
