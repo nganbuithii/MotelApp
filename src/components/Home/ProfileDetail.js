@@ -58,7 +58,7 @@ const ProfileDetail = () => {
             let token = await AsyncStorage.getItem("access-token");
             console.log(token);
             console.log(user.id);
-            let res = await authApi(token).patch(endpoints['update_user'](user.id), updateData);
+            let res = await authApi(token).patch(endpoints['updateUser'], updateData);
 
             console.log("RESDATA", res.data);
             // Cập nhật thông tin người dùng toàn cục

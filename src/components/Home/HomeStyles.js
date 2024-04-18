@@ -41,6 +41,7 @@ export default StyleSheet.create({
             height: 50, // Độ cao của ảnh
             resizeMode: 'cover', // Chế độ hiển thị của ảnh
             marginRight: 10,
+            borderRadius:50
         },
         flexInput: {
             flex:1,
