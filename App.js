@@ -18,6 +18,7 @@ import RegisterMotel from './src/components/Auth/RegisterMotel';
 import UploadImgHouse from './src/components/Auth/UploadImgHouse';
 import PostDetail from './src/components/Home/PostDetail';
 import DetailOwner from './src/components/OwnerMotel/DetailOwner';
+import Toast, { ToastProvider } from 'react-native-toast-message';
 
 //Điều hướng kiểu stack
 const Stack = createStackNavigator();
@@ -26,6 +27,7 @@ export default function App() {
   // khởi gán là null, và cấp cho các con xài
   const [user, dispatch] = useReducer(MyUserReducer, null);
   return (
+    
     <MyContext.Provider value={[user, dispatch]}>
       <NavigationContainer>
         <Stack.Navigator initialRouteName="Slider">
@@ -116,6 +118,8 @@ export default function App() {
 
         </Stack.Navigator>
       </NavigationContainer>
+      <Toast position='top'
+        topOffset={80}></Toast>
     </MyContext.Provider>
   );
 }

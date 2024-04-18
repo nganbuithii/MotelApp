@@ -5,6 +5,7 @@ import * as ImagePicker from 'expo-image-picker';
 import { COLOR, SHADOWS } from '../common/color';
 import ButtonAuth from '../common/ButtonAuth';
 import MyContext from '../../configs/MyContext';
+import { Dialog, Portal } from 'react-native-paper';
 import API, { authApi, endpoints } from '../../configs/API';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Toast from 'react-native-toast-message';
@@ -14,6 +15,7 @@ const ProfileDetail = () => {
     const [user, dispatch] = useContext(MyContext);
 
     const [upuser, setUpuser] = useState(user);
+    const [dialog, setDialog] = useState(false);
     const [image, setImage] = useState(null);
     const [avatar, setAvatar] = useState(user.avatar);
     const [loading, setLoading] = useState(null);
@@ -50,7 +52,15 @@ const ProfileDetail = () => {
 
         }
     };
-
+    const showToast = () => {
+        Toast.show({
+            type: 'success',
+            text1: 'Thành công',
+            text2: 'Thông tin của bạn đã được cập nhật.',
+            visibilityTime: 5000, // Thời gian tồn tại của toast (milliseconds)
+            autoHide: true, // Tự động ẩn toast sau khi hết thời gian tồn tại
+        });
+    }
     const handleUpdate = async () => {
         const isInfoChanged = lastname !== user.last_name || username !== user.username || email !== user.email || phoneNumber !== user.phone || image !== null;
 
@@ -78,15 +88,18 @@ const ProfileDetail = () => {
             let token = await AsyncStorage.getItem("access-token");
             console.log(token);
             console.log(user.id);
-            let res = await authApi(token).patch(endpoints['updateUser'],formData ,{
+            let res = await authApi(token).patch(endpoints['updateUser'], formData, {
                 headers: {
                     'Content-Type': 'multipart/form-data',
                 },
             });
             // setLoading(true);
             console.log("RESDATA", res.data);
+            setDialog(true);
             // Cập nhật thông tin người dùng toàn cục
             dispatch({ type: 'update_user', payload: res.data });
+             // Hiển thị toast khi cập nhật thành công
+        showToast();
         } catch (ex) {
             Alert.alert("Lỗi", "Lỗi cập nhật thông tin hồ sơ!")
             console.error(ex);
@@ -100,6 +113,8 @@ const ProfileDetail = () => {
 
     return (
         <View style={styles.containerDetail}>
+
+
 
             <TouchableOpacity onPress={addImage} >
                 <Image
@@ -160,7 +175,7 @@ const ProfileDetail = () => {
                 />
             </View>
             {loading ? (<ActivityIndicator />) : (
-            <ButtonAuth onPress={handleUpdate} title="Lưu thay đổi" />)}
+                <ButtonAuth onPress={handleUpdate} title="Lưu thay đổi" />)}
         </View>
     );
 };
