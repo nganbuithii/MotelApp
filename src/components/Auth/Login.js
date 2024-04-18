@@ -48,7 +48,14 @@ const Login = ({ navigation }) => {
             });
 
             // Điều hướng đến màn hình chính
-            navigation.navigate("Home");
+            if(user.role === 'MOTEL_OWNER')
+            {
+                navigation.navigate("RegisterHouse")
+            }else{
+                navigation.navigate("Login")
+                
+            }
+        
 
             console.log(userData); // Log thông tin người dùng
         } catch (ex) {

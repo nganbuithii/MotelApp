@@ -82,30 +82,54 @@ const UploadImg = ({ navigation, route }) => {
         }
 
         setLoading(true);
-        if (user.role == "MOTEL_OWNER") {
-            navigation.navigate("RegisterHouse");
-        }
-
+        // if (user.role == "MOTEL_OWNER") {
+        //     navigation.navigate("RegisterHouse");
+        // }
+        console.log("user:", user)
         try {
             const response = await API.post(endpoints['register'], formRegister, {
                 headers: {
                     'Content-Type': 'multipart/form-data',
                 },
             });
+
+
+
             console.info("res.data", response.data);
             console.log("Thành công");
             // Kiểm tra vai trò và chuyển hướng người dùng
-            if (user.role === "MOTEL_OWNER") {
-                navigation.navigate("RegisterMotel");
-            } else {
-                navigation.navigate("Login");
-            }
-        } catch (ex) {
-            Alert.alert("Lỗi", "Đã có lỗi xảy ra khi đăng ký. Vui lòng thử lại sau.");
-            console.error(ex.message);
-            console.log(firstName, user)
-
+            navigation.navigate("Login");
+            // if (user.role === "MOTEL_OWNER") {
+            //     navigation.navigate("RegisterMotel");
+            // } else {
+            //     navigation.navigate("Login");
+            // }
+            // Trong phần xử lý lỗi của hàm handleSave()
+        } catch (error) {
+            // console.error(error.message);
             setLoading(false);
+
+            if (error.response) {
+                // console.error('Status:', error.response.status);
+                // console.error('Data:', error.response.data);
+
+                let errorMessage = ''; // Chuỗi lưu trữ thông điệp lỗi
+
+                // Trích xuất các thông điệp lỗi từ đối tượng error.response.data
+                for (const key in error.response.data) {
+                    errorMessage += `${error.response.data[key].join(', ')}\n`;
+                }
+
+                // Hiển thị thông báo lỗi
+                Alert.alert("Error", errorMessage, [
+                    { text: "OK", onPress: () => navigation.goBack() } // Quay lại màn hình Register2 khi người dùng bấm OK
+                ]);
+            } 
+            // else if (error.request) {
+            //     console.error('No response received:', error.request);
+            // } else {
+            //     console.error('Error setting up request:', error.message);
+            // }
         }
 
         setLoading(false);
