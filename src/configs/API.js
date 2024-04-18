@@ -8,6 +8,7 @@ export const endpoints = {
     register:"/user/",
     // /user/id
     update_user: (id) =>`/user/${id}/`,
+    postMotel:"/motels/",
 };
 
 // Tạo một phiên bản axios với các cài đặt đã được cung cấp

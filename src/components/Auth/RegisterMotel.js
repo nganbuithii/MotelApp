@@ -1,5 +1,7 @@
-import React, { useState } from "react";
-import { View,Text,TextInput,TouchableOpacity,StyleSheet,ScrollView,Image,
+import React, { useContext, useState } from "react";
+import {
+    View, Text, TextInput, TouchableOpacity, StyleSheet, ScrollView, Image, ActivityIndicator,
+    Alert,
 } from "react-native";
 import { COLOR, SHADOWS } from "../common/color";
 import RNPickerSelect from "react-native-picker-select";
@@ -9,26 +11,105 @@ import { Entypo } from "@expo/vector-icons";
 import { Ionicons } from "@expo/vector-icons";
 import ButtonAuth from "../common/ButtonAuth";
 import DataXaPhuong from "../../assets/data/DataXaPhuong";
+import { AntDesign } from '@expo/vector-icons';
+import API, { authApi, endpoints } from "../../configs/API";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import MyContext from '../../configs/MyContext';
 
-const RegisterMotel = ({navigation}) => {
-    const [houseInfo, setHouseInfo] = useState({
-        id: "",
-        giathue: "",
-        dientich: "",
-        xaphuong: "",
-        quanhuyen: "",
-        tinhtp: "",
-        diachikhac: "",
-        mota: "",
+
+const RegisterMotel = ({ navigation }) => {
+    const [user, dispatch] = useContext(MyContext);
+    const [loading, setLoading] = useState(false);
+    const [price, setPrice] = useState('');
+    const [desc, setDesc] = useState(null);
+    const [people, setPeople] = useState(null);
+    const [ward, setWard] = useState(null);
+    const [district, setDistrict] = useState(null);
+    const [city, setCity] = useState(null);
+    const [area, setArea] = useState(null);
+    const [other, setOther] = useState(null);
+
+    const [error, setError] = useState({
+        price: '',
+        desc: '',
+        people: '',
+        ward: '',
+        district: '',
+        city: '',
+        area: '',
     });
 
-    const handleChangeText = (key, value) => {
-        setHouseInfo({ ...houseInfo, [key]: value });
-    };
+    const handleSubmit = async () => {
+        try {
+            const newErrors = {};
+            if (!price) {
+                newErrors.price = "Vui lòng nhập giá phòng";
+            } else if (price && price <= 0) {
+                newErrors.price = "Vui lòng nhập giá lớn hơn 0";
+            }
+            if (!people) {
+                newErrors.people = "Vui lòng nhập số lượng người ở";
+            } else if (people && people <= 0) {
+                newErrors.people = "Vui lòng nhập số lượng lớn hơn 0";
+            }
+            if (!area) {
+                newErrors.area = "Vui lòng nhập diện tích nhà";
+            } else if (area && area < 100) {
+                newErrors.area = "Vui lòng nhập diện tích lớn hơn 100 m2";
+            }
+            if (!desc) {
+                newErrors.desc = "Vui lòng nhập mô tả";
+            }
+            if (!ward) {
+                newErrors.ward = "Vui lòng nhập xã/phường";
+            }
+            if (!district) {
+                newErrors.district = "Vui lòng nhập quận/huyện";
+            }
+            if (!city) {
+                newErrors.city = "Vui lòng nhập tỉnh/thành phố";
+            }
 
-    const handleSubmit = () => {
-        // Xử lý logic đăng ký trọ ở đây
-        console.log("Thông tin đăng ký trọ:", houseInfo);
+
+            try {
+                let token = await AsyncStorage.getItem("access-token");
+                console.log(user.id);
+                const formData = new FormData();
+                formData.append('price', price);
+                formData.append('description', desc);
+                formData.append('max_people', people);
+                formData.append('ward', ward);
+                formData.append('district', district);
+                formData.append('city', city);
+                formData.append('area', area);
+                formData.append('other_address', other);
+                formData.append('lat', "1");
+                formData.append('lon', "1");
+                // console.log(token);
+                // console.log("FORM DATA TRO", formData);
+                let res = await authApi(token).post(endpoints['postMotel'], formData, {
+                    headers: {
+                        'Content-Type': 'multipart/form-data',
+                    },
+                });
+                console.info("TRỌ RES DATA", res.data);
+                console.log("Thành công tạo trọ")
+
+            } catch (ex) {
+                Alert.alert("lỗi", "Tạo trọ không thành công")
+                console.error(ex);
+            } finally {
+                setLoading(false);
+            }
+
+
+
+
+            setError(newErrors);
+
+        } catch (ex) {
+            console.error("Lỗi trong quá trình xử lý form:", ex);
+        }
     };
 
     return (
@@ -37,16 +118,17 @@ const RegisterMotel = ({navigation}) => {
                 source={require("../../assets/images/3.png")}
                 style={styles.backgroundImage}
             />
-            <ScrollView contentContainerStyle={styles.formContainer}>
 
-                <View style={styles.imageContainer}>
-                    <Image
-                        source={require("../../assets/images/a1.png")}
-                        style={styles.a1Image}
-                    />
-                    <Text style={styles.txtHead}>Đăng ký nhà trọ của bạn</Text>
-                </View>
-                
+            {/* <View style={styles.formContainer}> */}
+            <View style={styles.imageContainer}>
+                <Image
+                    source={require("../../assets/images/a1.png")}
+                    style={styles.a1Image}
+                />
+                <Text style={styles.txtHead}>Đăng ký nhà trọ của bạn</Text>
+            </View>
+            <ScrollView contentContainerStyle={styles.scrollView}>
+                {error.price && <Text style={styles.errorMsg}><AntDesign name="exclamation" size={13} color="red" />{error.price}</Text>}
                 <View style={styles.inputContainer}>
                     <MaterialIcons
                         style={styles.icon}
@@ -54,8 +136,10 @@ const RegisterMotel = ({navigation}) => {
                         size={24}
                         color="black"
                     />
-                    <TextInput style={styles.input} placeholder="Giá phòng" />
+                    <TextInput style={styles.input} value={price} onChangeText={setPrice} placeholder="Giá phòng" />
                 </View>
+
+                {error.area && <Text style={styles.errorMsg}><AntDesign name="exclamation" size={13} color="red" />{error.area}</Text>}
                 <View style={styles.inputContainer}>
                     <FontAwesome5
                         style={styles.icon}
@@ -63,8 +147,16 @@ const RegisterMotel = ({navigation}) => {
                         size={24}
                         color="black"
                     />
-                    <TextInput style={styles.input} placeholder="Diện tích" />
+                    <TextInput style={styles.input} value={area} onChangeText={setArea} placeholder="Diện tích" />
                 </View>
+
+                {error.people && <Text style={styles.errorMsg}><AntDesign name="exclamation" size={13} color="red" />{error.people}</Text>}
+                <View style={styles.inputContainer}>
+                    <FontAwesome5 style={styles.icon} name="user-friends" size={24} color="black" />
+                    <TextInput style={styles.input} value={people} onChangeText={setPeople} placeholder="Số lượng người " />
+                </View>
+
+                {error.desc && <Text style={styles.errorMsg}><AntDesign name="exclamation" size={13} color="red" />{error.desc}</Text>}
                 <View style={styles.inputContainer}>
                     <Entypo
                         style={styles.icon}
@@ -72,7 +164,53 @@ const RegisterMotel = ({navigation}) => {
                         size={24}
                         color="black"
                     />
-                    <TextInput style={styles.input} placeholder="Mô tả" />
+                    <TextInput value={desc} style={styles.input} onChangeText={setDesc} placeholder="Mô tả" />
+                </View>
+
+                {error.ward && <Text style={styles.errorMsg}><AntDesign name="exclamation" size={13} color="red" />{error.ward}</Text>}
+                <View style={styles.selectContainer}>
+                    <RNPickerSelect
+                        style={styles}
+                        value={ward}
+
+                        onValueChange={(value) => setWard(value)}
+                        placeholder={{ label: "Chọn xã/phường", value: null }}
+                        items={[
+                            { label: "Xã/Phường 1", value: "XaPhuong1" },
+                            { label: "Xã/Phường 2", value: "XaPhuong2" },
+                            { label: "Xã/Phường 3", value: "XaPhuong3" },
+                            // Thêm các xã/phường khác vào đây
+                        ]}
+                    />
+                </View>
+
+                {error.district && <Text style={styles.errorMsg}><AntDesign name="exclamation" size={13} color="red" />{error.district}</Text>}
+                <View style={styles.selectContainer}>
+                    <RNPickerSelect
+                        value={district}
+                        style={styles}
+                        onValueChange={(value) => setDistrict(value)}
+                        placeholder={{ label: "Chọn quận/huyện", value: null }}
+
+                        items={DataXaPhuong["Thành phố Hồ Chí Minh"]["Quận 1"]}
+
+                    />
+                </View>
+
+                {error.city && <Text style={styles.errorMsg}><AntDesign name="exclamation" size={13} color="red" />{error.city}</Text>}
+                <View style={styles.selectContainer}>
+                    <RNPickerSelect
+                        style={styles}
+                        value={city}
+                        onValueChange={(value) => setCity(value)}
+                        placeholder={{ label: "Chọn tỉnh/thành phố", value: null }}
+                        items={[
+                            { label: "Tỉnh/Thành phố 1", value: "TinhThanhPho1" },
+                            { label: "Tỉnh/Thành phố 2", value: "TinhThanhPho2" },
+                            { label: "Tỉnh/Thành phố 3", value: "TinhThanhPho3" },
+                            // Thêm các tỉnh/thành phố khác vào đây
+                        ]}
+                    />
                 </View>
                 <View style={styles.inputContainer}>
                     <Ionicons
@@ -83,51 +221,18 @@ const RegisterMotel = ({navigation}) => {
                     />
                     <TextInput
                         style={styles.input}
+                        value={other}
+                        onChangeText={setOther}
                         placeholder="Địa chỉ khác (Nếu có)"
-                    />
-                </View>
-                <View style={styles.selectContainer}>
-                    <RNPickerSelect
-                        style={styles}
-                        onValueChange={(value) => handleChangeText("xaphuong", value)}
-                        placeholder={{ label: "Chọn xã/phường", value: null }}
-                        items={[
-                            { label: "Xã/Phường 1", value: "XaPhuong1" },
-                            { label: "Xã/Phường 2", value: "XaPhuong2" },
-                            { label: "Xã/Phường 3", value: "XaPhuong3" },
-                            // Thêm các xã/phường khác vào đây
-                        ]}
-                    />
-                </View>
-                <View style={styles.selectContainer}>
-                    <RNPickerSelect
-                        style={styles}
-                        onValueChange={(value) => handleChangeText("quanhuyen", value)}
-                        placeholder={{ label: "Chọn quận/huyện", value: null }}
-                        
-                        items={DataXaPhuong["Thành phố Hồ Chí Minh"]["Quận 1"]} 
-                        
-                    />
-                </View>
-
-                <View style={styles.selectContainer}>
-                    <RNPickerSelect
-                        style={styles}
-                        onValueChange={(value) => handleChangeText("tinhtp", value)}
-                        placeholder={{ label: "Chọn tỉnh/thành phố", value: null }}
-                        items={[
-                            { label: "Tỉnh/Thành phố 1", value: "TinhThanhPho1" },
-                            { label: "Tỉnh/Thành phố 2", value: "TinhThanhPho2" },
-                            { label: "Tỉnh/Thành phố 3", value: "TinhThanhPho3" },
-                            // Thêm các tỉnh/thành phố khác vào đây
-                        ]}
                     />
                 </View>
 
                 <View style={styles.buttonContainer}>
-                    <ButtonAuth title="Đăng kí nhà trọ" onPress={() => navigation.navigate("UploadImgHouse")}/>
+                    {loading ? (<ActivityIndicator />) : (
+                        <ButtonAuth title="Đăng kí nhà trọ" onPress={handleSubmit} />)}
                 </View>
             </ScrollView>
+            {/* </View> */}
         </View>
     );
 };
@@ -139,7 +244,6 @@ const styles = StyleSheet.create({
         fontWeight: "500",
     },
     input: {
-        // backgroundColor:"red",
         width: "85%",
         padding: 5
     },
@@ -151,14 +255,8 @@ const styles = StyleSheet.create({
         position: "absolute",
         width: "100%",
         height: "100%",
-        opacity: 0.6, // Điều chỉnh độ mờ của hình ảnh
-    },
-    formContainer: {
-        flexGrow: 1,
-        justifyContent: "center",
-        paddingHorizontal: 30,
-        paddingBottom: 20,
-        color: COLOR.offWhite,
+        opacity: 0.6,
+
     },
     inputContainer: {
         flexDirection: "row",
@@ -175,7 +273,6 @@ const styles = StyleSheet.create({
         color: COLOR.PRIMARY,
     },
     selectContainer: {
-        borderColor: "black",
         marginBottom: 5,
         backgroundColor: "#fff",
         marginVertical: 5,
@@ -187,17 +284,32 @@ const styles = StyleSheet.create({
         marginTop: 20,
     },
     imageContainer: {
-        flex: 1,
         alignItems: "center",
         justifyContent: "center",
-    
+        marginTop: 20,
     },
     a1Image: {
-        marginTop:10,
         width: 120,
         height: 102,
     },
-
+    errorMsg: {
+        fontWeight: "300",
+        color: "red",
+        fontSize: 10,
+        textAlign: "left",
+        fontWeight: "500"
+    },
+    formContainer: {
+        paddingHorizontal: 30,
+        paddingBottom: 20,
+        color: COLOR.offWhite,
+    },
+    scrollView: {
+        flexGrow: 1,
+        paddingHorizontal: 30,
+        paddingBottom: 30
+    },
 });
+
 
 export default RegisterMotel;

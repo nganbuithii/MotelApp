@@ -124,7 +124,7 @@ const UploadImg = ({ navigation, route }) => {
                 Alert.alert("Error", errorMessage, [
                     { text: "OK", onPress: () => navigation.goBack() } // Quay lại màn hình Register2 khi người dùng bấm OK
                 ]);
-            } 
+            }
             // else if (error.request) {
             //     console.error('No response received:', error.request);
             // } else {

@@ -45,11 +45,11 @@ export default function App() {
             options={{ headerTitle: 'Tài khoản của bạn' }} />
           <Stack.Screen name="SearchFilter" component={SearchFilter}
             options={{ headerTitle: 'Lọc kết quả tìm kiếm' }} />
-          <Stack.Screen
+          {/* <Stack.Screen
             name="RegisterMotel"
             component={RegisterMotel}
             options={{ headerShown: false }} // Tắt header cho màn hình Slider
-          />
+          /> */}
           <Stack.Screen
             name="DetailOwner"
             component={DetailOwner}
@@ -88,6 +88,11 @@ export default function App() {
                   headerShown: false ,
                   headerTitle: "NACA",
                   }} />
+              <Stack.Screen
+            name="RegisterMotel"
+            component={RegisterMotel}
+            options={{ headerShown: false }} // Tắt header cho màn hình Slider
+          />
             </>
           }
 

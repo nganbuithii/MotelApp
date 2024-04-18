@@ -47,15 +47,13 @@ const Login = ({ navigation }) => {
                 payload: userData,
             });
 
-            // Điều hướng đến màn hình chính
-            if(user.role === 'MOTEL_OWNER')
-            {
-                navigation.navigate("RegisterHouse")
-            }else{
-                navigation.navigate("Login")
-                
+             // Điều hướng đến màn hình chính
+            if (userData.user_role === 'MOTEL_OWNER') {
+                navigation.navigate("RegisterMotel"); // Điều hướng đến màn hình đăng ký cho chủ nhà trọ
+            } else {
+                navigation.navigate("Home"); // Điều hướng đến màn hình chính
             }
-        
+            
 
             console.log(userData); // Log thông tin người dùng
         } catch (ex) {
