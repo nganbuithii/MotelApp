@@ -19,6 +19,8 @@ import { endpoints } from "../../configs/API";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const PlusOwner = () => {
+    const [currentImageIndex, setCurrentImageIndex] = useState(0);
+
     const navigation = useNavigation();
     const [showHouseList, setShowHouseList] = useState(false);
     const [content, setContent] = useState('');
@@ -53,26 +55,33 @@ const PlusOwner = () => {
                         }
                         return prevMotel;
                     }));
-                    console.log("RESDATA", res.data);
+                    //console.log("RESDATA", res.data);
                 });
             }
-            console.log("STORE MOTELL", storedMotels);
+            //console.log("STORE MOTELL", storedMotels);
         };
 
         fetchMotels();
     }, []);
 
 
+    // const Badge = ({ value }) => (
+    //     <View style={styles.badgeContainer}>
+    //         <Text style={styles.badgeText}>1/2</Text>
+    //     </View>
+    // );
 
 
     const renderHouseItem = ({ item }) => (
         <View style={styles.imageContainer}>
             <Image
                 source={{ uri: item.url }}
-                style={styles.imgMotel} // Có thể điều chỉnh kích thước ảnh tại đây
+                style={styles.imgMotel}
             />
+            {/* {item.images?.length > 1 && <Badge value={item.images.length} />} */}
         </View>
     );
+
 
     const handlePress = () => {
         navigation.navigate("Home"); // Quay lại trang trước đó
@@ -88,6 +97,9 @@ const PlusOwner = () => {
         // Xử lý khi nút "Thêm phòng" được nhấn
         // Ví dụ: chuyển hướng đến màn hình thêm phòng
         navigation.navigate('RegisterMotel');
+    };
+    const handleImageChange = (index) => {
+        setCurrentImageIndex(index);
     };
 
 
@@ -138,14 +150,21 @@ const PlusOwner = () => {
                             renderItem={({ item }) => (
                                 <Image
                                     source={{ uri: item.url }}
-                                    style={[styles.imgMotel, { width: Dimensions.get('window').width  }]}
+                                    style={[styles.imgMotel, { width: Dimensions.get('window').width }]}
+                                    onLoad={() => handleImageChange(index)}
                                 />
                             )}
                             keyExtractor={(image) => (image.id ? image.id.toString() : Math.random().toString())}
                             horizontal={true}
                         />
 
-
+                        <View style={styles.badgeContainer}>
+                            {item.images && item.images.length > 0 &&
+                                <Text style={styles.badgeText}>
+                                    {currentImageIndex + 1}/{item.images.length}
+                                </Text>
+                            }
+                        </View>
 
 
                         <View style={styles.buttonContainer}>
@@ -165,6 +184,8 @@ const PlusOwner = () => {
                                 <FontAwesome name="trash" size={13} color="black" />
                                 <Text style={styles.buttonText}>Xóa</Text>
                             </TouchableOpacity>
+
+
                         </View>
                     </View>
                 ))}
@@ -282,6 +303,22 @@ const styles = StyleSheet.create({
     deleteButton: {
         backgroundColor: "#FF6347",
     },
+    badgeContainer: {
+        position: 'absolute',
+        top: 100,
+        right: 10, // Hoặc left: 10 nếu bạn muốn đặt badge ở góc trái
+        // backgroundColor:COLOR.color6,
+        borderRadius: 10,
+        paddingHorizontal: 5,
+        paddingVertical: 2,
+    },
+    badgeText: {
+        color: COLOR.PRIMARY,
+        fontSize: 12,
+    },
+    imageContainer: {
+        position: "relative"
+    }
 });
 
 export default PlusOwner;
