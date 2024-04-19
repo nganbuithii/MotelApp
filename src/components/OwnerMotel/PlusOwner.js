@@ -1,4 +1,4 @@
-import { View, Text, StyleSheet, TouchableNativeFeedback, TouchableWithoutFeedback, Image, FlatList, Dimensions, ScrollView } from "react-native";
+import { View, Text, StyleSheet, TouchableNativeFeedback, TouchableWithoutFeedback, Image, FlatList, Dimensions, ScrollView, ActivityIndicator } from "react-native";
 import React, { useContext, useEffect, useState } from "react";
 import HomeStyles from "../Home/HomeStyles";
 import { Octicons } from "@expo/vector-icons";
@@ -22,6 +22,7 @@ const PlusOwner = () => {
     const [currentImageIndex, setCurrentImageIndex] = useState(0);
 
     const navigation = useNavigation();
+    const [isLoading, setIsLoading] = useState(true); // State để kiểm soát trạng thái của việc tải dữ liệu
     const [showHouseList, setShowHouseList] = useState(false);
     const [content, setContent] = useState('');
     const [user, dispatch] = useContext(MyContext);
@@ -55,22 +56,17 @@ const PlusOwner = () => {
                         }
                         return prevMotel;
                     }));
+                    // Sau khi dữ liệu đã được tải xong, set isLoading thành false
+                    setIsLoading(false);
+                    setMotels(storedMotels);
+
                     //console.log("RESDATA", res.data);
                 });
             }
-            //console.log("STORE MOTELL", storedMotels);
+            console.log("STORE MOTELL", storedMotels);
         };
-
         fetchMotels();
     }, []);
-
-
-    // const Badge = ({ value }) => (
-    //     <View style={styles.badgeContainer}>
-    //         <Text style={styles.badgeText}>1/2</Text>
-    //     </View>
-    // );
-
 
     const renderHouseItem = ({ item }) => (
         <View style={styles.imageContainer}>
@@ -78,10 +74,8 @@ const PlusOwner = () => {
                 source={{ uri: item.url }}
                 style={styles.imgMotel}
             />
-            {/* {item.images?.length > 1 && <Badge value={item.images.length} />} */}
         </View>
     );
-
 
     const handlePress = () => {
         navigation.navigate("Home"); // Quay lại trang trước đó
@@ -90,8 +84,21 @@ const PlusOwner = () => {
         // Xử lý khi nút "Sửa" được nhấn
     };
 
-    const handleDelete = () => {
+    const handleDelete = async(idMotel) => {
         // Xử lý khi nút "Xóa" được nhấn
+        try{
+            let token = await AsyncStorage.getItem("access-token");
+            console.log("TOKEN",token);
+            console.log("ID",idMotel);
+            await authApi(token).delete(endpoints['deleteMotel'](idMotel));
+            console.log("Xóa nhà thành công");
+            setStoredMotels(prevMotels => prevMotels.filter(motel => motel.id !== idMotel));
+        }catch(ex)
+        {
+            console.error(ex);
+        }finally{
+            setIsLoading(false);
+        }
     };
     const handleAddRoomPress = () => {
         // Xử lý khi nút "Thêm phòng" được nhấn
@@ -101,8 +108,6 @@ const PlusOwner = () => {
     const handleImageChange = (index) => {
         setCurrentImageIndex(index);
     };
-
-
 
     return (
         <View style={styles.container}>
@@ -120,76 +125,81 @@ const PlusOwner = () => {
                     <Text style={styles.textAdd}>Thêm mới</Text>
                 </View>
             </TouchableOpacity>
-
-            <ScrollView style={{ flex: 1 }} showsVerticalScrollIndicator={false}>
-                {storedMotels.map((item, index) => (
-                    <View key={index} style={styles.containerMotel}>
+            {isLoading ? ( // Kiểm tra nếu đang tải dữ liệu
+                <ActivityIndicator size="large" color={COLOR.PRIMARY} /> // Hiển thị biểu tượng loading
+            ) : (
+                <ScrollView style={{ flex: 1 }} showsVerticalScrollIndicator={false}>
+                    {storedMotels.map((item, index) => (
+                        
+                        <View key={index} style={styles.containerMotel}>
+                            <Text>Id: {item.id}</Text>
                         <Text style={{ textAlign: "center", marginBottom: 5 }}>{item.name}</Text>
-                        <View >
-                            <View style={{ flexDirection: "row" }}>
-                                <View style={styles.tag}>
-                                    <MaterialIcons name="attach-money" style={styles.iconTag} size={20} color="green" />
-                                    <Text style={{ fontSize: 12 }}>{item.price}</Text>
+                            <View >
+                                <View style={{ flexDirection: "row" }}>
+                                    <View style={styles.tag}>
+                                        <MaterialIcons name="attach-money" style={styles.iconTag} size={20} color="green" />
+                                        <Text style={{ fontSize: 12 }}>{item.price}</Text>
+                                    </View>
+                                    <View style={styles.tag}>
+                                        <FontAwesome6 name="house-chimney-window" style={styles.iconTag} size={20} color="green" />
+                                        <Text style={{ fontSize: 12 }}>{item.area}</Text>
+                                    </View>
+                                    <View style={styles.tag}>
+                                        <FontAwesome name="users" style={styles.iconTag} size={20} color="green" />
+                                        <Text>{item.max_people}</Text>
+                                    </View>
                                 </View>
-                                <View style={styles.tag}>
-                                    <FontAwesome6 name="house-chimney-window" style={styles.iconTag} size={20} color="green" />
-                                    <Text style={{ fontSize: 12 }}>{item.area}</Text>
-                                </View>
-                                <View style={styles.tag}>
-                                    <FontAwesome name="users" style={styles.iconTag} size={20} color="green" />
-                                    <Text>{item.max_people}</Text>
+                                <View style={{ flexDirection: "row", marginBottom: 10 }}>
+                                    <FontAwesome6 style={styles.iconTag} name="location-dot" size={20} color="green" />
+                                    <Text style={{ fontSize: 12 }}>{item.other_address}</Text>
                                 </View>
                             </View>
-                            <View style={{ flexDirection: "row", marginBottom: 10 }}>
-                                <FontAwesome6 style={styles.iconTag} name="location-dot" size={20} color="green" />
-                                <Text style={{ fontSize: 12 }}>{item.other_address}</Text>
+                            <FlatList
+                                data={item.images || []}
+                                renderItem={({ item }) => (
+                                    <Image
+                                        source={{ uri: item.url }}
+                                        style={[styles.imgMotel, { width: Dimensions.get('window').width }]}
+                                        onLoad={() => handleImageChange(index)}
+                                    />
+                                )}
+                                keyExtractor={(image) => (image.id ? image.id.toString() : Math.random().toString())}
+                                horizontal={true}
+                                showsHorizontalScrollIndicator={false} // Tắt thanh trượt ngang
+                            />
+
+                            {/* <View style={styles.badgeContainer}>
+                                {item.images && item.images.length > 0 &&
+                                    <Text style={styles.badgeText}>
+                                        {currentImageIndex + 1}/{item.images.length}
+                                    </Text>
+                                }
+                            </View> */}
+
+
+                            <View style={styles.buttonContainer}>
+                                <TouchableOpacity onPress={handleEdit} style={[styles.button, styles.editButton]}>
+                                    <FontAwesome name="edit" size={13} color="black" />
+                                    <Text style={styles.buttonText}>Sửa</Text>
+                                </TouchableOpacity>
+                                <TouchableOpacity onPress={handleEdit} style={[styles.button, styles.editButton]}>
+                                    <Entypo name="add-to-list" size={13} color="black" />
+                                    <Text style={styles.buttonText}>Thêm phí</Text>
+                                </TouchableOpacity>
+                                <TouchableOpacity onPress={handleEdit} style={[styles.button, styles.editButton]}>
+                                    <FontAwesome5 name="images" size={13} color="black" />
+                                    <Text style={styles.buttonText}>Sửa ảnh</Text>
+                                </TouchableOpacity>
+                                <TouchableOpacity onPress={() => handleDelete(item.id)} style={[styles.button, styles.deleteButton]}>
+                                    <FontAwesome name="trash" size={13} color="black" />
+                                    <Text style={styles.buttonText}>Xóa</Text>
+                                </TouchableOpacity>
+
+
                             </View>
                         </View>
-                        <FlatList
-                            data={item.images || []}
-                            renderItem={({ item }) => (
-                                <Image
-                                    source={{ uri: item.url }}
-                                    style={[styles.imgMotel, { width: Dimensions.get('window').width }]}
-                                    onLoad={() => handleImageChange(index)}
-                                />
-                            )}
-                            keyExtractor={(image) => (image.id ? image.id.toString() : Math.random().toString())}
-                            horizontal={true}
-                        />
-
-                        <View style={styles.badgeContainer}>
-                            {item.images && item.images.length > 0 &&
-                                <Text style={styles.badgeText}>
-                                    {currentImageIndex + 1}/{item.images.length}
-                                </Text>
-                            }
-                        </View>
-
-
-                        <View style={styles.buttonContainer}>
-                            <TouchableOpacity onPress={handleEdit} style={[styles.button, styles.editButton]}>
-                                <FontAwesome name="edit" size={13} color="black" />
-                                <Text style={styles.buttonText}>Sửa</Text>
-                            </TouchableOpacity>
-                            <TouchableOpacity onPress={handleEdit} style={[styles.button, styles.editButton]}>
-                                <Entypo name="add-to-list" size={13} color="black" />
-                                <Text style={styles.buttonText}>Thêm phí</Text>
-                            </TouchableOpacity>
-                            <TouchableOpacity onPress={handleEdit} style={[styles.button, styles.editButton]}>
-                                <FontAwesome5 name="images" size={13} color="black" />
-                                <Text style={styles.buttonText}>Sửa ảnh</Text>
-                            </TouchableOpacity>
-                            <TouchableOpacity onPress={handleDelete} style={[styles.button, styles.deleteButton]}>
-                                <FontAwesome name="trash" size={13} color="black" />
-                                <Text style={styles.buttonText}>Xóa</Text>
-                            </TouchableOpacity>
-
-
-                        </View>
-                    </View>
-                ))}
-            </ScrollView>
+                    ))}
+                </ScrollView>)}
 
         </View>
     )
@@ -295,7 +305,7 @@ const styles = StyleSheet.create({
     },
     buttonText: {
         marginLeft: 5,
-        fontSize: 12,
+        fontSize: 12
     },
     editButton: {
         backgroundColor: "#FFD700",

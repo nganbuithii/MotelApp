@@ -10,7 +10,8 @@ export const endpoints = {
     upImgMotel:(idMotel) => `/motels/${idMotel}/images/`,  //POST
     updateUser:"/user/current_user/",  //PATCH
     detailMotelOwner:(idUser) => `/user/${idUser}/motels/`,   //GET
-    getImageMotel:(idMotel) => `/motels/${idMotel}`, //GET
+    getImageMotel:(idMotel) => `/motels/${idMotel}/`, //GET
+    deleteMotel:(idMotel) =>`/motels/${idMotel}/`,   //DELETE
 };
 
 // Tạo một phiên bản axios với các cài đặt đã được cung cấp
