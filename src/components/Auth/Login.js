@@ -62,16 +62,15 @@ const Login = ({ navigation }) => {
             console.log("hasmotel:", hasMotelData);
             console.log("role", userData.user_role);
             // Xác định màn hình chuyển hướng
-            if(userData.user_role ==="TENANT")
-            {
+            if (userData.user_role === "TENANT") {
                 navigation.navigate("Home");
-            }else{
+            } else {
                 let targetScreen = hasMotelData ? 'Home' : 'RegisterMotel';
 
-            // Chuyển hướng đến màn hình tương ứng
-            navigation.navigate(targetScreen);
+                // Chuyển hướng đến màn hình tương ứng
+                navigation.navigate(targetScreen);
             }
-            
+
             console.log(userData); // Log thông tin người dùng
         } catch (error) {
             setLoading(false);
@@ -101,18 +100,20 @@ const Login = ({ navigation }) => {
             }
             // const idUser = user.id;
             console.log(userId);
-            let response = await authApi(token).get(endpoints['detailMotelOwner'](userId))
+            let response = await authApi(token).get(endpoints['detailMotelOwner'](userId));
 
             // Trả về true nếu người dùng có nhà trọ, ngược lại trả về false
 
-            console.log("nhà trọ của bạn:", response.data)
+            //console.log("nhà trọ của bạn:", response.data);
             // Kiểm tra xem mảng dữ liệu có rỗng hay không
 
             const hasMotelData = response.data && response.data.length > 0;
 
             // Cập nhật giá trị của biến hasMotel dựa trên kết quả kiểm tra
             setHasMotel(hasMotelData);
-            console.log("hasmotel:", hasMotelData);
+            //console.log("hasmotel:", hasMotelData);
+            // Lưu dữ liệu trọ vào AsyncStorage
+            await AsyncStorage.setItem("motels", JSON.stringify(response.data));
 
             // Trả về giá trị kết quả
             return hasMotelData;

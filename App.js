@@ -23,6 +23,7 @@ import NotificationsSc from './src/components/Home/NotificationsSc';
 import PlusOwner from './src/components/OwnerMotel/PlusOwner';
 import ChatDetail from './src/components/Home/ChatDetail';
 import ChatSc from './src/components/Home/ChatSc';
+import CreatePost from './src/components/Home/CreatePost';
 
 //Điều hướng kiểu stack
 const Stack = createStackNavigator();
@@ -31,11 +32,11 @@ export default function App() {
   // khởi gán là null, và cấp cho các con xài
   const [user, dispatch] = useReducer(MyUserReducer, null);
   return (
-    
+
     <MyContext.Provider value={[user, dispatch]}>
       <NavigationContainer>
         <Stack.Navigator initialRouteName="Slider">
-        
+
           <Stack.Screen
             name="Slider"
             component={Slider}
@@ -58,7 +59,9 @@ export default function App() {
           <Stack.Screen name="ChatDetail" component={ChatDetail}
             options={{ headerShown: false }} />
           <Stack.Screen name="ChatSc" component={ChatSc}
-            options={{ headerShown: true}} />
+            options={{ headerShown: true }} />
+          <Stack.Screen name="CreatePost" component={CreatePost}
+            options={{ headerTitle: 'Tạo bài viết' }} />
           {/* <Stack.Screen
             name="RegisterMotel"
             component={RegisterMotel}
@@ -67,8 +70,10 @@ export default function App() {
           <Stack.Screen
             name="DetailOwner"
             component={DetailOwner}
-            options={{ headerShown: true,// Tắt header cho màn hình Slider
-            headerTitle: 'Ngan xxjk'}}
+            options={{
+              headerShown: true,// Tắt header cho màn hình Slider
+              headerTitle: 'Ngan xxjk'
+            }}
           />
           <Stack.Screen
             name="PostDetail"
@@ -84,7 +89,7 @@ export default function App() {
               name="Home" 
               component={Home} 
               options={{ headerShown: false }}/> */}
-          
+
           {user === null ?
             <>
               <Stack.Screen
@@ -97,16 +102,16 @@ export default function App() {
               <Stack.Screen
                 name="Home"
                 component={Home}
-                options={{ 
+                options={{
                   headerLeft: null, // Tắt icon back
-                  headerShown: false ,
+                  headerShown: false,
                   headerTitle: "NACA",
-                  }} />
+                }} />
               <Stack.Screen
-            name="RegisterMotel"
-            component={RegisterMotel}
-            options={{ headerShown: false }} // Tắt header cho màn hình Slider
-          />
+                name="RegisterMotel"
+                component={RegisterMotel}
+                options={{ headerShown: false }} // Tắt header cho màn hình Slider
+              />
             </>
           }
 

@@ -46,8 +46,6 @@ const HomeIndex = () => {
     <View style={MyStyles.container}>
       {/* <Text>Trang chủ</Text>
 
-      <Logout /> */}
-
 
 
       {/* Bài đăng */}
@@ -60,18 +58,21 @@ const HomeIndex = () => {
           />
 
 
-          <View style={[HomeStyles.postInputContainer, MyStyles.flex]}>
-            <TextInput
-              style={HomeStyles.postInput}
-              placeholder="Bạn muốn đăng bài?"
-              value={postContent}
-              multiline
-              editable={false} // Vô hiệu hóa tính năng nhập liệu
-            />
-            <TouchableOpacity style={HomeStyles.plusButton} >
-              <AntDesign name="pluscircleo" size={24} color="black" />
-            </TouchableOpacity>
-          </View>
+<TouchableOpacity onPress={() => navigation.navigate("CreatePost")}>
+  <View style={HomeStyles.postInputContainer}>
+    <TextInput
+      style={HomeStyles.postInput}
+      placeholder="Bạn muốn đăng bài?"
+      value={postContent}
+      multiline
+      editable={false}
+    />
+    <TouchableOpacity style={HomeStyles.plusButton} onPress={() => navigation.navigate("CreatePost")} >
+      <AntDesign name="pluscircleo" size={24} color="black" />
+    </TouchableOpacity>
+  </View>
+</TouchableOpacity>
+
 
         </View>
         {/* Bài viết */}

@@ -39,13 +39,21 @@ const DetailOwner = () => {
                         source={require('../../assets/images/5.jpg')}
                         style={styles.avatar}
                     />
-                    <TouchableOpacity style={styles.btnFollow}>
-                        <Text style={{ color: "#fff" }}> Theo dõi</Text>
-                        <Entypo name="plus" size={20} color="#fff" />
-                    </TouchableOpacity>
+                    <View style={{ flexDirection: "row" }}>
+                        <TouchableOpacity style={styles.btnFollow1}>
+                            <Text style={{ color: "#fff" }}> Theo dõi</Text>
+                            <Entypo name="plus" size={10} color="#fff" />
+                        </TouchableOpacity>
+                        <TouchableOpacity style={styles.btnFollow2}>
+                            <Text style={{ color: "#fff" }}> Nhắn tin</Text>
+                            <Entypo name="chat" size={10} color="#fff" />
+                        </TouchableOpacity>
+                    </View>
+
                 </View>
                 <View style={styles.containerInfo}>
                     <Text style={styles.txtName}>Ngan cute</Text>
+
                     <View style={styles.infoRow}>
                         <Text style={styles.infoText}>Người theo dõi: 2</Text>
                         <Text style={styles.separator}>|</Text>
@@ -55,6 +63,8 @@ const DetailOwner = () => {
                         <MaterialIcons style={styles.icon} name="calendar-month" size={20} color="black" />
                         <Text style={styles.infoText}>Ngày tham gia: 23-11-2003</Text>
                     </View>
+
+
                 </View>
 
                 <View style={styles.buttonContainer}>
@@ -149,8 +159,8 @@ const styles = StyleSheet.create({
         opacity: 0.2
     },
     avatar: {
-        width: 120,
-        height: 120,
+        width: 100,
+        height: 100,
         borderRadius: 60,
         position: "absolute",
         top: -55,
@@ -160,24 +170,39 @@ const styles = StyleSheet.create({
     },
     containerProfile: {
         position: "relative",
-        height: 80,
+        height: 55,
         width: "100%",
-        backgroundColor: COLOR.color6
+        // backgroundColor: COLOR.color6
     },
-    btnFollow: {
+    btnFollow1: {
         flexDirection: "row",
         backgroundColor: COLOR.PRIMARY,
         paddingVertical: 8,
         paddingHorizontal: 12,
         borderRadius: 10,
-        width: 105,
-        marginTop: 20,
-        marginLeft: 170,
+        // width: 70,
+        marginLeft: 100, // Dịch sang trái
+        position: "absolute",
+        top: 8,
+        left: 55,
+        marginRight: 5,
+    },
+    btnFollow2: {
+        flexDirection: "row",
+        backgroundColor: COLOR.PRIMARY,
+        paddingVertical: 8,
+        paddingHorizontal: 12,
+        borderRadius: 10,
+
+        marginLeft: 100, // Dịch sang trái
+        position: "absolute",
+        top: 8,
+        left: 160
     },
     containerInfo: {
         width: "100%",
         paddingHorizontal: 20,
-        backgroundColor: COLOR.color6,
+        // backgroundColor: COLOR.color6,
     },
     txtName: {
         color: COLOR.PRIMARY,
@@ -205,7 +230,7 @@ const styles = StyleSheet.create({
     buttonContainer: {
         marginTop: 10,
         width: '100%',
-        backgroundColor:"#fff", // Màu nền mới
+        backgroundColor: "#fff", // Màu nền mới
         padding: 10, // Padding cho các view chứa thông tin nhà trọ
         borderRadius: 8, // Bo tròn các góc
         ...SHADOWS.medium

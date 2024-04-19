@@ -11,9 +11,10 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import Toast from 'react-native-toast-message';
 import MyStyles from '../../Styles/MyStyles';
 
+
 const ProfileDetail = () => {
     const [user, dispatch] = useContext(MyContext);
-
+    
     const [upuser, setUpuser] = useState(user);
     const [dialog, setDialog] = useState(false);
     const [image, setImage] = useState(null);
@@ -98,8 +99,8 @@ const ProfileDetail = () => {
             setDialog(true);
             // Cập nhật thông tin người dùng toàn cục
             dispatch({ type: 'update_user', payload: res.data });
-             // Hiển thị toast khi cập nhật thành công
-        showToast();
+            // Hiển thị toast khi cập nhật thành công
+            showToast();
         } catch (ex) {
             Alert.alert("Lỗi", "Lỗi cập nhật thông tin hồ sơ!")
             console.error(ex);
@@ -114,17 +115,22 @@ const ProfileDetail = () => {
     return (
         <View style={styles.containerDetail}>
 
+            <Image
+                source={require('../../assets/images/5.jpg')} // Sử dụng ảnh mới nếu có, nếu không sử dụng avatar, nếu không có avatar sử dụng ảnh mặc định
+                style={styles.imgBg}
+            />
 
+            <View style={styles.containerAvt}>
+                <TouchableOpacity onPress={addImage} >
+                    <Image
+                        source={image ? { uri: image } : avatar ? { uri: avatar } : require('../../assets/images/avt.png')} // Sử dụng ảnh mới nếu có, nếu không sử dụng avatar, nếu không có avatar sử dụng ảnh mặc định
+                        style={styles.avatar}
+                    />
+                    <AntDesign name="camera" style={styles.iconCam} size={20} color={COLOR.PRIMARY} />
+                </TouchableOpacity>
+                <Text style={{textAlign:"center", color:"green", fontSize:20, fontWeight:"500"}}>{user.username}</Text>
+            </View>
 
-            <TouchableOpacity onPress={addImage} >
-                <Image
-                    source={image ? { uri: image } : avatar ? { uri: avatar } : require('../../assets/images/avt.png')} // Sử dụng ảnh mới nếu có, nếu không sử dụng avatar, nếu không có avatar sử dụng ảnh mặc định
-                    style={styles.avatar}
-                />
-
-
-                <AntDesign name="camera" style={styles.iconCam} size={35} color={COLOR.PRIMARY} />
-            </TouchableOpacity>
 
             <View style={MyStyles.flex}>
                 <View style={styles.badgeContainer}>
@@ -187,51 +193,60 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         paddingHorizontal: 20,
         width: '100%',
-        backgroundColor: "#FFF"
+        backgroundColor: "#fff",
+        position:"relative"
     },
     avatar: {
-        width: 200,
-        height: 200,
-        marginBottom: 20,
+        width: 120,
+        height: 120,
+        marginBottom: 5,
         borderRadius: 100, // Đặt borderRadius thành nửa chiều rộng (200 / 2 = 100)
-        borderWidth: 8,
-        borderColor: COLOR.color3,
+        borderWidth: 5,
+        borderColor:"#fff",
         // position: 'relative',
         // aspectRatio: 1, // Đảm bảo tỷ lệ khung hình là 1:1
     },
     inputContainer: {
-        marginBottom: 15,
+        marginBottom: 10,
         width: '100%',
+        ...SHADOWS.medium
     },
     label: {
         marginBottom: 5,
         fontSize: 16,
         fontWeight: 'bold',
-        color: COLOR.PRIMARY
+        color: COLOR.input_default
     },
     inputDetail: {
         height: 40,
-        borderColor: COLOR.PRIMARY,
-        borderWidth: 1,
-        padding: 5,
+        borderColor: "gray",
+        borderWidth: 0.3,
+        paddingVertical:10,
+        paddingHorizontal:10,
         borderRadius: 5,
         width: '100%',
+        fontSize:16,
+        color:"gray",
+        
     },
     iconCam: {
         position: 'absolute',
-        bottom: 30,
-        right: 20,
-        color: COLOR.PRIMARY,
+        bottom: 10,
+        right: 10,
+        color: "black",
+        backgroundColor:"#fff",
+        borderRadius:50,
+        padding:3
     },
     badgeContainer: {
         backgroundColor: COLOR.offWhite, // Màu nền của badge
         borderRadius: 20, // Độ cong của badge
-        marginVertical: 5,
+        // marginVertical: 5,
         alignItems: 'center',
         justifyContent: 'center',
         marginLeft: 20,
         padding: 5,
-        width: "40%",
+        width: 140,
         // borderColor:COLOR.color4,
         // borderWidth: 1, // Độ dày của viền
         ...SHADOWS.medium,
@@ -249,6 +264,19 @@ const styles = StyleSheet.create({
         // fontWeight: 'bold',
         fontSize: 12
     },
+    imgBg: {
+        width: "100%",
+        height: 100,
+        opacity: 0.3,
+        // position:"relative"
+    },
+    containerAvt:{
+    // position:"absolute",
+    // top:30
+    top:-60,
+    flexDirection:"column"
+
+    }
 });
 
 
