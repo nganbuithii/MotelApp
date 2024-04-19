@@ -60,12 +60,18 @@ const Login = ({ navigation }) => {
             // Gọi hàm kiểm tra nhà trọ của người dùng và chờ đợi kết quả
             const hasMotelData = await checkMotel(userData.id);
             console.log("hasmotel:", hasMotelData);
-
+            console.log("role", userData.user_role);
             // Xác định màn hình chuyển hướng
-            let targetScreen = hasMotelData ? 'Home' : 'RegisterMotel';
+            if(userData.user_role ==="TENANT")
+            {
+                navigation.navigate("Home");
+            }else{
+                let targetScreen = hasMotelData ? 'Home' : 'RegisterMotel';
 
             // Chuyển hướng đến màn hình tương ứng
             navigation.navigate(targetScreen);
+            }
+            
             console.log(userData); // Log thông tin người dùng
         } catch (error) {
             setLoading(false);

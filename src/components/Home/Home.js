@@ -37,7 +37,7 @@ const Home = () => {
         chat: ChatSc,
         notification: NotificationsSc,
         profile: ProfileSc,
-        plus: PlusOwner
+        plus:PlusOwner
     });
 
     return (

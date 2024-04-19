@@ -4,6 +4,7 @@ import { COLOR, SHADOWS } from '../common/color';
 import { Octicons } from '@expo/vector-icons';
 import MyContext from '../../configs/MyContext';
 import { ScrollView } from 'react-native-gesture-handler';
+import HomeStyles from './HomeStyles';
 
 const NotificationsSc = () => {
   const [user] = useContext(MyContext);
@@ -12,9 +13,9 @@ const NotificationsSc = () => {
     <View style={styles.container}>
     
 
-      <View style={styles.tab}>
-        <Octicons name="bell-fill" size={24} color={COLOR.PRIMARY} style={styles.bellIcon} />
-        <Text style={styles.textHead}>Thông báo</Text>
+      <View style={HomeStyles.tab}>
+        <Octicons name="bell-fill" size={24} color={COLOR.PRIMARY} style={HomeStyles.bellIcon} />
+        <Text style={HomeStyles.textHead}>Thông báo</Text>
         {/* <Image
         source={require('../../assets/images/bell.gif')}
         style={styles.avatar}
@@ -120,28 +121,28 @@ const styles = StyleSheet.create({
     justifyContent: 'flex-start',
     alignItems: 'center',
   },
-  tab: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent:"center",
-    width: "100%",
-    backgroundColor: COLOR.color11,
-    paddingVertical: 25,
-    paddingLeft: 10,
-    ...SHADOWS.medium,
-  },
-  textHead: {
-    fontSize: 18,
-    color: COLOR.PRIMARY,
-    fontWeight: "500",
-    textAlign: "center",
-    marginTop: 10,
-    marginLeft: 10
-  },
-  bellIcon: {
-    marginRight: 3,
-    marginTop:10
-  },
+  // tab: {
+  //   flexDirection: "row",
+  //   alignItems: "center",
+  //   justifyContent:"center",
+  //   width: "100%",
+  //   backgroundColor: COLOR.color11,
+  //   paddingVertical: 25,
+  //   paddingLeft: 10,
+  //   ...SHADOWS.medium,
+  // },
+  // textHead: {
+  //   fontSize: 18,
+  //   color: COLOR.PRIMARY,
+  //   fontWeight: "500",
+  //   textAlign: "center",
+  //   marginTop: 10,
+  //   marginLeft: 10
+  // },
+  // bellIcon: {
+  //   marginRight: 3,
+  //   marginTop:10
+  // },
   notification: {
     flexDirection: 'row',
     alignItems: 'center',
