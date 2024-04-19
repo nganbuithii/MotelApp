@@ -18,8 +18,11 @@ const Login = ({ navigation }) => {
     const [password, setPassword] = useState('');
     const [user, dispatch] = React.useContext(MyContext);
     const [loading, setLoading] = useState(false);
+    const [hasMotel, setHasMotel] = useState(false);
     const loginApp = async () => {
         setLoading(true);
+
+
         try {
             let header = {
                 'Content-Type': 'application/x-www-form-urlencoded' // Change Content-Type
@@ -34,7 +37,7 @@ const Login = ({ navigation }) => {
             };
             let res = await API.post(endpoints["login"], data, { headers: header });
             console.log(res.data);
-            
+
             // Lưu access token vào AsyncStorage
             await AsyncStorage.setItem("access-token", res.data.access_token);
 
@@ -48,30 +51,73 @@ const Login = ({ navigation }) => {
                 payload: userData,
             });
 
-             // Điều hướng đến màn hình chính
-            if (userData.user_role === 'MOTEL_OWNER') {
-                navigation.navigate("RegisterMotel"); // Điều hướng đến màn hình đăng ký cho chủ nhà trọ
-            } else {
-                navigation.navigate("Home"); // Điều hướng đến màn hình chính
-            }
-            
+            //  // Điều hướng đến màn hình chính
+            // if (userData.user_role === 'MOTEL_OWNER') {
+            //     navigation.navigate("RegisterMotel"); // Điều hướng đến màn hình đăng ký cho chủ nhà trọ
+            // } else {
+            //     navigation.navigate("Home"); // Điều hướng đến màn hình chính
+            // }
+            // Gọi hàm kiểm tra nhà trọ của người dùng và chờ đợi kết quả
+            const hasMotelData = await checkMotel(userData.id);
+            console.log("hasmotel:", hasMotelData);
 
+            // Xác định màn hình chuyển hướng
+            let targetScreen = hasMotelData ? 'Home' : 'RegisterMotel';
+
+            // Chuyển hướng đến màn hình tương ứng
+            navigation.navigate(targetScreen);
             console.log(userData); // Log thông tin người dùng
         } catch (error) {
             setLoading(false);
-    
+
             if (error.response) {
                 // Trích xuất thông báo lỗi từ phản hồi
                 let errorMessage = error.response.data.error_description || 'Có lỗi xảy ra. Vui lòng thử lại sau.';
-    
+
                 // Hiển thị thông báo lỗi
                 Alert.alert('Lỗi', errorMessage);
-            } 
+            }
         } finally {
             setLoading(false);
         }
     };
 
+    // Hàm kiểm tra xem người dùng có nhà trọ hay không
+    const checkMotel = async (userId) => {
+        try {
+            // Gửi yêu cầu API để lấy thông tin về nhà trọ của người dùng
+            // Lấy access token từ AsyncStorage
+            const token = await AsyncStorage.getItem("access-token");
+
+            // Kiểm tra nếu token không tồn tại
+            if (!token) {
+                throw new Error("Access token not found");
+            }
+            // const idUser = user.id;
+            console.log(userId);
+            let response = await authApi(token).get(endpoints['detailMotelOwner'](userId))
+
+            // Trả về true nếu người dùng có nhà trọ, ngược lại trả về false
+
+            console.log("nhà trọ của bạn:", response.data)
+            // Kiểm tra xem mảng dữ liệu có rỗng hay không
+
+            const hasMotelData = response.data && response.data.length > 0;
+
+            // Cập nhật giá trị của biến hasMotel dựa trên kết quả kiểm tra
+            setHasMotel(hasMotelData);
+            console.log("hasmotel:", hasMotelData);
+
+            // Trả về giá trị kết quả
+            return hasMotelData;
+
+        } catch (error) {
+            console.error('Error checking motel owner:', error);
+            // Trả về false nếu có lỗi xảy ra hoặc người dùng không có nhà trọ
+            setHasMotel(false);
+            return false;
+        }
+    }
 
 
     return (

@@ -6,6 +6,7 @@ import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import HomeStyles from './HomeStyles';
 import MyContext from '../../configs/MyContext';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const ProfileScreen = () => {
   const navigation = useNavigation();
@@ -17,6 +18,19 @@ const ProfileScreen = () => {
   const goToService = () => {
     navigation.navigate('TermService'); // Điều hướng đến màn hình ProfileDetail
   };
+  const logout = async() => {
+    // try {
+    //   // Xóa thông tin người dùng khỏi AsyncStorage (nếu cần)
+    //   await AsyncStorage.removeItem('access-token');
+    //   // Xóa người dùng khỏi Context
+    //   dispatch({ type: 'logout' });
+    //   // Điều hướng đến màn hình đăng nhập
+    //   navigation.navigate('Login');
+    // } catch (error) {
+    //   console.error('Error logging out:', error);
+    //   Alert.alert('Lỗi', 'Đã xảy ra lỗi khi đăng xuất. Vui lòng thử lại sau.');
+    // }
+  }
   return (
     <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
     {/* <Text style={MyStyles.textHead}>Hồ sơ cá nhân</Text> */}
@@ -90,7 +104,7 @@ const ProfileScreen = () => {
           </View>
       </View>
     </TouchableOpacity>
-    <TouchableOpacity style={HomeStyles.profileContainer}>
+    <TouchableOpacity style={HomeStyles.profileContainer} onPress={logout}>
       <View style={HomeStyles.flexInput}>
       <MaterialIcons name="logout" size={24} color="black" />
         <Text> Đăng xuất</Text>

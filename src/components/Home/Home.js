@@ -8,10 +8,14 @@ import ChatSc from './ChatSc';
 import SearchSc from './SearchSc';
 import ProfileSc from './ProfileSc';
 import NotificationsSc from './NotificationsSc';
+import MyContext from '../../configs/MyContext';
 
 
 const Home = () => {
     const [index, setIndex] = React.useState(0);
+    const [user, dispatch] = React.useContext(MyContext);
+    const role = user.user_role;
+    console.log(role)
     const [routes] = React.useState([
         { key: 'home', focusedIcon: HomeIcon, unfocusedIcon: HomeIcon },
         { key: 'search', focusedIcon: SearchIcon, unfocusedIcon: SearchIcon },

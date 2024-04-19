@@ -9,6 +9,7 @@ export const endpoints = {
     postMotel:"/motels/",
     upImgMotel:(idMotel) => `/motels/${idMotel}/images/`,  //POST
     updateUser:"/user/current_user/",  //PATCH
+    detailMotelOwner:(idUser) => `/user/${idUser}/motels/`   //GET
 };
 
 // Tạo một phiên bản axios với các cài đặt đã được cung cấp

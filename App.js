@@ -19,6 +19,7 @@ import UploadImgHouse from './src/components/Auth/UploadImgHouse';
 import PostDetail from './src/components/Home/PostDetail';
 import DetailOwner from './src/components/OwnerMotel/DetailOwner';
 import Toast, { ToastProvider } from 'react-native-toast-message';
+import NotificationsSc from './src/components/Home/NotificationsSc';
 
 //Điều hướng kiểu stack
 const Stack = createStackNavigator();
@@ -47,6 +48,8 @@ export default function App() {
             options={{ headerTitle: 'Tài khoản của bạn' }} />
           <Stack.Screen name="SearchFilter" component={SearchFilter}
             options={{ headerTitle: 'Lọc kết quả tìm kiếm' }} />
+          <Stack.Screen name="NotificationsSc" component={NotificationsSc}
+            options={{ headerTitle: 'Thông báo' }} />
           {/* <Stack.Screen
             name="RegisterMotel"
             component={RegisterMotel}
