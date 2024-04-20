@@ -92,6 +92,23 @@ const RegisterMotel = ({ navigation }) => {
                         'Content-Type': 'multipart/form-data',
                     },
                 });
+                // Lưu dữ liệu vào AsyncStorage
+                let currentMotels = await AsyncStorage.getItem("motels");
+                currentMotels = currentMotels ? JSON.parse(currentMotels) : [];
+
+                // Bước 2: Thêm dữ liệu mới từ res.data vào mảng nhà trọ
+                currentMotels.push(res.data);
+
+                // Bước 3: Cập nhật mảng nhà trọ đã được cập nhật vào AsyncStorage
+                await AsyncStorage.setItem("motels", JSON.stringify(currentMotels));
+                const motels = await AsyncStorage.getItem("motels");
+                console.log("MOTEL Ở ĐK: ", motels);
+                console.info("TRỌ RES DATA đã được lưu vào AsyncStorage");
+
+                // // Kiểm tra dữ liệu đã được lưu vào AsyncStorage hay chưa
+                // const infoMotel = await AsyncStorage.getItem("infoMotel");
+                // console.log("INFOMOTELS", infoMotel);
+
                 console.info("TRỌ RES DATA", res.data);
                 console.log("Thành công tạo trọ");
                 navigation.navigate("UploadImgHouse", { idMotel: res.data.id });

@@ -93,7 +93,7 @@ const UploadImg = ({ navigation, route }) => {
                 },
             });
 
-
+            
 
             console.info("res.data", response.data);
             console.log("Thành công");

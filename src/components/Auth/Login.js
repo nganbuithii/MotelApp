@@ -90,34 +90,20 @@ const Login = ({ navigation }) => {
     // Hàm kiểm tra xem người dùng có nhà trọ hay không
     const checkMotel = async (userId) => {
         try {
-            // Gửi yêu cầu API để lấy thông tin về nhà trọ của người dùng
-            // Lấy access token từ AsyncStorage
             const token = await AsyncStorage.getItem("access-token");
-
-            // Kiểm tra nếu token không tồn tại
             if (!token) {
                 throw new Error("Access token not found");
             }
-            // const idUser = user.id;
             console.log(userId);
             let response = await authApi(token).get(endpoints['detailMotelOwner'](userId));
-
-            // Trả về true nếu người dùng có nhà trọ, ngược lại trả về false
-
-            //console.log("nhà trọ của bạn:", response.data);
-            // Kiểm tra xem mảng dữ liệu có rỗng hay không
-
+            console.log("MOtels ban đầu:", response.data);
             const hasMotelData = response.data && response.data.length > 0;
-
-            // Cập nhật giá trị của biến hasMotel dựa trên kết quả kiểm tra
             setHasMotel(hasMotelData);
-            //console.log("hasmotel:", hasMotelData);
+            console.log("motelS:", hasMotelData);
             // Lưu dữ liệu trọ vào AsyncStorage
             await AsyncStorage.setItem("motels", JSON.stringify(response.data));
-
             // Trả về giá trị kết quả
             return hasMotelData;
-
         } catch (error) {
             console.error('Error checking motel owner:', error);
             // Trả về false nếu có lỗi xảy ra hoặc người dùng không có nhà trọ
@@ -125,7 +111,6 @@ const Login = ({ navigation }) => {
             return false;
         }
     }
-
 
     return (
         <View style={MyStyles.container}>

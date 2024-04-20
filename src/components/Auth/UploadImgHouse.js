@@ -7,7 +7,7 @@ import MyContext from '../../configs/MyContext';
 import API, { authApi, endpoints } from "../../configs/API";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
-const UploadImgHouse = ({navigation, route}) => {
+const UploadImgHouse = ({ navigation, route }) => {
     const { idMotel } = route.params;
     const [user, dispatch] = useContext(MyContext);
     const [loading, setLoading] = useState(false);
@@ -40,8 +40,8 @@ const UploadImgHouse = ({navigation, route}) => {
         />
     );
     // Khi ấn submit
-    const handleComplete = async() => {
-        try{
+    const handleComplete = async () => {
+        try {
             const formData = new FormData();
             images.forEach((image, index) => {
                 // console.log(`image_${index}:`, image);
@@ -60,22 +60,44 @@ const UploadImgHouse = ({navigation, route}) => {
             // console.log(idMotel);
             // console.log(formData);
 
-        
+
             let res = await authApi(token).post(endpoints['upImgMotel'](idMotel), formData, {
                 headers: {
                     'Content-Type': 'multipart/form-data',
                 },
             });
-            // console.log("RESDATA IMG:", res.data);
+            console.log(idMotel);
+            // Lấy dữ liệu từ AsyncStorage
+            // Lấy dữ liệu từ AsyncStorage
+            let currentMotels = await AsyncStorage.getItem("motels");
+            currentMotels = currentMotels ? JSON.parse(currentMotels) : [];
+
+            // Lặp qua mỗi nhà trọ trong mảng currentMotels
+            currentMotels.forEach(motel => {
+                // Tìm nhà trọ có cùng id với dữ liệu mới từ res.data
+                const newDataForMotel = res.data.find(newData => newData.id === idMotel);
+                if (newDataForMotel) {
+                    // Thêm ảnh từ newDataForMotel vào mảng ảnh của nhà trọ
+                    motel.motel_images = [...motel.motel_images, ...newDataForMotel];
+                }
+            });
+
+            // Lưu dữ liệu đã cập nhật vào AsyncStorage
+            await AsyncStorage.setItem("motels", JSON.stringify(currentMotels));
+
+
+            console.log("Motels sau update img:", currentMotels);
+            console.log(res.data);
             console.log("Up ảnh thành công");
-            navigation.navigate("Home");
-            
-            
-        }catch(ex)
-        {
-            Alert.alert("Lỗi","Tải ảnh nhà trọ của bạn thất bại")
+            navigation.navigate("Home")
+
+
+
+
+        } catch (ex) {
+            Alert.alert("Lỗi", "Tải ảnh nhà trọ của bạn thất bại")
             console.error(ex);
-        }finally {
+        } finally {
             setLoading(false);
         }
     };
@@ -124,9 +146,9 @@ const UploadImgHouse = ({navigation, route}) => {
                         <Text style={{ color: "#fff", textAlign: "center" }}>Thoát</Text>
                     </TouchableOpacity>
                     {loading ? (<ActivityIndicator />) : (
-                    <TouchableOpacity onPress={handleComplete} style={styles.completeButton}>
-                        <Text style={{ color: "#fff", textAlign: "center" }}>Hoàn tất</Text>
-                    </TouchableOpacity>)}
+                        <TouchableOpacity onPress={handleComplete} style={styles.completeButton}>
+                            <Text style={{ color: "#fff", textAlign: "center" }}>Hoàn tất</Text>
+                        </TouchableOpacity>)}
                 </View>
 
 
@@ -155,13 +177,13 @@ const styles = StyleSheet.create({
         justifyContent: "center",
         // width:"100%",
         // height:"100%",
-        position:"absolute",
-        top:0,
-        left:0,
-        right:0,
-        bottom:0,
-        opacity:0.4,
-        backgroundColor:COLOR.PRIMARY
+        position: "absolute",
+        top: 0,
+        left: 0,
+        right: 0,
+        bottom: 0,
+        opacity: 0.4,
+        backgroundColor: COLOR.PRIMARY
     },
     image: {
         width: imageWidth,

@@ -55,7 +55,8 @@ export default function App() {
           <Stack.Screen name="NotificationsSc" component={NotificationsSc}
             options={{ headerTitle: 'Thông báo' }} />
           <Stack.Screen name="PlusOwner" component={PlusOwner}
-            options={{ headerTitle: 'Nhà trọ của tôi' }} />
+            // options={{ headerTitle: 'Nhà trọ của tôi' }}
+            options={{ headerShown: false }} />
           <Stack.Screen name="ChatDetail" component={ChatDetail}
             options={{ headerShown: false }} />
           <Stack.Screen name="ChatSc" component={ChatSc}

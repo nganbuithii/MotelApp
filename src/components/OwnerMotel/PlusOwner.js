@@ -26,47 +26,59 @@ const PlusOwner = () => {
     const [showHouseList, setShowHouseList] = useState(false);
     const [content, setContent] = useState('');
     const [user, dispatch] = useContext(MyContext);
-
+    const [triggerRender, setTriggerRender] = useState(false);
     const [motels, setMotels] = useState([]);
     const [storedMotels, setStoredMotels] = useState([]);
 
+    const getMotel = async () => {
+        try {
+            const token = await AsyncStorage.getItem("access-token");
+            let response = await authApi(token).get(endpoints['detailMotelOwner'](user.id));
+            let motelData = response.data;
+            setMotels(response.data); // Cập nhật state với dữ liệu từ response.data
+            console.log("FETCH API motel", response.data);
+            return motelData;
+
+        } catch (ex) {
+            console.error(ex);
+        }
+
+    }
+    const fetchMotels = async () => {
+        const motelData = await getMotel();
+        if (motelData.length > 0) {
+
+            //const parsedMotels = JSON.parse(motelData);
+            setMotels(motelData);
+            setStoredMotels(motelData);
+            let token = await AsyncStorage.getItem("access-token");
+            //console.log(token);
+
+            // Duyệt qua mỗi nhà trọ trong mảng storedMotels
+            motelData.forEach(async (motel) => {
+                // Lấy ID của nhà trọ
+                const idMotel = motel.id;
+
+                // Gọi API để lấy hình ảnh của nhà trọ dựa trên ID
+                const res = await authApi(token).get(endpoints['getImageMotel'](idMotel));
+                const motelImages = res.data.motel_images;
+
+                // Cập nhật state của nhà trọ với danh sách hình ảnh
+                setStoredMotels(prevMotels => prevMotels.map(prevMotel => {
+                    if (prevMotel.id === idMotel) {
+                        return { ...prevMotel, images: motelImages };
+                    }
+                    return prevMotel;
+                }));
+            });
+            setIsLoading(false);
+            setMotels(motelData);
+        }
+        console.log("STORE MOTELL", motelData);
+    };
     useEffect(() => {
-        const fetchMotels = async () => {
-            const storedMotels = await AsyncStorage.getItem("motels");
-            if (storedMotels) {
-                const parsedMotels = JSON.parse(storedMotels);
-                setMotels(parsedMotels);
-                setStoredMotels(parsedMotels);
-                let token = await AsyncStorage.getItem("access-token");
-                //console.log(token);
-
-                // Duyệt qua mỗi nhà trọ trong mảng storedMotels
-                parsedMotels.forEach(async (motel) => {
-                    // Lấy ID của nhà trọ
-                    const idMotel = motel.id;
-
-                    // Gọi API để lấy hình ảnh của nhà trọ dựa trên ID
-                    const res = await authApi(token).get(endpoints['getImageMotel'](idMotel));
-                    const motelImages = res.data.motel_images;
-
-                    // Cập nhật state của nhà trọ với danh sách hình ảnh
-                    setStoredMotels(prevMotels => prevMotels.map(prevMotel => {
-                        if (prevMotel.id === idMotel) {
-                            return { ...prevMotel, images: motelImages };
-                        }
-                        return prevMotel;
-                    }));
-                    // Sau khi dữ liệu đã được tải xong, set isLoading thành false
-                    setIsLoading(false);
-                    setMotels(storedMotels);
-
-                    //console.log("RESDATA", res.data);
-                });
-            }
-            console.log("STORE MOTELL", storedMotels);
-        };
         fetchMotels();
-    }, []);
+    }, [triggerRender]);
 
     const renderHouseItem = ({ item }) => (
         <View style={styles.imageContainer}>
@@ -79,32 +91,40 @@ const PlusOwner = () => {
 
     const handlePress = () => {
         navigation.navigate("Home"); // Quay lại trang trước đó
+
     };
     const handleEdit = () => {
         // Xử lý khi nút "Sửa" được nhấn
     };
 
-    const handleDelete = async(idMotel) => {
+    const handleDelete = async (idMotel) => {
         // Xử lý khi nút "Xóa" được nhấn
-        try{
+        try {
             let token = await AsyncStorage.getItem("access-token");
-            console.log("TOKEN",token);
-            console.log("ID",idMotel);
+            console.log("TOKEN", token);
+            console.log("ID", idMotel);
             await authApi(token).delete(endpoints['deleteMotel'](idMotel));
             console.log("Xóa nhà thành công");
-            setStoredMotels(prevMotels => prevMotels.filter(motel => motel.id !== idMotel));
-        }catch(ex)
-        {
+            // setStoredMotels(prevMotels => prevMotels.filter(motel => motel.id !== idMotel));
+            // Lọc danh sách nhà trọ mới sau khi xóa nhà trọ thành công
+            const updatedMotels = storedMotels.filter(motel => motel.id !== idMotel);
+            // Cập nhật state với danh sách nhà trọ mới
+            setStoredMotels(updatedMotels);
+            // Cập nhật AsyncStorage với danh sách nhà trọ mới
+            await AsyncStorage.setItem("motels", JSON.stringify(updatedMotels));
+            const motelsauxoa = await AsyncStorage.getItem("motels");
+            console.log("Motel sau xóa:", motelsauxoa);
+        } catch (ex) {
             console.error(ex);
-        }finally{
+        } finally {
             setIsLoading(false);
         }
     };
-    const handleAddRoomPress = () => {
-        // Xử lý khi nút "Thêm phòng" được nhấn
-        // Ví dụ: chuyển hướng đến màn hình thêm phòng
+    const handleAddRoomPress = async () => {
         navigation.navigate('RegisterMotel');
+        setTriggerRender(!triggerRender);
     };
+
     const handleImageChange = (index) => {
         setCurrentImageIndex(index);
     };
@@ -130,10 +150,10 @@ const PlusOwner = () => {
             ) : (
                 <ScrollView style={{ flex: 1 }} showsVerticalScrollIndicator={false}>
                     {storedMotels.map((item, index) => (
-                        
+
                         <View key={index} style={styles.containerMotel}>
                             <Text>Id: {item.id}</Text>
-                        <Text style={{ textAlign: "center", marginBottom: 5 }}>{item.name}</Text>
+                            <Text style={{ textAlign: "center", marginBottom: 5 }}>{item.name}</Text>
                             <View >
                                 <View style={{ flexDirection: "row" }}>
                                     <View style={styles.tag}>
