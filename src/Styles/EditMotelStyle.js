@@ -46,11 +46,12 @@ export default StyleSheet.create({
     serviceInfo: {
         marginTop: 15,
         backgroundColor: "#D7FAD4",
-        width: "100%",
+        width: "92%",
         alignItems: "center", // Căn giữa theo chiều ngang
         borderRadius:20,
         ...SHADOWS.small,
         paddingVertical:10,
+        marginHorizontal:10,
     },
     labelService: {
         color: COLOR.PRIMARY,
@@ -115,19 +116,22 @@ export default StyleSheet.create({
         justifyContent: 'space-between', // Căn các nút ra hai bên
         paddingHorizontal: 20, // Khoảng cách ngang từ lề trái và lề phải
         marginTop: 20, // Khoảng cách từ phần trên của container
+        
     },
     button: {
         backgroundColor: 'orange', // Màu nền của nút
         paddingVertical: 10, // Khoảng cách dọc bên trong nút
         paddingHorizontal: 20, // Khoảng cách ngang bên trong nút
         borderRadius: 5, // Độ cong viền nút
+        width:"48%"
     },
     buttonText: {
         color: 'white', // Màu chữ
         fontWeight: 'bold', // Độ đậm của chữ
+        textAlign:"center"
     },
     saveButton: {
-        marginLeft:80,
+        marginLeft:20,
         backgroundColor: COLOR.PRIMARY, // Màu nền của nút lưu thông tin
     },
 });

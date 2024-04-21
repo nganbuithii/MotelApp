@@ -1,4 +1,4 @@
-import { View, Text, StyleSheet, TextInput, FlatList, TouchableOpacity, Image, ScrollView } from "react-native"
+import { View, Text, StyleSheet, TextInput, FlatList, TouchableOpacity, Image, ScrollView, Alert } from "react-native"
 import HomeStyles from "../Home/HomeStyles";
 import { Entypo, MaterialIcons, Octicons } from "@expo/vector-icons";
 import { COLOR, SHADOWS } from "../common/color";
@@ -8,7 +8,20 @@ import { FontAwesome } from '@expo/vector-icons';
 import { FontAwesome6 } from '@expo/vector-icons';
 import { FontAwesome5 } from '@expo/vector-icons';
 import EditMotelStyle from '../../Styles/EditMotelStyle'
-const EditMotel = () => {
+import { useState } from "react";
+const EditMotel = ({ navigation, route }) => {
+    const { motel } = route.params;
+    const [price, setPrice] = useState(motel.price.toString() || "");
+    const [area, setArea] = useState(motel.area.toString() || "");
+    const [desc, setDesc] = useState(motel.description || "");
+    const [maxpeople, setMaxpeople] = useState(motel.max_people.toString() || "");
+    const [ward, setWard] = useState(motel.ward || "");
+    const [district, setDistrict] = useState(motel.district||"");
+    const [city, setCity] = useState(motel.city || "");
+    const [other, setOther] = useState(motel.onther || "");
+
+
+
     const handleAddImage = async () => {
         try {
             const selectedImages = await ImagePicker.launchImageLibraryAsync({
@@ -28,6 +41,19 @@ const EditMotel = () => {
             console.log("Error selecting images: ", error);
         }
     };
+    const handleExit = () => {
+        console.log(motel)
+        Alert.alert("Thông báo", "Bạn có chắc chắn thoát không?",
+            [
+                {
+                    text: "Hủy",
+                    onPress: () => console.log("Cancel Pressed"),
+                    style: "cancel"
+                },
+                { text: "Thoát", onPress: () => navigation.goBack() }
+            ],
+            { cancelable: false })
+    }
     return (
         <View style={EditMotelStyle.container}>
             <View style={HomeStyles.tab}>
@@ -37,19 +63,29 @@ const EditMotel = () => {
             <ScrollView contentContainerStyle={EditMotelStyle.scrollContainer} showsVerticalScrollIndicator={false}>
                 <View style={EditMotelStyle.infoContainer}>
                     {/* <Text>Thông tin phòng</Text> */}
-                    {/* <View>
-                    <MaterialCommunityIcons name="office-building-marker" size={24} color="green" />
-                </View> */}
+                
 
-                    <Text style={EditMotelStyle.label}> Nhập số / tên phòng</Text>
+                    <Text style={EditMotelStyle.labelService}> Thông tin phòng</Text>
+                    <Text style={EditMotelStyle.label}>Xã/Phường</Text>
                     <View style={EditMotelStyle.inputContainer}>
-                        <FontAwesome name="money" style={EditMotelStyle.icon} size={24} color="green" />
-                        <TextInput style={EditMotelStyle.input} placeholder="Giá phòng" />
+                        <FontAwesome5 name="location-arrow" style={EditMotelStyle.icon} size={24} color="green" />
+                        <TextInput value={ward}  style={EditMotelStyle.input} placeholder="Xã/Phường" />
                     </View>
-                    <Text style={EditMotelStyle.label}> Nhập địa chỉ</Text>
+                    <Text style={EditMotelStyle.label}> Quận/Huyện</Text>
+                    <View style={EditMotelStyle.inputContainer}>
+
+                        <FontAwesome5 name="location-arrow" style={EditMotelStyle.icon} size={24} color="green" />
+                        <TextInput value={district} style={EditMotelStyle.input} placeholder="Quận/Huyện" />
+                    </View>
+                    <Text style={EditMotelStyle.label}>Tỉnh/Thành phố</Text>
+                    <View style={EditMotelStyle.inputContainer}>
+                        <FontAwesome5 name="location-arrow" style={EditMotelStyle.icon} size={24} color="green" />
+                        <TextInput value={city} style={EditMotelStyle.input} placeholder="Tỉnh/Thành phố" />
+                    </View>
+                    <Text style={EditMotelStyle.label}> Địa chỉ khác</Text>
                     <View style={EditMotelStyle.inputContainer}>
                         <FontAwesome6 name="location-dot" style={EditMotelStyle.icon} size={24} color="green" />
-                        <TextInput style={EditMotelStyle.input} placeholder="Địa chỉ" />
+                        <TextInput value={other} style={EditMotelStyle.input} placeholder="Địa chỉ khác" />
                     </View>
                     <View style={EditMotelStyle.inputContainer}>
                         <FontAwesome5 name="map-marked-alt" style={EditMotelStyle.icon} size={24} color="green" />
@@ -58,24 +94,24 @@ const EditMotel = () => {
                     <Text style={EditMotelStyle.label}> Tiền phòng</Text>
                     <View style={EditMotelStyle.inputContainer}>
                         <FontAwesome name="money" style={EditMotelStyle.icon} size={24} color="green" />
-                        <TextInput style={EditMotelStyle.input} placeholder="Giá phòng" />
+                        <TextInput value={price} style={EditMotelStyle.input} placeholder="Giá phòng" />
                     </View>
                     <Text style={EditMotelStyle.label}> Diện tích</Text>
                     <View style={EditMotelStyle.inputContainer}>
                         <FontAwesome6 name="house" style={EditMotelStyle.icon} size={24} color="green" />
-                        <TextInput style={EditMotelStyle.input} placeholder="Diện tích" />
+                        <TextInput value={area} style={EditMotelStyle.input} placeholder="Diện tích" />
                     </View>
                     <Text style={EditMotelStyle.label}> Mô tả</Text>
 
                     <View style={EditMotelStyle.inputContainer}>
                         <Entypo name="pencil" style={EditMotelStyle.icon} size={24} color="green" />
-                        <TextInput style={EditMotelStyle.input} placeholder="Mô tả" />
+                        <TextInput value={desc} style={EditMotelStyle.input} placeholder="Mô tả" />
                     </View>
                     <Text style={EditMotelStyle.label}> Số người</Text>
 
                     <View style={EditMotelStyle.inputContainer}>
                         <FontAwesome5 name="users" style={EditMotelStyle.icon} size={24} color="green" />
-                        <TextInput style={EditMotelStyle.input} placeholder="Số người" />
+                        <TextInput value={maxpeople} style={EditMotelStyle.input} placeholder="Số người" />
                     </View>
                 </View>
 
@@ -117,7 +153,7 @@ const EditMotel = () => {
                     </TouchableOpacity>
                 </View>
                 <View style={EditMotelStyle.containerBtn}>
-                    <TouchableOpacity style={EditMotelStyle.button}>
+                    <TouchableOpacity style={EditMotelStyle.button} onPress={handleExit}>
                         <Text style={EditMotelStyle.buttonText}> Thoát</Text>
                     </TouchableOpacity>
                     <TouchableOpacity style={[EditMotelStyle.button, EditMotelStyle.saveButton]}>
