@@ -1,7 +1,7 @@
 import { View, Text, StyleSheet, TextInput, FlatList, TouchableOpacity, Image, ScrollView, Alert } from "react-native"
 import HomeStyles from "../Home/HomeStyles";
-import { Entypo, MaterialIcons, Octicons } from "@expo/vector-icons";
-import { COLOR, SHADOWS } from "../common/color";
+import { Entypo, MaterialIcons } from "@expo/vector-icons";
+import { COLOR} from "../common/color";
 import { AntDesign } from '@expo/vector-icons';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { FontAwesome } from '@expo/vector-icons';
@@ -19,8 +19,31 @@ const EditMotel = ({ navigation, route }) => {
     const [district, setDistrict] = useState(motel.district||"");
     const [city, setCity] = useState(motel.city || "");
     const [other, setOther] = useState(motel.onther || "");
+    const [images, setImages] = useState(motel.images || []);
 
+    const handleDeleteImage = (index) => {
+        Alert.alert(
+            "Xóa ảnh",
+            "Bạn có chắc chắn muốn xóa ảnh này?",
+            [
+                { text: "Hủy", onPress: () => console.log("Cancel Pressed") },
+                {
+                    text: "Xóa",
+                    onPress: () => deleteImage(index),
+                    style: "destructive"
+                }
+            ],
+            { cancelable: false }
+        );
+    };
 
+    const deleteImage = (index) => {
+        const updatedImages = [...images]; // Tạo một bản sao của mảng images
+        updatedImages.splice(index, 1); // Xóa ảnh khỏi bản sao
+        setImages(updatedImages); // Cập nhật state images với bản sao đã xóa ảnh
+        console.log(updatedImages);
+    };
+    
 
     const handleAddImage = async () => {
         try {
@@ -43,6 +66,7 @@ const EditMotel = ({ navigation, route }) => {
     };
     const handleExit = () => {
         console.log(motel)
+        console.log(motel.images)
         Alert.alert("Thông báo", "Bạn có chắc chắn thoát không?",
             [
                 {
@@ -54,6 +78,16 @@ const EditMotel = ({ navigation, route }) => {
             ],
             { cancelable: false })
     }
+    const renderImageItem = ({ item, index }) => {
+        return (
+            <View style={{position:"relative"}}>
+                <Image source={{ uri: item.url }} style={EditMotelStyle.imageMotel} />
+                <TouchableOpacity onPress={() => handleDeleteImage(index)} style={EditMotelStyle.deleteButton}>
+                    <AntDesign name="close" size={10} color="white" />
+                </TouchableOpacity>
+            </View>
+        );
+    };
     return (
         <View style={EditMotelStyle.container}>
             <View style={HomeStyles.tab}>
@@ -142,11 +176,17 @@ const EditMotel = ({ navigation, route }) => {
                 </View>
                 <View style={EditMotelStyle.serviceInfo}>
                     <Text style={EditMotelStyle.labelService}> Ảnh phòng</Text>
-                    {/* <FlatList /> */}
-                    <Image
+                    <FlatList
+                    data={images}
+                    renderItem={renderImageItem}
+                    keyExtractor={(item, index) => index.toString()}
+                    horizontal
+                    showsHorizontalScrollIndicator={false}
+                />
+                    {/* <Image
                         source={require("../../assets/images/hi.gif")}
                         style={EditMotelStyle.imageMotel}
-                    />
+                    /> */}
                     <TouchableOpacity onPress={handleAddImage} style={EditMotelStyle.addButton}>
                         <Text style={EditMotelStyle.addButtonText}>Thêm</Text>
                         <AntDesign name="camera" size={20} color="#fff" />

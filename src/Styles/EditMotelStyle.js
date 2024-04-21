@@ -102,10 +102,6 @@ export default StyleSheet.create({
         marginRight: 10,
         color: "#fff"
     },
-    imageMotel: {
-        width: 120,
-        height: 120,
-    },
     scrollContainer: {
         flexGrow: 1,
         alignItems: "center",
@@ -133,5 +129,21 @@ export default StyleSheet.create({
     saveButton: {
         marginLeft:20,
         backgroundColor: COLOR.PRIMARY, // Màu nền của nút lưu thông tin
+    },
+    imageMotel:{
+        width:200,
+        height:200,
+        borderRadius:20,
+        marginRight:10,
+    },
+    deleteButton:{
+        padding:10,
+        backgroundColor:"red",
+        width:30,
+        height:30,
+        borderRadius:20,
+        position:"absolute",
+        right:3,
+        top:0
     },
 });
