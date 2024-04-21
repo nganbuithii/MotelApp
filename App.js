@@ -24,6 +24,7 @@ import PlusOwner from './src/components/OwnerMotel/PlusOwner';
 import ChatDetail from './src/components/Home/ChatDetail';
 import ChatSc from './src/components/Home/ChatSc';
 import CreatePost from './src/components/Home/CreatePost';
+import EditMotel from './src/components/OwnerMotel/EditMotel';
 
 //Điều hướng kiểu stack
 const Stack = createStackNavigator();
@@ -58,6 +59,8 @@ export default function App() {
             // options={{ headerTitle: 'Nhà trọ của tôi' }}
             options={{ headerShown: false }} />
           <Stack.Screen name="ChatDetail" component={ChatDetail}
+            options={{ headerShown: false }} />
+          <Stack.Screen name="EditMotel" component={EditMotel}
             options={{ headerShown: false }} />
           <Stack.Screen name="ChatSc" component={ChatSc}
             options={{ headerShown: true }} />

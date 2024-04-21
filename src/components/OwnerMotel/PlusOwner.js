@@ -103,6 +103,12 @@ const PlusOwner = () => {
     };
     const handleEdit = () => {
         // Xử lý khi nút "Sửa" được nhấn
+        navigation.navigate("EditMotel")
+
+    };
+    const handleEditImage = () => {
+        // Xử lý khi nút "Sửa" được nhấn
+
     };
 
     const handleDelete = async (idMotel) => {
@@ -151,7 +157,6 @@ const PlusOwner = () => {
         }
     };
     
-    
     const handleAddRoomPress = async () => {
         navigation.navigate('RegisterMotel');
         setTriggerRender(!triggerRender);
@@ -187,7 +192,7 @@ const PlusOwner = () => {
                     {storedMotels.map((item, index) => (
 
                         <View key={index} style={styles.containerMotel}>
-                            <Text>Id: {item.id}</Text>
+                            {/* <Text>Id: {item.id}</Text> */}
                             <Text style={{ textAlign: "center", marginBottom: 5 }}>{item.name}</Text>
                             <View >
                                 <View style={{ flexDirection: "row" }}>
@@ -223,15 +228,6 @@ const PlusOwner = () => {
                                 showsHorizontalScrollIndicator={false} // Tắt thanh trượt ngang
                             />
 
-                            {/* <View style={styles.badgeContainer}>
-                                {item.images && item.images.length > 0 &&
-                                    <Text style={styles.badgeText}>
-                                        {currentImageIndex + 1}/{item.images.length}
-                                    </Text>
-                                }
-                            </View> */}
-
-
                             <View style={styles.buttonContainer}>
                                 <TouchableOpacity onPress={handleEdit} style={[styles.button, styles.editButton]}>
                                     <FontAwesome name="edit" size={13} color="black" />
@@ -241,7 +237,7 @@ const PlusOwner = () => {
                                     <Entypo name="add-to-list" size={13} color="black" />
                                     <Text style={styles.buttonText}>Thêm phí</Text>
                                 </TouchableOpacity>
-                                <TouchableOpacity onPress={handleEdit} style={[styles.button, styles.editButton]}>
+                                <TouchableOpacity onPress={handleEditImage} style={[styles.button, styles.editButton]}>
                                     <FontAwesome5 name="images" size={13} color="black" />
                                     <Text style={styles.buttonText}>Sửa ảnh</Text>
                                 </TouchableOpacity>
