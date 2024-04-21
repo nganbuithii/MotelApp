@@ -12,6 +12,7 @@ import * as ImagePicker from "expo-image-picker";
 import { useContext, useEffect, useState } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { authApi, endpoints } from "../../configs/API";
+import Toast from 'react-native-toast-message';
 import MyContext from "../../configs/MyContext";
 const EditMotel = ({ navigation, route }) => {
     const { motel } = route.params;
@@ -28,6 +29,7 @@ const EditMotel = ({ navigation, route }) => {
     const [user, dispatch] = useContext(MyContext);
     const [updatedMotel, setUpdatedMotel] = useState(route.params.motel);
     const [motelData, setMotelData] = useState(route.params.motel);
+    const [valuesChanged, setValuesChanged] = useState(false); // Biến cờ để kiểm tra xem giá trị đã thay đổi hay không
     const handleDeleteImage = (index) => {
         Alert.alert(
             "Xóa ảnh",
@@ -73,6 +75,10 @@ const EditMotel = ({ navigation, route }) => {
         }
     };
     const handleSaveInfo = async () => {
+        if (!valuesChanged) {
+            showToast2();
+            return;
+        }
         try {
             const token = await AsyncStorage.getItem("access-token");
             const idMotel = updatedMotel.id; // Sử dụng updatedMotel thay vì motel
@@ -94,14 +100,15 @@ const EditMotel = ({ navigation, route }) => {
                             const formData = new FormData();
                             console.log("Giá trị other_address được gửi đi:", other);
 
-                            if (price !== motel.price) formData.append("price", price);
-                            if (area !== motel.area) formData.append("area", area);
-                            if (desc !== motel.description) formData.append("description", desc);
+                            formData.append("price", price);
+                            formData.append("area", area);
+                            formData.append("description", desc);
                             // if (maxpeople !== motel.max_people) formData.append("max_people", maxpeople);
-                            if (ward !== motel.ward) formData.append("ward", ward);
-                            if (district !== motel.district) formData.append("district", district);
-                            if (city !== motel.city) formData.append("city", city);
-                            if (other !== motel.onther) formData.append("other_address", other)
+                            formData.append("ward", ward);
+                            formData.append("district", district);
+                            formData.append("city", city);
+                            formData.append("other_address", other)
+
 
                             const res = await authApi(token).patch(endpoints['updateMotel'](idMotel), formData, {
                                 headers: {
@@ -122,6 +129,7 @@ const EditMotel = ({ navigation, route }) => {
                             setDistrict(res.data.district);
                             setCity(res.data.city);
                             setOther(res.data.other_address);
+                            showToast1();
                             // Cập nhật route.params.motel
                             navigation.setParams({
                                 motel: res.data,
@@ -141,28 +149,43 @@ const EditMotel = ({ navigation, route }) => {
         }
     }
     useEffect(() => {
-        console.log("Gia trị gửi đến effect:", updatedMotel);
-    }, [updatedMotel]);
-    
+        // Kiểm tra xem các giá trị có thay đổi so với ban đầu không
+        const valuesChanged =
+            price !== motel.price.toString() ||
+            area !== motel.area.toString() ||
+            desc !== motel.description ||
+            maxpeople !== motel.max_people.toString() ||
+            ward !== motel.ward ||
+            district !== motel.district ||
+            city !== motel.city ||
+            other !== motel.other_address ||
+            // images.length !== motel.images.length;
 
+        // Cập nhật giá trị của biến cờ
+        setValuesChanged(valuesChanged);
+    }, [price, area, desc, maxpeople, ward, district, city, other, images]);
 
-
-    // useEffect(() => {
-    //     if (!loading) {
-    //         // Cập nhật lại các state của các ô input
-    //         setPrice(motel.price.toString());
-    //         setArea(motel.area.toString());
-    //         setDesc(motel.description);
-    //         setMaxpeople(motel.max_people.toString());
-    //         setWard(motel.ward);
-    //         setDistrict(motel.district);
-    //         setCity(motel.city);
-    //         setOther(motel.other_address);
-    //     }
-    // }, [loading]);
+    const showToast1 = () => {
+        Toast.show({
+            type: 'success',
+            text1: 'Thành công',
+            text2: 'Cập nhật thông tin thành công.',
+            visibilityTime: 3000, // Thời gian tồn tại của toast (milliseconds)
+            autoHide: true, // Tự động ẩn toast sau khi hết thời gian tồn tại
+        });
+    }
+    const showToast2 = () => {
+        Toast.show({
+            type: 'error',
+            text1: 'Cảnh báo',
+            text2: 'Không có thông tin mới để cập nhật.',
+            visibilityTime: 3000, // Thời gian tồn tại của toast (milliseconds)
+            autoHide: true, // Tự động ẩn toast sau khi hết thời gian tồn tại
+        });
+    }
     const handleExit = () => {
-        
-        console.log("Thoát");console.log("dỮ LIỆU KHI THOÁT",motel);
+
+        console.log("Thoát"); console.log("dỮ LIỆU KHI THOÁT", motel);
         //console.log(motel.images)
         Alert.alert("Thông báo", "Bạn có chắc chắn thoát không?",
             [
