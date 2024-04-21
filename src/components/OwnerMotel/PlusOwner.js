@@ -1,7 +1,6 @@
-import { View, Text, StyleSheet, TouchableNativeFeedback, TouchableWithoutFeedback, Image, FlatList, Dimensions, ScrollView, ActivityIndicator } from "react-native";
+import { View, Text, StyleSheet, TouchableNativeFeedback, TouchableWithoutFeedback, Image, FlatList, Dimensions, ScrollView, ActivityIndicator, Alert } from "react-native";
 import React, { useContext, useEffect, useState } from "react";
 import HomeStyles from "../Home/HomeStyles";
-import { Octicons } from "@expo/vector-icons";
 import { COLOR, SHADOWS } from "../common/color";
 import { Ionicons } from '@expo/vector-icons';
 import { TouchableOpacity } from "react-native-gesture-handler";
@@ -13,10 +12,11 @@ import { MaterialIcons } from '@expo/vector-icons';
 import MyContext from "../../configs/MyContext";
 import { FontAwesome5 } from '@expo/vector-icons';
 import { Entypo } from '@expo/vector-icons';
-import API from "../../configs/API";
 import { authApi } from "../../configs/API";
 import { endpoints } from "../../configs/API";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import Toast from 'react-native-toast-message';
+
 
 const PlusOwner = () => {
     const [currentImageIndex, setCurrentImageIndex] = useState(0);
@@ -88,7 +88,15 @@ const PlusOwner = () => {
             />
         </View>
     );
-
+    const showToast = () => {
+        Toast.show({
+            type: 'success',
+            text1: 'Thành công',
+            text2: 'Xóa nhà trọ thành công.',
+            visibilityTime: 3000, // Thời gian tồn tại của toast (milliseconds)
+            autoHide: true, // Tự động ẩn toast sau khi hết thời gian tồn tại
+        });
+    }
     const handlePress = () => {
         navigation.navigate("Home"); // Quay lại trang trước đó
 
@@ -103,23 +111,47 @@ const PlusOwner = () => {
             let token = await AsyncStorage.getItem("access-token");
             console.log("TOKEN", token);
             console.log("ID", idMotel);
-            await authApi(token).delete(endpoints['deleteMotel'](idMotel));
-            console.log("Xóa nhà thành công");
-            // setStoredMotels(prevMotels => prevMotels.filter(motel => motel.id !== idMotel));
-            // Lọc danh sách nhà trọ mới sau khi xóa nhà trọ thành công
-            const updatedMotels = storedMotels.filter(motel => motel.id !== idMotel);
-            // Cập nhật state với danh sách nhà trọ mới
-            setStoredMotels(updatedMotels);
-            // Cập nhật AsyncStorage với danh sách nhà trọ mới
-            await AsyncStorage.setItem("motels", JSON.stringify(updatedMotels));
-            const motelsauxoa = await AsyncStorage.getItem("motels");
-            console.log("Motel sau xóa:", motelsauxoa);
+            
+            // Hiển thị cửa sổ cảnh báo
+            Alert.alert(
+                'Xác nhận xóa',
+                'Bạn có chắc muốn xóa nhà trọ này?',
+                [
+                    {
+                        text: 'Hủy',
+                        onPress: () => console.log('Hủy xóa'), // Xử lý khi người dùng nhấn Hủy
+                        style: 'cancel',
+                    },
+                    {
+                        text: 'Xóa',
+                        onPress: async () => {
+                            // Xử lý khi người dùng nhấn Xóa
+                            await authApi(token).delete(endpoints['deleteMotel'](idMotel));
+                            console.log("Xóa nhà thành công");
+                            // Lọc danh sách nhà trọ mới sau khi xóa nhà trọ thành công
+                            const updatedMotels = storedMotels.filter(motel => motel.id !== idMotel);
+                            // Cập nhật state với danh sách nhà trọ mới
+                            setStoredMotels(updatedMotels);
+                            // Cập nhật AsyncStorage với danh sách nhà trọ mới
+                            await AsyncStorage.setItem("motels", JSON.stringify(updatedMotels));
+                            const motelsauxoa = await AsyncStorage.getItem("motels");
+                            console.log("Motel sau xóa:", motelsauxoa);
+                            setIsLoading(false);
+                            showToast();
+                        },
+                    },
+                ],
+                { cancelable: true }
+            );
+            
         } catch (ex) {
             console.error(ex);
         } finally {
             setIsLoading(false);
         }
     };
+    
+    
     const handleAddRoomPress = async () => {
         navigation.navigate('RegisterMotel');
         setTriggerRender(!triggerRender);
