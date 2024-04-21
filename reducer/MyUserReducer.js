@@ -6,6 +6,8 @@ const MyUserReducer = (currentState, action) => {
             return null;
         case "update_user":
             return action.payload;// Cập nhật thông tin người dùng khi nhận action update_user
+        case "update_motel":
+            return { ...currentState, motel: action.payload };
 
     }
     return currentState;

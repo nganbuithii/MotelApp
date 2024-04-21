@@ -104,7 +104,10 @@ const PlusOwner = () => {
     const handleEdit= (motel) => {
         // Xử lý khi nút "Sửa" được nhấn
         navigation.navigate("EditMotel", { motel });
-
+        setTriggerRender(!triggerRender);
+        // navigation.addListener('focus', async () => {
+        //     await fetchMotels(); // Cập nhật lại danh sách nhà trọ sau khi thêm mới
+        // });
     };
 
     const handleDelete = async (idMotel) => {
@@ -156,9 +159,9 @@ const PlusOwner = () => {
     const handleAddRoomPress = async () => {
         navigation.navigate('RegisterMotel');
         setTriggerRender(!triggerRender);
-        navigation.addListener('focus', async () => {
-            await fetchMotels(); // Cập nhật lại danh sách nhà trọ sau khi thêm mới
-        });
+        // navigation.addListener('focus', async () => {
+        //     await fetchMotels(); // Cập nhật lại danh sách nhà trọ sau khi thêm mới
+        // });
     };
 
     const handleImageChange = (index) => {
