@@ -5,10 +5,8 @@ import { COLOR, SHADOWS } from "../components/common/color";
 export default StyleSheet.create({
     container: {
         flex: 1,
-        //backgroundColor: COLOR.color3,
         alignContent: "center",
         alignItems: "center"
-        // justifyContent:"center"
     },
     infoContainer: {
         marginTop: 10,
@@ -18,15 +16,10 @@ export default StyleSheet.create({
     inputContainer: {
         flexDirection: "row",
         alignItems: "center",
-        // borderWidth: 1,
-        // borderColor: "#fff"
         borderBottomWidth: 1,
         borderRadius: 5,
         padding: 10,
-        //marginVertical: 5,
         borderColor: "gray",
-        // backgroundColor: "#fff",
-        // paddingHorizontal:10,
         marginHorizontal: 20,
         paddingVertical:15
     },
@@ -37,7 +30,6 @@ export default StyleSheet.create({
     input: {
         width: "85%",
         color:"gray"
-        // padding: 5
     },
     label: {
         color: COLOR.finally,
@@ -86,7 +78,6 @@ export default StyleSheet.create({
         borderRadius: 20,
         marginTop: 5,
         paddingHorizontal: 10
-        // fontSize:10
     },
     addButton: {
         flexDirection: "row",

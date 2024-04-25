@@ -53,7 +53,7 @@ const EditMotel = ({ navigation, route }) => {
         console.log(updatedImages);
     };
     const addPrice = () =>{
-        navigation.navigate("AddPrice")
+        navigation.navigate("AddPrice", {idMotel:motel.id});
     }
 
     const handleAddImage = async () => {
