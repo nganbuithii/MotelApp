@@ -62,11 +62,13 @@ const PlusOwner = () => {
                 // Gọi API để lấy hình ảnh của nhà trọ dựa trên ID
                 const res = await authApi(token).get(endpoints['getImageMotel'](idMotel));
                 const motelImages = res.data.motel_images;
+                const motelPrices = res.data.prices;
+                // console.log("DTATA TEST",motelPrices);
 
                 // Cập nhật state của nhà trọ với danh sách hình ảnh
                 setStoredMotels(prevMotels => prevMotels.map(prevMotel => {
                     if (prevMotel.id === idMotel) {
-                        return { ...prevMotel, images: motelImages };
+                        return { ...prevMotel, images: motelImages, prices: motelPrices  };
                     }
                     return prevMotel;
                 }));
@@ -74,7 +76,9 @@ const PlusOwner = () => {
             setIsLoading(false);
             setMotels(motelData);
         }
-        console.log("STORE MOTELL", motelData);
+        // console.log("STORE MOTELL", motelData);
+        // console.log("STORE MOTELL 222", motelData.prices);
+        // console.log(storedMotels);
     };
     useEffect(() => {
         fetchMotels();
@@ -104,6 +108,8 @@ const PlusOwner = () => {
     const handleEdit= (motel) => {
         // Xử lý khi nút "Sửa" được nhấn
         navigation.navigate("EditMotel", { motel });
+        console.log("Motel khi edit", motel)
+        console.log("Motel khi giá cả", motel.prices)
         setTriggerRender(!triggerRender);
         // navigation.addListener('focus', async () => {
         //     await fetchMotels(); // Cập nhật lại danh sách nhà trọ sau khi thêm mới
@@ -159,9 +165,9 @@ const PlusOwner = () => {
     const handleAddRoomPress = async () => {
         navigation.navigate('RegisterMotel');
         setTriggerRender(!triggerRender);
-        navigation.addListener('focus', async () => {
-            await fetchMotels(); // Cập nhật lại danh sách nhà trọ sau khi thêm mới
-        });
+        // navigation.addListener('focus', async () => {
+        //     await fetchMotels(); // Cập nhật lại danh sách nhà trọ sau khi thêm mới
+        // });
     };
 
     const handleImageChange = (index) => {

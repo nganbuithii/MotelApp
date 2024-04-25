@@ -30,6 +30,8 @@ const EditMotel = ({ navigation, route }) => {
     const [motelData, setMotelData] = useState(route.params.motel);
     const [images, setImages] = useState(motel.images || []);
     const [valuesChanged, setValuesChanged] = useState(false); // Biến cờ để kiểm tra xem giá trị đã thay đổi hay không
+    const [prices, setPrices] = useState(motel.prices);
+
     const handleDeleteImage = (index) => {
         Alert.alert(
             "Xóa ảnh",
@@ -52,8 +54,8 @@ const EditMotel = ({ navigation, route }) => {
         setImages(updatedImages); // Cập nhật state images với bản sao đã xóa ảnh
         console.log(updatedImages);
     };
-    const addPrice = () =>{
-        navigation.navigate("AddPrice", {idMotel:motel.id});
+    const addPrice = () => {
+        navigation.navigate("AddPrice", { idMotel: motel.id });
     }
 
     const handleAddImage = async () => {
@@ -149,6 +151,8 @@ const EditMotel = ({ navigation, route }) => {
                             });
                             const updatedMotel = { /* Thông tin nhà trọ sau khi cập nhật */ };
                             dispatch({ type: 'update_motel', payload: updatedMotel });
+                            setValuesChanged(false);
+                            // setPrices(res.data.prices);
 
                             //showToast();
                         },
@@ -202,6 +206,7 @@ const EditMotel = ({ navigation, route }) => {
 
         console.log("Thoát"); console.log("dỮ LIỆU KHI THOÁT", motel);
         console.log(motel.images);
+        console.log(motel);
         //console.log(motel.images)
         Alert.alert("Thông báo", "Bạn có chắc chắn thoát không?",
             [
@@ -308,28 +313,25 @@ const EditMotel = ({ navigation, route }) => {
                     <TouchableOpacity onPress={addPrice}>
                         <AntDesign style={{ marginLeft: "auto", paddingRight: 20, }} name="pluscircleo" size={24} color={COLOR.PRIMARY} />
                     </TouchableOpacity>
-                    
 
-                    <View style={EditMotelStyle.serviceRow} >
-                        <View style={EditMotelStyle.serviceIt}>
-                            <MaterialIcons name="electric-bolt" size={24} color="green" />
-                            <Text>Điện</Text>
-                            <Text>3.000 đ/Kwh</Text>
-                            <AntDesign style={EditMotelStyle.iconEdit} name="edit" size={24} color="black" />
-                        </View>
-                        <View style={EditMotelStyle.serviceIt}>
-                            <MaterialIcons name="electric-bolt" size={24} color="green" />
-                            <Text>Mạng</Text>
-                            <Text>100.000 đ/ Phòng</Text>
-                            <AntDesign style={EditMotelStyle.iconEdit} name="edit" size={24} color="black" />
-                        </View>
-                        <View style={EditMotelStyle.serviceIt}>
-                            <MaterialIcons name="electric-bolt" size={24} color="green" />
-                            <Text>Nước</Text>
-                            <Text>20.000 đ/m3</Text>
-                            <AntDesign style={EditMotelStyle.iconEdit} name="edit" size={24} color="black" />
-                        </View>
+
+                    <View style={EditMotelStyle.serviceRow}>
+                        {prices.map((item, index) => (
+                            <View key={index} style={EditMotelStyle.serviceIt}>
+                                {/* Icon tương ứng với từng loại dịch vụ */}
+                                {item.period === "Phòng" && <MaterialIcons name="bedroom-child" size={24} color="green" />}
+                                {item.period === "Tháng" && <MaterialIcons name="event" size={24} color="green" />}
+                                {item.period === "Km3" && <MaterialIcons name="local-drink" size={24} color="green" />}
+                                {/* Tên dịch vụ */}
+                                <Text>{item.label}</Text>
+                                {/* Giá và đơn vị */}
+                                <Text>{item.value} đ/{item.period}</Text>
+                                {/* Icon chỉnh sửa */}
+                                <AntDesign style={EditMotelStyle.iconEdit} name="edit" size={24} color="black" />
+                            </View>
+                        ))}
                     </View>
+
                 </View>
                 <View style={EditMotelStyle.serviceInfo}>
                     <Text style={EditMotelStyle.labelService}> Ảnh phòng</Text>
@@ -341,9 +343,9 @@ const EditMotel = ({ navigation, route }) => {
                         showsHorizontalScrollIndicator={false}
                     />
                     {/* <Image
-                        source={require("../../assets/images/hi.gif")}
-                        style={EditMotelStyle.imageMotel}
-                    /> */}
+                            source={require("../../assets/images/hi.gif")}
+                            style={EditMotelStyle.imageMotel}
+                        /> */}
                     <TouchableOpacity onPress={handleAddImage} style={EditMotelStyle.addButton}>
                         <Text style={EditMotelStyle.addButtonText}>Thêm</Text>
                         <AntDesign name="camera" size={20} color="#fff" />

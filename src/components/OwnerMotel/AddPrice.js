@@ -68,8 +68,12 @@ const AddPrice = ({ route }) => {
     };
     const handleSubmit = async () => {
         try {
-            !tenDichVu ? setTenDichVuError("Tên dịch vụ không được để trống") : setTenDichVuError("");
-            
+            if (!tenDichVu) {
+                setTenDichVuError("Tên dịch vụ không được để trống");
+                return;
+            } else {
+                setTenDichVuError("");
+            }
 
             if (!phiDichVu || !/^\d+(\.\d+)?$/.test(phiDichVu)) {
                 setPhiError("Phí dịch vụ không hợp lệ");
@@ -91,12 +95,7 @@ const AddPrice = ({ route }) => {
             } else {
                 setIconError("");
             }
-            if (!donViDo) {
-                setDonviError("Vui lòng điền đơn vị đo");
-                return;
-            } else {
-                setDonviError("");
-            }
+        
 
 
             if (!selectedService || (selectedService === "Theo chỉ số đồng hồ" && !donViDo)) {
@@ -165,16 +164,14 @@ const AddPrice = ({ route }) => {
                 {/* Hiển thị input đơn vị đo khi chọn "Theo chỉ số đồng hồ" */}
                 
                 {showUnitInput && (
-                    <View>
-                        {donviError ? <Text style={{ color: "red", fontSize: 14, }}>{donviError}</Text> : null}
+                    
                     
                     <View style={EditMotelStyle.inputContainer}>
                         <Entypo name="ruler" style={EditMotelStyle.icon} size={24} color="green" />
 
                         <TextInput value={donViDo}
                             onChangeText={(text) => setDonViDo(text)} style={EditMotelStyle.input} placeholder="Nhập đơn vị đo (Vd: Kwh, m3...)" />
-                    </View></View>
-                )}
+                    </View>)}
                 {/* Background mờ */}
                 {modalVisible && <View style={styles.modalBackground} />}
                 {/* Modal */}
