@@ -159,9 +159,9 @@ const PlusOwner = () => {
     const handleAddRoomPress = async () => {
         navigation.navigate('RegisterMotel');
         setTriggerRender(!triggerRender);
-        // navigation.addListener('focus', async () => {
-        //     await fetchMotels(); // Cập nhật lại danh sách nhà trọ sau khi thêm mới
-        // });
+        navigation.addListener('focus', async () => {
+            await fetchMotels(); // Cập nhật lại danh sách nhà trọ sau khi thêm mới
+        });
     };
 
     const handleImageChange = (index) => {

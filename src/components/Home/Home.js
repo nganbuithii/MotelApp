@@ -11,6 +11,7 @@ import NotificationsSc from './NotificationsSc';
 import MyContext from '../../configs/MyContext';
 import PlusOwner from '../OwnerMotel/PlusOwner';
 
+
 const Home = () => {
     const [index, setIndex] = React.useState(0);
     const [user, dispatch] = React.useContext(MyContext);

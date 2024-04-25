@@ -28,6 +28,7 @@ export default StyleSheet.create({
         // backgroundColor: "#fff",
         // paddingHorizontal:10,
         marginHorizontal: 20,
+        paddingVertical:15
     },
     icon: {
         width: 45,
@@ -35,13 +36,14 @@ export default StyleSheet.create({
     },
     input: {
         width: "85%",
+        color:"gray"
         // padding: 5
     },
     label: {
         color: COLOR.finally,
         fontWeight: "500",
         paddingLeft: 10,
-        marginTop: 5,
+        marginTop: 8,
     },
     serviceInfo: {
         marginTop: 15,

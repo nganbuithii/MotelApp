@@ -24,11 +24,11 @@ const EditMotel = ({ navigation, route }) => {
     const [district, setDistrict] = useState(motel.district || "");
     const [city, setCity] = useState(motel.city || "");
     const [other, setOther] = useState(motel.other_address || "");
-    const [images, setImages] = useState(motel.images || []);
     const [loading, setLoading] = useState(false);
     const [user, dispatch] = useContext(MyContext);
     const [updatedMotel, setUpdatedMotel] = useState(route.params.motel);
     const [motelData, setMotelData] = useState(route.params.motel);
+    const [images, setImages] = useState(motel.images || []);
     const [valuesChanged, setValuesChanged] = useState(false); // Biến cờ để kiểm tra xem giá trị đã thay đổi hay không
     const handleDeleteImage = (index) => {
         Alert.alert(
@@ -52,7 +52,9 @@ const EditMotel = ({ navigation, route }) => {
         setImages(updatedImages); // Cập nhật state images với bản sao đã xóa ảnh
         console.log(updatedImages);
     };
-
+    const addPrice = () =>{
+        navigation.navigate("AddPrice")
+    }
 
     const handleAddImage = async () => {
         try {
@@ -66,9 +68,9 @@ const EditMotel = ({ navigation, route }) => {
             console.log(JSON.stringify(selectedImages));
             if (!selectedImages.canceled) {
                 const newImages = selectedImages.assets.filter(asset => asset.uri);
-                // Thêm uri của từng asset mới vào mảng images
-                const imagesWithUri = newImages.map(asset => ({ uri: asset.uri }));
-                setImages([...images, ...imagesWithUri]);
+                // Add new images to the existing images array
+                const updatedImages = [...images, ...newImages];
+                setImages(updatedImages);
             }
         } catch (error) {
             console.log("Error selecting images: ", error);
@@ -98,7 +100,7 @@ const EditMotel = ({ navigation, route }) => {
                         text: 'Cập nhật',
                         onPress: async () => {
                             const formData = new FormData();
-                            console.log("Giá trị other_address được gửi đi:", other);
+                            console.log(images);
 
                             formData.append("price", price);
                             formData.append("area", area);
@@ -107,7 +109,18 @@ const EditMotel = ({ navigation, route }) => {
                             formData.append("ward", ward);
                             formData.append("district", district);
                             formData.append("city", city);
-                            formData.append("other_address", other)
+                            formData.append("other_address", other);
+                            // Thêm ảnh vào FormData
+                            images.forEach((image, index) => {
+                                if (image.uri) {
+                                    formData.append(`images`, {
+                                        uri: image.uri,
+                                        type: 'image/jpeg',
+                                        name: `image_${index}.jpg`,
+                                    });
+                                }
+                            });
+
 
 
                             const res = await authApi(token).patch(endpoints['updateMotel'](idMotel), formData, {
@@ -116,7 +129,6 @@ const EditMotel = ({ navigation, route }) => {
                                 },
                             });
                             console.log("Data returned from API:", res.data);
-                            // Cập nhật state updatedMotel với dữ liệu mới từ res.data
                             // Cập nhật state updatedMotel với dữ liệu mới từ res.data
                             setUpdatedMotel(res.data);
                             console.log("Cập nhật thành công");
@@ -129,6 +141,7 @@ const EditMotel = ({ navigation, route }) => {
                             setDistrict(res.data.district);
                             setCity(res.data.city);
                             setOther(res.data.other_address);
+                            //setImages(res.data.motel_images);
                             showToast1();
                             // Cập nhật route.params.motel
                             navigation.setParams({
@@ -149,7 +162,9 @@ const EditMotel = ({ navigation, route }) => {
         }
     }
     useEffect(() => {
-        // Kiểm tra xem các giá trị có thay đổi so với ban đầu không
+        // Kiểm tra xem giá trị của images có thay đổi hay không
+        const imagesChanged = JSON.stringify(images) !== JSON.stringify(motel.images);
+        // Kiểm tra xem các giá trị khác có thay đổi so với ban đầu không
         const valuesChanged =
             price !== motel.price.toString() ||
             area !== motel.area.toString() ||
@@ -158,12 +173,12 @@ const EditMotel = ({ navigation, route }) => {
             ward !== motel.ward ||
             district !== motel.district ||
             city !== motel.city ||
-            other !== motel.other_address ||
-            // images.length !== motel.images.length;
+            other !== motel.other_address;
 
         // Cập nhật giá trị của biến cờ
-        setValuesChanged(valuesChanged);
+        setValuesChanged(valuesChanged || imagesChanged);
     }, [price, area, desc, maxpeople, ward, district, city, other, images]);
+
 
     const showToast1 = () => {
         Toast.show({
@@ -186,6 +201,7 @@ const EditMotel = ({ navigation, route }) => {
     const handleExit = () => {
 
         console.log("Thoát"); console.log("dỮ LIỆU KHI THOÁT", motel);
+        console.log(motel.images);
         //console.log(motel.images)
         Alert.alert("Thông báo", "Bạn có chắc chắn thoát không?",
             [
@@ -289,7 +305,10 @@ const EditMotel = ({ navigation, route }) => {
 
                 <View style={EditMotelStyle.serviceInfo}>
                     <Text style={EditMotelStyle.labelService}> Thông tin dịch vụ</Text>
-                    <AntDesign style={{ marginLeft: "auto", paddingRight: 20, }} name="pluscircleo" size={24} color={COLOR.PRIMARY} />
+                    <TouchableOpacity onPress={addPrice}>
+                        <AntDesign style={{ marginLeft: "auto", paddingRight: 20, }} name="pluscircleo" size={24} color={COLOR.PRIMARY} />
+                    </TouchableOpacity>
+                    
 
                     <View style={EditMotelStyle.serviceRow} >
                         <View style={EditMotelStyle.serviceIt}>
