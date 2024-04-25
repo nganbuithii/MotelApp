@@ -15,6 +15,13 @@ import { authApi, endpoints } from "../../configs/API";
 import Toast from 'react-native-toast-message';
 import MyContext from "../../configs/MyContext";
 const EditMotel = ({ navigation, route }) => {
+    const defaultServices = [
+        { label: "Điện", value: "Giá điện", period: "Tháng" },
+        { label: "Nước", value: "Giá nước", period: "m3" },
+        { label: "Internet", value: "Giá mạng", period: "Tháng" }
+    ];
+
+
     const { motel } = route.params;
     const [price, setPrice] = useState(motel.price.toString() || "");
     const [area, setArea] = useState(motel.area.toString() || "");
@@ -309,30 +316,39 @@ const EditMotel = ({ navigation, route }) => {
                 </View>
 
                 <View style={EditMotelStyle.serviceInfo}>
-                    <Text style={EditMotelStyle.labelService}> Thông tin dịch vụ</Text>
+                    <Text style={EditMotelStyle.labelService}>Thông tin dịch vụ</Text>
                     <TouchableOpacity onPress={addPrice}>
-                        <AntDesign style={{ marginLeft: "auto", paddingRight: 20, }} name="pluscircleo" size={24} color={COLOR.PRIMARY} />
+                        <AntDesign style={{ marginLeft: "auto", paddingRight: 20 }} name="pluscircleo" size={24} color={COLOR.PRIMARY} />
                     </TouchableOpacity>
 
-
                     <View style={EditMotelStyle.serviceRow}>
+                        {/* Hiển thị các dịch vụ mặc định */}
+                        {defaultServices.map((item, index) => (
+                            <View key={index} style={EditMotelStyle.serviceIt}>
+                                {item.period === "Tháng" && <MaterialIcons name="event" size={24} color="green" />}
+                                {item.period === "m3" && <MaterialIcons name="local-drink" size={24} color="green" />}
+                                <Text>{item.label}</Text>
+                                <Text>{item.value} đ/{item.period}</Text>
+                                <AntDesign style={EditMotelStyle.iconEdit} name="edit" size={24} color="black" />
+                            </View>
+                        ))}
+                        {/* Hiển thị các dịch vụ từ mảng prices */}
                         {prices.map((item, index) => (
                             <View key={index} style={EditMotelStyle.serviceIt}>
-                                {/* Icon tương ứng với từng loại dịch vụ */}
-                                {item.period === "Phòng" && <MaterialIcons name="bedroom-child" size={24} color="green" />}
-                                {item.period === "Tháng" && <MaterialIcons name="event" size={24} color="green" />}
-                                {item.period === "Km3" && <MaterialIcons name="local-drink" size={24} color="green" />}
-                                {/* Tên dịch vụ */}
+                                {/* Thay đổi icon tùy thuộc vào loại dịch vụ */}
+                                {item.type === "electricity" && <MaterialCommunityIcons name="power-plug" size={24} color="green" />}
+                                {item.type === "water" && <MaterialCommunityIcons name="water" size={24} color="green" />}
+                                {item.type === "internet" && <FontAwesome name="wifi" size={24} color="green" />}
                                 <Text>{item.label}</Text>
-                                {/* Giá và đơn vị */}
                                 <Text>{item.value} đ/{item.period}</Text>
-                                {/* Icon chỉnh sửa */}
                                 <AntDesign style={EditMotelStyle.iconEdit} name="edit" size={24} color="black" />
                             </View>
                         ))}
                     </View>
-
                 </View>
+
+
+
                 <View style={EditMotelStyle.serviceInfo}>
                     <Text style={EditMotelStyle.labelService}> Ảnh phòng</Text>
                     <FlatList
