@@ -8,9 +8,10 @@ import ButtonAuth from "../common/ButtonAuth";
 import EditMotelStyle from "../../Styles/EditMotelStyle";
 import { authApi, endpoints } from "../../configs/API";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import Toast from "react-native-toast-message";
 
-const AddPrice = ({route}) => {
-    const {idMotel } = route.params;
+const AddPrice = ({ route }) => {
+    const { idMotel } = route.params;
 
     const [selectedIcon, setSelectedIcon] = useState("");
     const [selectedService, setSelectedService] = useState("");
@@ -22,6 +23,12 @@ const AddPrice = ({route}) => {
     const [phiDichVu, setPhiDichVu] = useState("");
     const [donViDo, setDonViDo] = useState("");
 
+    const [tenDichVuError, setTenDichVuError] = useState("");
+    const [phiError, setPhiError] = useState("");
+    const [serviceError, setServiceError] = useState("");
+    const [iconError, setIconError] = useState("");
+    const [donviError, setDonviError] = useState("");
+
     const openModal = () => {
         setModalVisible(true);
     };
@@ -32,6 +39,24 @@ const AddPrice = ({route}) => {
         setSelectedIcon(icon);
         setModalIconVisible(false); // Đóng modal chọn icon
     };
+    const showToast1 = () => {
+        Toast.show({
+            type: 'success',
+            text1: 'Thành công',
+            text2: 'Thêm thông tin thành công.',
+            visibilityTime: 3000, // Thời gian tồn tại của toast (milliseconds)
+            autoHide: true, // Tự động ẩn toast sau khi hết thời gian tồn tại
+        });
+    }
+    const showToast2 = () => {
+        Toast.show({
+            type: 'error',
+            text1: 'Thất bại',
+            text2: 'Thêm thông tin thất bại.',
+            visibilityTime: 3000, // Thời gian tồn tại của toast (milliseconds)
+            autoHide: true, // Tự động ẩn toast sau khi hết thời gian tồn tại
+        });
+    }
     const selectService = (service) => {
         setSelectedService(service);
         if (service === "Theo chỉ số đồng hồ") {
@@ -41,23 +66,59 @@ const AddPrice = ({route}) => {
         }
         setModalVisible(false);
     };
-    const handleSubmit = async() =>{
-        try{
+    const handleSubmit = async () => {
+        try {
+            !tenDichVu ? setTenDichVuError("Tên dịch vụ không được để trống") : setTenDichVuError("");
+            
+
+            if (!phiDichVu || !/^\d+(\.\d+)?$/.test(phiDichVu)) {
+                setPhiError("Phí dịch vụ không hợp lệ");
+                return;
+            } else {
+                setPhiError("");
+            }
+
+            if (!selectedService) {
+                setServiceError("Vui lòng chọn thu phí dựa trên");
+                return;
+            } else {
+                setServiceError("");
+            }
+
+            if (!selectedIcon) {
+                setIconError("Vui lòng chọn icon");
+                return;
+            } else {
+                setIconError("");
+            }
+            if (!donViDo) {
+                setDonviError("Vui lòng điền đơn vị đo");
+                return;
+            } else {
+                setDonviError("");
+            }
+
+
+            if (!selectedService || (selectedService === "Theo chỉ số đồng hồ" && !donViDo)) {
+                showToast2();
+                return;
+            }
+
             const token = await AsyncStorage.getItem("access-token");
             console.log(token);
             console.log(idMotel);
             const formData = new FormData();
-            formData.append("label","OTHER");
-            formData.append("value",phiDichVu);
+            formData.append("label", "OTHER");
+            formData.append("value", phiDichVu);
             let period = "";
             if (selectedService === "Theo chỉ số đồng hồ") {
-                period = donViDo; // Nếu là "Theo chỉ số đồng hồ", sử dụng giá trị từ ô input đơn vị đo
+                period = donViDo;
             } else if (selectedService === "Người hoặc số lượng") {
-                period = "Tháng"; // Nếu là "Người hoặc số lượng", sử dụng giá trị mặc định là "Tháng"
+                period = "Tháng";
             } else if (selectedService === "Phòng") {
-                period = "Phòng"; // Nếu là "Phòng", sử dụng giá trị mặc định là "Phòng"
+                period = "Phòng";
             }
-            formData.append("period",period);
+            formData.append("period", period);
 
             let res = await authApi(token).post(endpoints['addPrice'](idMotel), formData, {
                 headers: {
@@ -66,28 +127,35 @@ const AddPrice = ({route}) => {
             });
             console.log(res.data);
             console.log("Thanh công add price");
-            
-        }catch(ex){
+            showToast1();
+
+        } catch (ex) {
             console.error(ex);
         }
     }
+
     return (
         <View style={styles.container}>
             <View style={modalVisible ? styles.modalBackground : null} />
             <View style={styles.box}>
+
                 <Text style={EditMotelStyle.label}>Tên dịch vụ</Text>
+                {tenDichVuError ? <Text style={{ color: "red" }}>{tenDichVuError}</Text> : null}
                 <View style={EditMotelStyle.inputContainer}>
                     <FontAwesome6 name="hand-holding-heart" style={EditMotelStyle.icon} size={24} color="green" />
                     <TextInput value={tenDichVu}
-                onChangeText={(text) => setTenDichVu(text)} style={EditMotelStyle.input} placeholder="Nhập tên dịch vụ" />
+                        onChangeText={(text) => setTenDichVu(text)} style={EditMotelStyle.input} placeholder="Nhập tên dịch vụ" />
+
                 </View>
                 <Text style={EditMotelStyle.label}>Phí dịch vụ</Text>
+                {phiError ? <Text style={{ color: "red" }}>{phiError}</Text> : null}
                 <View style={EditMotelStyle.inputContainer}>
                     <Fontisto name="money-symbol" style={EditMotelStyle.icon} size={24} color="green" />
                     <TextInput value={phiDichVu}
-                onChangeText={(text) => setPhiDichVu(text)} style={EditMotelStyle.input} placeholder="Nhập phí dịch vụ" />
+                        onChangeText={(text) => setPhiDichVu(text)} style={EditMotelStyle.input} placeholder="Nhập phí dịch vụ" />
                 </View>
                 <Text style={EditMotelStyle.label}>Thu phí dựa trên</Text>
+                {serviceError ? <Text style={{ color: "red" }}>{serviceError}</Text> : null}
                 <View style={EditMotelStyle.inputContainer}>
                     <MaterialCommunityIcons name="vector-arrange-below" style={EditMotelStyle.icon} size={24} color="green" />
                     <TouchableOpacity style={EditMotelStyle.input} onPress={openModal}>
@@ -95,12 +163,17 @@ const AddPrice = ({route}) => {
                     </TouchableOpacity>
                 </View>
                 {/* Hiển thị input đơn vị đo khi chọn "Theo chỉ số đồng hồ" */}
+                
                 {showUnitInput && (
+                    <View>
+                        {donviError ? <Text style={{ color: "red", fontSize: 14, }}>{donviError}</Text> : null}
+                    
                     <View style={EditMotelStyle.inputContainer}>
                         <Entypo name="ruler" style={EditMotelStyle.icon} size={24} color="green" />
+
                         <TextInput value={donViDo}
-                onChangeText={(text) => setDonViDo(text)} style={EditMotelStyle.input} placeholder="Nhập đơn vị đo (Vd: Kwh, m3...)" />
-                    </View>
+                            onChangeText={(text) => setDonViDo(text)} style={EditMotelStyle.input} placeholder="Nhập đơn vị đo (Vd: Kwh, m3...)" />
+                    </View></View>
                 )}
                 {/* Background mờ */}
                 {modalVisible && <View style={styles.modalBackground} />}
@@ -133,6 +206,7 @@ const AddPrice = ({route}) => {
                 </Modal>
                 {/* Button chọn icon */}
                 <Text style={EditMotelStyle.label}>Icon dịch vụ</Text>
+                {iconError ? <Text style={{ color: "red" }}>{iconError}</Text> : null}
                 <TouchableOpacity style={styles.inputContainer} onPress={openIconModal}>
                     {selectedIcon ? (
                         <View style={styles.iconContainer}>
@@ -181,7 +255,7 @@ const AddPrice = ({route}) => {
                         </View>
                     </View>
                 </Modal>
-                <ButtonAuth title="Thêm dịch vụ" onPress={handleSubmit}/>
+                <ButtonAuth title="Thêm dịch vụ" onPress={handleSubmit} />
             </View>
         </View>
     );
