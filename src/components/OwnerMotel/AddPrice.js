@@ -12,6 +12,7 @@ const AddPrice = () => {
     const [selectedService, setSelectedService] = useState("");
     const [modalVisible, setModalVisible] = useState(false);
     const [modalIconVisible, setModalIconVisible] = useState(false); // State cho modal chọn icon
+    const [showUnitInput, setShowUnitInput] = useState(false); // State cho việc hiển thị input đơn vị đo
 
     const openModal = () => {
         setModalVisible(true);
@@ -25,16 +26,18 @@ const AddPrice = () => {
     };
     const selectService = (service) => {
         setSelectedService(service);
+        if (service === "Theo chỉ số đồng hồ") {
+            setShowUnitInput(true); // Hiển thị input đơn vị đo nếu chọn "Theo chỉ số đồng hồ"
+        } else {
+            setShowUnitInput(false); // Ẩn input đơn vị đo khi chọn dịch vụ khác
+        }
         setModalVisible(false);
     };
-
 
     return (
         <View style={styles.container}>
             <View style={modalVisible ? styles.modalBackground : null} />
             <View style={styles.box}>
-
-
                 <Text style={EditMotelStyle.label}>Tên dịch vụ</Text>
                 <View style={EditMotelStyle.inputContainer}>
                     <FontAwesome6 name="hand-holding-heart" style={EditMotelStyle.icon} size={24} color="green" />
@@ -52,6 +55,13 @@ const AddPrice = () => {
                         <Text>{selectedService || "Chọn dịch vụ"}</Text>
                     </TouchableOpacity>
                 </View>
+                {/* Hiển thị input đơn vị đo khi chọn "Theo chỉ số đồng hồ" */}
+                {showUnitInput && (
+                    <View style={EditMotelStyle.inputContainer}>
+                        <Entypo name="ruler" style={EditMotelStyle.icon} size={24} color="green" />
+                        <TextInput style={EditMotelStyle.input} placeholder="Nhập đơn vị đo (Vd: Kwh, m3...)" />
+                    </View>
+                )}
                 {/* Background mờ */}
                 {modalVisible && <View style={styles.modalBackground} />}
                 {/* Modal */}
@@ -87,14 +97,11 @@ const AddPrice = () => {
                     {selectedIcon ? (
                         <View style={styles.iconContainer}>
                             {/* Hiển thị icon được chọn */}
-                            {selectedIcon === "IC1" && <MaterialIcons name="electric-bolt" size={24} color="black" />
-                            }
+                            {selectedIcon === "IC1" && <MaterialIcons name="electric-bolt" size={24} color="black" />}
                             {selectedIcon === "IC2" && <MaterialIcons name="garage" size={24} color="black" />}
                             {selectedIcon === "IC3" && <MaterialIcons name="cleaning-services" size={24} color="black" />}
-                            {selectedIcon === "IC4" && <MaterialIcons name="cell-wifi" size={24} color="black" />
-                            }
-                            {selectedIcon === "IC5" && <FontAwesome5 name="fan" size={24} color="black" />
-                            }
+                            {selectedIcon === "IC4" && <MaterialIcons name="cell-wifi" size={24} color="black" />}
+                            {selectedIcon === "IC5" && <FontAwesome5 name="fan" size={24} color="black" />}
                             {selectedIcon === "IC6" && <Entypo name="fingerprint" size={24} color="black" />}
                         </View>
                     ) : (
@@ -115,19 +122,19 @@ const AddPrice = () => {
                             <TouchableOpacity style={styles.modalIc} onPress={() => selectIcon("IC1")}>
                                 <MaterialIcons name="electric-bolt" size={30} color="black" />
                             </TouchableOpacity>
-                            <TouchableOpacity style={styles.modalIc}  onPress={() => selectIcon("IC2")}>
+                            <TouchableOpacity style={styles.modalIc} onPress={() => selectIcon("IC2")}>
                                 <MaterialIcons name="garage" size={30} color="black" />
                             </TouchableOpacity>
-                            <TouchableOpacity  style={styles.modalIc} onPress={() => selectIcon("IC3")}>
+                            <TouchableOpacity style={styles.modalIc} onPress={() => selectIcon("IC3")}>
                                 <MaterialIcons name="cleaning-services" size={30} color="black" />
                             </TouchableOpacity>
-                            <TouchableOpacity  style={styles.modalIc} onPress={() => selectIcon("IC4")}>
+                            <TouchableOpacity style={styles.modalIc} onPress={() => selectIcon("IC4")}>
                                 <MaterialIcons name="cell-wifi" size={30} color="black" />
                             </TouchableOpacity>
-                            <TouchableOpacity  style={styles.modalIc} onPress={() => selectIcon("IC5")}>
+                            <TouchableOpacity style={styles.modalIc} onPress={() => selectIcon("IC5")}>
                                 <FontAwesome5 name="fan" size={30} color="black" />
                             </TouchableOpacity>
-                            <TouchableOpacity  style={styles.modalIc} onPress={() => selectIcon("IC6")}>
+                            <TouchableOpacity style={styles.modalIc} onPress={() => selectIcon("IC6")}>
                                 <Entypo name="fingerprint" size={30} color="black" />
                             </TouchableOpacity>
                             {/* Add more icon options as needed */}
@@ -147,23 +154,23 @@ const styles = StyleSheet.create({
         alignItems: "center"
     },
     box: {
-        flex: 0.7,
+        // flex: 0.7,
         width: "94%",
-        alignContent:"center",
+        alignContent: "center",
         backgroundColor: "#fff",
         padding: 20,
-        // borderRadius:20,
+        borderRadius: 20,
         ...SHADOWS.medium,
         margin: 15,
-        paddingVertical: 50,
-        alignItems:"center"
+        paddingVertical: 60,
+        alignItems: "center"
 
     },
     // Làm mờ khi modal box xuất hiện 
-    modalBackground: {
-        ...StyleSheet.absoluteFillObject,
-        backgroundColor: "rgba(0, 0, 0, 0.5)",
-    },
+    // modalBackground: {
+    //     ...StyleSheet.absoluteFillObject,
+    //     backgroundColor: "rgba(0, 0, 0, 0.5)",
+    // },
     centeredView: {
         flex: 1,
         justifyContent: "flex-end",
@@ -183,14 +190,14 @@ const styles = StyleSheet.create({
         ...SHADOWS.medium,
         borderTopLeftRadius: 20,
         borderTopRightRadius: 20,
-        flexDirection:"row",
-        flexWrap:"wrap",
-        justifyContent:"center",
-        paddingLeft:80
+        flexDirection: "row",
+        flexWrap: "wrap",
+        justifyContent: "center",
+        paddingLeft: 80
     },
-    modalIc:{
-        width:"30%",
-        
+    modalIc: {
+        width: "30%",
+
     },
     modalText: {
         marginBottom: 5,
