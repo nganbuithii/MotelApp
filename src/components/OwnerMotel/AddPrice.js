@@ -46,7 +46,8 @@ const AddPrice = ({ route }) => {
         setModalIconVisible(false); // Đóng modal chọn icon
     };
     const selectType = (type) => {
-        setSelectedType(type); // Sửa thành setSelectedType
+        setSelectedType(type);
+        setTenDichVu(type); // Cập nhật tên dịch vụ dựa trên loại dịch vụ được chọn
         setModalTypeVisible(false);
     };
     
@@ -113,12 +114,19 @@ const AddPrice = ({ route }) => {
                 showToast2();
                 return;
             }
-
+            const serviceLabels = {
+                "Điện": "ELECTRICITY",
+                "Nước": "WATER",
+                "Mạng": "INTERNET",
+                "Khác": "OTHER"
+            };
+            
             const token = await AsyncStorage.getItem("access-token");
             console.log(token);
             console.log(idMotel);
             const formData = new FormData();
-            formData.append("label", "OTHER");
+            formData.append("label", serviceLabels[selectedType]);
+
             formData.append("value", phiDichVu);
             let period = "";
             if (selectedService === "Theo chỉ số đồng hồ") {
