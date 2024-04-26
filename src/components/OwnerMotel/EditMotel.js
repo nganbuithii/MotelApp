@@ -1,43 +1,51 @@
-import { View, Text, StyleSheet, TextInput, FlatList, TouchableOpacity, Image, ScrollView, Alert, ActivityIndicator } from "react-native"
+import {
+    View,
+    Text,
+    StyleSheet,
+    TextInput,
+    FlatList,
+    TouchableOpacity,
+    Image,
+    ScrollView,
+    Alert,
+    ActivityIndicator,
+} from "react-native";
 import HomeStyles from "../Home/HomeStyles";
 import { Entypo, MaterialIcons } from "@expo/vector-icons";
 import { COLOR } from "../common/color";
-import { AntDesign } from '@expo/vector-icons';
-import { MaterialCommunityIcons } from '@expo/vector-icons';
-import { FontAwesome } from '@expo/vector-icons';
-import { FontAwesome6 } from '@expo/vector-icons';
-import { FontAwesome5 } from '@expo/vector-icons';
-import EditMotelStyle from '../../Styles/EditMotelStyle'
+import { AntDesign } from "@expo/vector-icons";
+import { MaterialCommunityIcons } from "@expo/vector-icons";
+import { FontAwesome } from "@expo/vector-icons";
+import { FontAwesome6 } from "@expo/vector-icons";
+import { FontAwesome5 } from "@expo/vector-icons";
+import EditMotelStyle from "../../Styles/EditMotelStyle";
 import * as ImagePicker from "expo-image-picker";
 import { useContext, useEffect, useState } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { authApi, endpoints } from "../../configs/API";
-import Toast from 'react-native-toast-message';
+import Toast from "react-native-toast-message";
 import MyContext from "../../configs/MyContext";
 const EditMotel = ({ navigation, route }) => {
     const defaultServices = [
         { label: "Điện", value: "Giá điện", period: "Tháng" },
         { label: "Nước", value: "Giá nước", period: "m3" },
-        { label: "Internet", value: "Giá mạng", period: "Tháng" }
+        { label: "Internet", value: "Giá mạng", period: "Tháng" },
     ];
 
-
-    const { motel } = route.params;
-    const [price, setPrice] = useState(motel.price.toString() || "");
-    const [area, setArea] = useState(motel.area.toString() || "");
-    const [desc, setDesc] = useState(motel.description || "");
-    const [maxpeople, setMaxpeople] = useState(motel.max_people.toString() || "");
-    const [ward, setWard] = useState(motel.ward || "");
-    const [district, setDistrict] = useState(motel.district || "");
-    const [city, setCity] = useState(motel.city || "");
-    const [other, setOther] = useState(motel.other_address || "");
+    const { idMotel } = route.params;
+    const [price, setPrice] = useState("");
+    const [area, setArea] = useState("");
+    const [desc, setDesc] = useState("");
+    const [maxpeople, setMaxpeople] = useState("");
+    const [ward, setWard] = useState("");
+    const [district, setDistrict] = useState("");
+    const [city, setCity] = useState("");
+    const [other, setOther] = useState("");
     const [loading, setLoading] = useState(false);
-    const [user, dispatch] = useContext(MyContext);
-    const [updatedMotel, setUpdatedMotel] = useState(route.params.motel);
-    const [motelData, setMotelData] = useState(route.params.motel);
-    const [images, setImages] = useState(motel.images || []);
-    const [valuesChanged, setValuesChanged] = useState(false); // Biến cờ để kiểm tra xem giá trị đã thay đổi hay không
-    const [prices, setPrices] = useState(motel.prices);
+    const [images, setImages] = useState([]);
+    const [prices, setPrices] = useState([]);
+    const [render, setRender] = useState(false);
+    // const [valuesChanged, setValuesChanged] = useState(false); // Biến cờ để kiểm tra xem giá trị đã thay đổi hay không
 
     const handleDeleteImage = (index) => {
         Alert.alert(
@@ -48,22 +56,95 @@ const EditMotel = ({ navigation, route }) => {
                 {
                     text: "Xóa",
                     onPress: () => deleteImage(index),
-                    style: "destructive"
-                }
+                    style: "destructive",
+                },
             ],
             { cancelable: false }
         );
     };
 
-    const deleteImage = (index) => {
-        const updatedImages = [...images]; // Tạo một bản sao của mảng images
-        updatedImages.splice(index, 1); // Xóa ảnh khỏi bản sao
-        setImages(updatedImages); // Cập nhật state images với bản sao đã xóa ảnh
-        console.log(updatedImages);
+    useEffect(() => {
+        // Gọi hàm để lấy dữ liệu từ API khi component được render
+
+        loadDetailMotel();
+        console.log("USE EFFECT ĐƯỢC GỌI LẠI");
+    }, [render]);
+
+    const loadDetailMotel = async () => {
+        try {
+            // Gọi API để lấy dữ liệu chi tiết của nhà trọ với idMotel
+            const token = await AsyncStorage.getItem("access-token");
+            const res = await authApi(token).get(endpoints["detailMotel"](idMotel));
+
+            console.log("DATA API:", res.data);
+            console.log("Lấy thông tin nhà trọ thanhfc ông");
+            console.log(res.data.area);
+            // setLoading(true);
+
+            setWard(res.data.ward);
+            setDistrict(res.data.district);
+            setCity(res.data.city);
+            setOther(res.data.other_address);
+            setPrice(String(res.data.price));
+            setArea(String(res.data.area));
+            setMaxpeople(String(res.data.max_people));
+            setDesc(res.data.description);
+
+            console.log("Mảng ảnh:", res.data.motel_images);
+            console.log("Mảng prices:", res.data.prices);
+            setPrices(res.data.prices);
+            setImages(res.data.motel_images);
+        } catch (error) {
+            console.error("Error fetching motel detail:", error);
+            // Xử lý lỗi nếu có
+            Alert.alert(
+                "Error",
+                "Failed to load motel detail. Please try again later."
+            );
+        }
+    };
+
+    const showToast1 = () => {
+        Toast.show({
+            type: "success",
+            text1: "Thành công",
+            text2: "Cập nhật thông tin thành công.",
+            visibilityTime: 3000, // Thời gian tồn tại của toast (milliseconds)
+            autoHide: true, // Tự động ẩn toast sau khi hết thời gian tồn tại
+        });
+    };
+    const showToast2 = () => {
+        Toast.show({
+            type: "error",
+            text1: "Cảnh báo",
+            text2: "Không có thông tin mới để cập nhật.",
+            visibilityTime: 3000, // Thời gian tồn tại của toast (milliseconds)
+            autoHide: true, // Tự động ẩn toast sau khi hết thời gian tồn tại
+        });
+    };
+    const handleExit = () => {
+        console.log("Thoát");
+        console.log("dỮ LIỆU KHI THOÁT");
+        // console.log(motel.images);
+        console.log("id", idMotel);
+        //console.log(motel.images)
+        Alert.alert(
+            "Thông báo",
+            "Bạn có chắc chắn thoát không?",
+            [
+                {
+                    text: "Hủy",
+                    onPress: () => console.log("Cancel Pressed"),
+                    style: "cancel",
+                },
+                { text: "Thoát", onPress: () => navigation.goBack() },
+            ],
+            { cancelable: false }
+        );
     };
     const addPrice = () => {
-        navigation.navigate("AddPrice", { idMotel: motel.id });
-    }
+        navigation.navigate("AddPrice", { idMotel });
+    };
 
     const handleAddImage = async () => {
         try {
@@ -76,278 +157,276 @@ const EditMotel = ({ navigation, route }) => {
             });
             console.log(JSON.stringify(selectedImages));
             if (!selectedImages.canceled) {
-                const newImages = selectedImages.assets.filter(asset => asset.uri);
-                // Add new images to the existing images array
-                const updatedImages = [...images, ...newImages];
-                setImages(updatedImages);
+                const newImages = selectedImages.assets.filter((asset) => asset.uri);
+                // Upload new images to the server
+                await uploadImages(newImages);
             }
         } catch (error) {
             console.log("Error selecting images: ", error);
         }
     };
-    const handleSaveInfo = async () => {
-        if (!valuesChanged) {
-            showToast2();
-            return;
-        }
+    const uploadImages = async (newImages) => {
         try {
             const token = await AsyncStorage.getItem("access-token");
-            const idMotel = updatedMotel.id; // Sử dụng updatedMotel thay vì motel
-
-            console.log(idMotel);
-            console.log(token);
-            Alert.alert(
-                'Xác nhận ',
-                'Bạn muốn cập nhật thông tin?',
-                [
-                    {
-                        text: 'Hủy',
-                        onPress: () => console.log('Hủy update'), // Xử lý khi người dùng nhấn Hủy
-                        style: 'cancel',
-                    },
-                    {
-                        text: 'Cập nhật',
-                        onPress: async () => {
-                            const formData = new FormData();
-                            console.log(images);
-
-                            formData.append("price", price);
-                            formData.append("area", area);
-                            formData.append("description", desc);
-                            // if (maxpeople !== motel.max_people) formData.append("max_people", maxpeople);
-                            formData.append("ward", ward);
-                            formData.append("district", district);
-                            formData.append("city", city);
-                            formData.append("other_address", other);
-                            // Thêm ảnh vào FormData
-                            images.forEach((image, index) => {
-                                if (image.uri) {
-                                    formData.append(`images`, {
-                                        uri: image.uri,
-                                        type: 'image/jpeg',
-                                        name: `image_${index}.jpg`,
-                                    });
-                                }
-                            });
-
-
-
-                            const res = await authApi(token).patch(endpoints['updateMotel'](idMotel), formData, {
-                                headers: {
-                                    'Content-Type': 'multipart/form-data',
-                                },
-                            });
-                            console.log("Data returned from API:", res.data);
-                            // Cập nhật state updatedMotel với dữ liệu mới từ res.data
-                            setUpdatedMotel(res.data);
-                            console.log("Cập nhật thành công");
-                            // Cập nhật các state với dữ liệu mới từ res.data
-                            setPrice(res.data.price.toString());
-                            setArea(res.data.area.toString());
-                            setDesc(res.data.description);
-                            // //setMaxpeople(res.data.max_people.toString());
-                            setWard(res.data.ward);
-                            setDistrict(res.data.district);
-                            setCity(res.data.city);
-                            setOther(res.data.other_address);
-                            //setImages(res.data.motel_images);
-                            showToast1();
-                            // Cập nhật route.params.motel
-                            navigation.setParams({
-                                motel: res.data,
-                            });
-                            const updatedMotel = { /* Thông tin nhà trọ sau khi cập nhật */ };
-                            dispatch({ type: 'update_motel', payload: updatedMotel });
-                            setValuesChanged(false);
-                            // setPrices(res.data.prices);
-
-                            //showToast();
-                        },
-                    },
-                ],
-                { cancelable: true }
-            );
+            const formData = new FormData();
+            newImages.forEach((image, index) => {
+                formData.append(`images`, {
+                    uri: image.uri,
+                    type: 'image/jpeg',
+                    name: `image_${index}.jpg`,
+                });
+            });
+            let res = await authApi(token).post(endpoints['upImgMotel'](idMotel), formData, {
+                headers: {
+                    'Content-Type': 'multipart/form-data',
+                },
+            });
+            console.log("UP ANH MOI THANH CONG :",res.data);
+            console.log("Uploaded images successfully");
+            setRender(true);
         } catch (ex) {
             console.error(ex);
-            setLoading(false);
         }
-    }
-    useEffect(() => {
-        // Kiểm tra xem giá trị của images có thay đổi hay không
-        const imagesChanged = JSON.stringify(images) !== JSON.stringify(motel.images);
-        // Kiểm tra xem các giá trị khác có thay đổi so với ban đầu không
-        const valuesChanged =
-            price !== motel.price.toString() ||
-            area !== motel.area.toString() ||
-            desc !== motel.description ||
-            maxpeople !== motel.max_people.toString() ||
-            ward !== motel.ward ||
-            district !== motel.district ||
-            city !== motel.city ||
-            other !== motel.other_address;
 
-        // Cập nhật giá trị của biến cờ
-        setValuesChanged(valuesChanged || imagesChanged);
-    }, [price, area, desc, maxpeople, ward, district, city, other, images]);
+    };
 
-
-    const showToast1 = () => {
-        Toast.show({
-            type: 'success',
-            text1: 'Thành công',
-            text2: 'Cập nhật thông tin thành công.',
-            visibilityTime: 3000, // Thời gian tồn tại của toast (milliseconds)
-            autoHide: true, // Tự động ẩn toast sau khi hết thời gian tồn tại
-        });
-    }
-    const showToast2 = () => {
-        Toast.show({
-            type: 'error',
-            text1: 'Cảnh báo',
-            text2: 'Không có thông tin mới để cập nhật.',
-            visibilityTime: 3000, // Thời gian tồn tại của toast (milliseconds)
-            autoHide: true, // Tự động ẩn toast sau khi hết thời gian tồn tại
-        });
-    }
-    const handleExit = () => {
-
-        console.log("Thoát"); console.log("dỮ LIỆU KHI THOÁT", motel);
-        console.log(motel.images);
-        console.log(motel);
-        //console.log(motel.images)
-        Alert.alert("Thông báo", "Bạn có chắc chắn thoát không?",
-            [
-                {
-                    text: "Hủy",
-                    onPress: () => console.log("Cancel Pressed"),
-                    style: "cancel"
-                },
-                { text: "Thoát", onPress: () => navigation.goBack() }
-            ],
-            { cancelable: false })
-    }
     const renderImageItem = ({ item, index }) => {
         if (item.url) {
             // Nếu có thuộc tính url, giả sử đây là ảnh từ URL
             return (
                 <View style={{ position: "relative" }}>
                     <Image source={{ uri: item.url }} style={EditMotelStyle.imageMotel} />
-                    <TouchableOpacity onPress={() => handleDeleteImage(index)} style={EditMotelStyle.deleteButton}>
+                    <TouchableOpacity
+                        onPress={() => handleDeleteImage(index)}
+                        style={EditMotelStyle.deleteButton}
+                    >
                         <AntDesign name="close" size={10} color="white" />
                     </TouchableOpacity>
                 </View>
             );
-        } else if (item.uri) {
-            // Nếu có thuộc tính uri, giả sử đây là ảnh từ thiết bị
-            return (
-                <View style={{ position: "relative" }}>
-                    <Image source={{ uri: item.uri }} style={EditMotelStyle.imageMotel} />
-                    <TouchableOpacity onPress={() => handleDeleteImage(index)} style={EditMotelStyle.deleteButton}>
-                        <AntDesign name="close" size={10} color="white" />
-                    </TouchableOpacity>
-                </View>
-            );
-        } else {
-            // Nếu không có cả thuộc tính url và uri, không render gì cả
-            return null;
         }
-    };
 
+    };
 
     return (
         <View style={EditMotelStyle.container}>
             <View style={HomeStyles.tab}>
-                <AntDesign name="home" size={24} color={COLOR.PRIMARY} style={HomeStyles.bellIcon} />
+                <AntDesign
+                    name="home"
+                    size={24}
+                    color={COLOR.PRIMARY}
+                    style={HomeStyles.bellIcon}
+                />
                 <Text style={HomeStyles.textHead}>Thông Tin Nhà Trọ</Text>
             </View>
-            <ScrollView contentContainerStyle={EditMotelStyle.scrollContainer} showsVerticalScrollIndicator={false}>
+            <ScrollView
+                contentContainerStyle={EditMotelStyle.scrollContainer}
+                showsVerticalScrollIndicator={false}
+            >
                 <View style={EditMotelStyle.infoContainer}>
                     {/* <Text>Thông tin phòng</Text> */}
-
 
                     <Text style={EditMotelStyle.labelService}> Thông tin phòng</Text>
                     <Text style={EditMotelStyle.label}>Xã/Phường</Text>
                     <View style={EditMotelStyle.inputContainer}>
-                        <FontAwesome5 name="location-arrow" style={EditMotelStyle.icon} size={24} color="green" />
-                        <TextInput onChangeText={text => setWard(text)} value={ward} style={EditMotelStyle.input} placeholder="Xã/Phường" />
+                        <FontAwesome5
+                            name="location-arrow"
+                            style={EditMotelStyle.icon}
+                            size={24}
+                            color="green"
+                        />
+                        <TextInput
+                            onChangeText={(text) => setWard(text)}
+                            value={ward}
+                            style={EditMotelStyle.input}
+                            placeholder="Xã/Phường"
+                        />
                     </View>
                     <Text style={EditMotelStyle.label}> Quận/Huyện</Text>
                     <View style={EditMotelStyle.inputContainer}>
-
-                        <FontAwesome5 name="location-arrow" style={EditMotelStyle.icon} size={24} color="green" />
-                        <TextInput onChangeText={text => setDistrict(text)} value={district} style={EditMotelStyle.input} placeholder="Quận/Huyện" />
+                        <FontAwesome5
+                            name="location-arrow"
+                            style={EditMotelStyle.icon}
+                            size={24}
+                            color="green"
+                        />
+                        <TextInput
+                            onChangeText={(text) => setDistrict(text)}
+                            value={district}
+                            style={EditMotelStyle.input}
+                            placeholder="Quận/Huyện"
+                        />
                     </View>
                     <Text style={EditMotelStyle.label}>Tỉnh/Thành phố</Text>
                     <View style={EditMotelStyle.inputContainer}>
-                        <FontAwesome5 name="location-arrow" style={EditMotelStyle.icon} size={24} color="green" />
-                        <TextInput onChangeText={text => setCity(text)} value={city} style={EditMotelStyle.input} placeholder="Tỉnh/Thành phố" />
+                        <FontAwesome5
+                            name="location-arrow"
+                            style={EditMotelStyle.icon}
+                            size={24}
+                            color="green"
+                        />
+                        <TextInput
+                            onChangeText={(text) => setCity(text)}
+                            value={city}
+                            style={EditMotelStyle.input}
+                            placeholder="Tỉnh/Thành phố"
+                        />
                     </View>
                     <Text style={EditMotelStyle.label}> Địa chỉ khác</Text>
                     <View style={EditMotelStyle.inputContainer}>
-                        <FontAwesome6 name="location-dot" style={EditMotelStyle.icon} size={24} color="green" />
-                        <TextInput onChangeText={text => setOther(text)} value={other} style={EditMotelStyle.input} placeholder="Địa chỉ khác" />
+                        <FontAwesome6
+                            name="location-dot"
+                            style={EditMotelStyle.icon}
+                            size={24}
+                            color="green"
+                        />
+                        <TextInput
+                            onChangeText={(text) => setOther(text)}
+                            value={other}
+                            style={EditMotelStyle.input}
+                            placeholder="Địa chỉ khác"
+                        />
                     </View>
                     <View style={EditMotelStyle.inputContainer}>
-                        <FontAwesome5 name="map-marked-alt" style={EditMotelStyle.icon} size={24} color="green" />
-
+                        <FontAwesome5
+                            name="map-marked-alt"
+                            style={EditMotelStyle.icon}
+                            size={24}
+                            color="green"
+                        />
                     </View>
                     <Text style={EditMotelStyle.label}> Tiền phòng</Text>
                     <View style={EditMotelStyle.inputContainer}>
-                        <FontAwesome name="money" style={EditMotelStyle.icon} size={24} color="green" />
-                        <TextInput onChangeText={text => setPrice(text)} value={price} style={EditMotelStyle.input} placeholder="Giá phòng" />
+                        <FontAwesome
+                            name="money"
+                            style={EditMotelStyle.icon}
+                            size={24}
+                            color="green"
+                        />
+                        <TextInput
+                            onChangeText={(text) => setPrice(text)}
+                            value={price}
+                            style={EditMotelStyle.input}
+                            placeholder="Giá phòng"
+                        />
                     </View>
                     <Text style={EditMotelStyle.label}> Diện tích</Text>
                     <View style={EditMotelStyle.inputContainer}>
-                        <FontAwesome6 name="house" style={EditMotelStyle.icon} size={24} color="green" />
-                        <TextInput onChangeText={text => setArea(text)} value={area} style={EditMotelStyle.input} placeholder="Diện tích" />
+                        <FontAwesome6
+                            name="house"
+                            style={EditMotelStyle.icon}
+                            size={24}
+                            color="green"
+                        />
+                        <TextInput
+                            onChangeText={(text) => setArea(text)}
+                            value={area}
+                            style={EditMotelStyle.input}
+                            placeholder="Diện tích"
+                        />
                     </View>
                     <Text style={EditMotelStyle.label}> Mô tả</Text>
 
                     <View style={EditMotelStyle.inputContainer}>
-                        <Entypo name="pencil" style={EditMotelStyle.icon} size={24} color="green" />
-                        <TextInput onChangeText={text => setDesc(text)} value={desc} style={EditMotelStyle.input} placeholder="Mô tả" />
+                        <Entypo
+                            name="pencil"
+                            style={EditMotelStyle.icon}
+                            size={24}
+                            color="green"
+                        />
+                        <TextInput
+                            onChangeText={(text) => setDesc(text)}
+                            value={desc}
+                            style={EditMotelStyle.input}
+                            placeholder="Mô tả"
+                        />
                     </View>
                     <Text style={EditMotelStyle.label}> Số người</Text>
 
                     <View style={EditMotelStyle.inputContainer}>
-                        <FontAwesome5 name="users" style={EditMotelStyle.icon} size={24} color="green" />
-                        <TextInput onChangeText={text => setMaxpeople(text)} value={maxpeople} style={EditMotelStyle.input} placeholder="Số người" />
+                        <FontAwesome5
+                            name="users"
+                            style={EditMotelStyle.icon}
+                            size={24}
+                            color="green"
+                        />
+                        <TextInput
+                            onChangeText={(text) => setMaxpeople(text)}
+                            value={maxpeople}
+                            style={EditMotelStyle.input}
+                            placeholder="Số người"
+                        />
                     </View>
                 </View>
 
                 <View style={EditMotelStyle.serviceInfo}>
                     <Text style={EditMotelStyle.labelService}>Thông tin dịch vụ</Text>
                     <TouchableOpacity onPress={addPrice}>
-                        <AntDesign style={{ marginLeft: "auto", paddingRight: 20 }} name="pluscircleo" size={24} color={COLOR.PRIMARY} />
+                        <AntDesign
+                            style={{ marginLeft: "auto", paddingRight: 20 }}
+                            name="pluscircleo"
+                            size={24}
+                            color={COLOR.PRIMARY}
+                        />
                     </TouchableOpacity>
 
                     <View style={EditMotelStyle.serviceRow}>
                         {/* Hiển thị các dịch vụ mặc định */}
                         {defaultServices.map((item, index) => (
                             <View key={index} style={EditMotelStyle.serviceIt}>
-                                {item.period === "Tháng" && <MaterialIcons name="event" size={24} color="green" />}
-                                {item.period === "m3" && <MaterialIcons name="local-drink" size={24} color="green" />}
+                                {item.period === "Tháng" && (
+                                    <MaterialIcons name="event" size={24} color="green" />
+                                )}
+                                {item.period === "m3" && (
+                                    <MaterialIcons name="local-drink" size={24} color="green" />
+                                )}
                                 <Text>{item.label}</Text>
-                                <Text>{item.value} đ/{item.period}</Text>
-                                <AntDesign style={EditMotelStyle.iconEdit} name="edit" size={24} color="black" />
+                                <Text>
+                                    {item.value} đ/{item.period}
+                                </Text>
+                                <AntDesign
+                                    style={EditMotelStyle.iconEdit}
+                                    name="edit"
+                                    size={24}
+                                    color="black"
+                                />
                             </View>
                         ))}
                         {/* Hiển thị các dịch vụ từ mảng prices */}
                         {prices.map((item, index) => (
                             <View key={index} style={EditMotelStyle.serviceIt}>
                                 {/* Thay đổi icon tùy thuộc vào loại dịch vụ */}
-                                {item.type === "electricity" && <MaterialCommunityIcons name="power-plug" size={24} color="green" />}
-                                {item.type === "water" && <MaterialCommunityIcons name="water" size={24} color="green" />}
-                                {item.type === "internet" && <FontAwesome name="wifi" size={24} color="green" />}
+                                {item.type === "electricity" && (
+                                    <MaterialCommunityIcons
+                                        name="power-plug"
+                                        size={24}
+                                        color="green"
+                                    />
+                                )}
+                                {item.type === "water" && (
+                                    <MaterialCommunityIcons
+                                        name="water"
+                                        size={24}
+                                        color="green"
+                                    />
+                                )}
+                                {item.type === "internet" && (
+                                    <FontAwesome name="wifi" size={24} color="green" />
+                                )}
                                 <Text>{item.label}</Text>
-                                <Text>{item.value} đ/{item.period}</Text>
-                                <AntDesign style={EditMotelStyle.iconEdit} name="edit" size={24} color="black" />
+                                <Text>
+                                    {item.value} đ/{item.period}
+                                </Text>
+                                <AntDesign
+                                    style={EditMotelStyle.iconEdit}
+                                    name="edit"
+                                    size={24}
+                                    color="black"
+                                />
                             </View>
                         ))}
                     </View>
                 </View>
-
-
 
                 <View style={EditMotelStyle.serviceInfo}>
                     <Text style={EditMotelStyle.labelService}> Ảnh phòng</Text>
@@ -358,11 +437,11 @@ const EditMotel = ({ navigation, route }) => {
                         horizontal
                         showsHorizontalScrollIndicator={false}
                     />
-                    {/* <Image
-                            source={require("../../assets/images/hi.gif")}
-                            style={EditMotelStyle.imageMotel}
-                        /> */}
-                    <TouchableOpacity onPress={handleAddImage} style={EditMotelStyle.addButton}>
+
+                    <TouchableOpacity
+                        style={EditMotelStyle.addButton}
+                        onPress={handleAddImage}
+                    >
                         <Text style={EditMotelStyle.addButtonText}>Thêm</Text>
                         <AntDesign name="camera" size={20} color="#fff" />
                     </TouchableOpacity>
@@ -371,15 +450,19 @@ const EditMotel = ({ navigation, route }) => {
                     <TouchableOpacity style={EditMotelStyle.button} onPress={handleExit}>
                         <Text style={EditMotelStyle.buttonText}> Thoát</Text>
                     </TouchableOpacity>
-                    {loading ? (<ActivityIndicator color={COLOR.PRIMARY} />) : (
-                        <TouchableOpacity onPress={handleSaveInfo} style={[EditMotelStyle.button, EditMotelStyle.saveButton]}>
+                    {loading ? (
+                        <ActivityIndicator color={COLOR.PRIMARY} />
+                    ) : (
+                        <TouchableOpacity
+                            style={[EditMotelStyle.button, EditMotelStyle.saveButton]}
+                        >
                             <Text style={EditMotelStyle.buttonText}> Lưu thông tin</Text>
-                        </TouchableOpacity>)}
+                        </TouchableOpacity>
+                    )}
                 </View>
             </ScrollView>
         </View>
-    )
-}
-
+    );
+};
 
 export default EditMotel;
