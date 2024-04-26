@@ -1,15 +1,4 @@
-import {
-    View,
-    Text,
-    StyleSheet,
-    TextInput,
-    FlatList,
-    TouchableOpacity,
-    Image,
-    ScrollView,
-    Alert,
-    ActivityIndicator,
-} from "react-native";
+import { View, Text, StyleSheet, TextInput, FlatList, TouchableOpacity, Image, ScrollView, Alert, ActivityIndicator, Modal, } from "react-native";
 import HomeStyles from "../Home/HomeStyles";
 import { Entypo, MaterialIcons } from "@expo/vector-icons";
 import { COLOR } from "../common/color";
@@ -20,18 +9,27 @@ import { FontAwesome6 } from "@expo/vector-icons";
 import { FontAwesome5 } from "@expo/vector-icons";
 import EditMotelStyle from "../../Styles/EditMotelStyle";
 import * as ImagePicker from "expo-image-picker";
-import { useContext, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { authApi, endpoints } from "../../configs/API";
 import Toast from "react-native-toast-message";
-import MyContext from "../../configs/MyContext";
+import InputEditMotel from "../common/InputEditMotel";
+import { Button } from "react-native-paper";
+import ButtonAuth from "../common/ButtonAuth";
 const EditMotel = ({ navigation, route }) => {
     const defaultServices = [
         { label: "Điện", value: "Giá điện", period: "Tháng" },
         { label: "Nước", value: "Giá nước", period: "m3" },
         { label: "Internet", value: "Giá mạng", period: "Tháng" },
     ];
+    const [editingService, setEditingService] = useState(null);
+    const [newPrice, setNewPrice] = useState('');
 
+    // Hàm này được gọi khi người dùng ấn vào biểu tượng chỉnh sửa
+    const handleEdit = (service) => {
+        setEditingService(service);
+        setNewPrice(''); // Đặt giá mới về trạng thái ban đầu
+    };
     const { idMotel } = route.params;
     const [price, setPrice] = useState("");
     const [area, setArea] = useState("");
@@ -45,7 +43,13 @@ const EditMotel = ({ navigation, route }) => {
     const [images, setImages] = useState([]);
     const [prices, setPrices] = useState([]);
     const [render, setRender] = useState(false);
-    // const [valuesChanged, setValuesChanged] = useState(false); // Biến cờ để kiểm tra xem giá trị đã thay đổi hay không
+
+    const savePrice = () => {
+
+    }
+    const exitModal = () => {
+        setEditingService("");
+    }
     const canDeleteImage = (index) => {
         return images.length > 3;
     };
@@ -181,8 +185,13 @@ const EditMotel = ({ navigation, route }) => {
             { cancelable: false }
         );
     };
-    const addPrice = () => {
+    const addPrice = async () => {
         navigation.navigate("AddPrice", { idMotel });
+        setRender(!render);
+
+        navigation.addListener('focus', async () => {
+            await loadDetailMotel();
+        });
     };
 
     const handleAddImage = async () => {
@@ -264,7 +273,7 @@ const EditMotel = ({ navigation, route }) => {
                     'Content-Type': 'multipart/form-data',
                 },
             });
-    
+
             console.log("Update thành công");
             console.log(response.data);
             // Hiển thị thông báo thành công
@@ -299,71 +308,28 @@ const EditMotel = ({ navigation, route }) => {
                     <Text style={EditMotelStyle.labelService}> Thông tin phòng</Text>
                     <Text style={EditMotelStyle.label}>Xã/Phường</Text>
                     <View style={EditMotelStyle.inputContainer}>
-                        <FontAwesome5
-                            name="location-arrow"
-                            style={EditMotelStyle.icon}
-                            size={24}
-                            color="green"
-                        />
-                        <TextInput
-                            onChangeText={(text) => setWard(text)}
-                            value={ward}
-                            style={EditMotelStyle.input}
-                            placeholder="Xã/Phường"
-                        />
+                        <FontAwesome5 name="location-arrow" style={EditMotelStyle.icon} size={24} color="green" />
+                        <InputEditMotel value={ward} placeholder="Xã/Phường" onChangeText={(text) => setWard(text)} />
                     </View>
                     <Text style={EditMotelStyle.label}> Quận/Huyện</Text>
                     <View style={EditMotelStyle.inputContainer}>
-                        <FontAwesome5
-                            name="location-arrow"
-                            style={EditMotelStyle.icon}
-                            size={24}
-                            color="green"
-                        />
-                        <TextInput
-                            onChangeText={(text) => setDistrict(text)}
-                            value={district}
-                            style={EditMotelStyle.input}
-                            placeholder="Quận/Huyện"
-                        />
+                        <FontAwesome5 name="location-arrow" style={EditMotelStyle.icon} size={24} color="green" />
+                        <InputEditMotel placeholder="Quận/Huyện" value={district} onChangeText={(text) => setDistrict(text)} />
                     </View>
                     <Text style={EditMotelStyle.label}>Tỉnh/Thành phố</Text>
                     <View style={EditMotelStyle.inputContainer}>
-                        <FontAwesome5
-                            name="location-arrow"
-                            style={EditMotelStyle.icon}
-                            size={24}
-                            color="green"
-                        />
-                        <TextInput
-                            onChangeText={(text) => setCity(text)}
-                            value={city}
-                            style={EditMotelStyle.input}
-                            placeholder="Tỉnh/Thành phố"
-                        />
+                        <FontAwesome5 name="location-arrow" style={EditMotelStyle.icon} size={24} color="green" />
+                        <InputEditMotel value={city} placeholder="Tỉnh/Thành phố" onChangeText={(text) => setCity(text)} />
                     </View>
                     <Text style={EditMotelStyle.label}> Địa chỉ khác</Text>
                     <View style={EditMotelStyle.inputContainer}>
-                        <FontAwesome6
-                            name="location-dot"
-                            style={EditMotelStyle.icon}
-                            size={24}
-                            color="green"
+                        <FontAwesome6 name="location-dot" style={EditMotelStyle.icon} size={24} color="green"
                         />
-                        <TextInput
-                            onChangeText={(text) => setOther(text)}
-                            value={other}
-                            style={EditMotelStyle.input}
-                            placeholder="Địa chỉ khác"
-                        />
+                        <InputEditMotel onChangeText={(text) => setOther(text)} value={other} placeholder="Địa chỉ khác" />
+
                     </View>
                     <View style={EditMotelStyle.inputContainer}>
-                        <FontAwesome5
-                            name="map-marked-alt"
-                            style={EditMotelStyle.icon}
-                            size={24}
-                            color="green"
-                        />
+                        <FontAwesome5 name="map-marked-alt" style={EditMotelStyle.icon} size={24} color="green" />
                     </View>
                     <Text style={EditMotelStyle.label}> Tiền phòng</Text>
                     <View style={EditMotelStyle.inputContainer}>
@@ -373,21 +339,12 @@ const EditMotel = ({ navigation, route }) => {
                             size={24}
                             color="green"
                         />
-                        <TextInput
-                            onChangeText={(text) => setPrice(text)}
-                            value={price}
-                            style={EditMotelStyle.input}
-                            placeholder="Giá phòng"
-                        />
+                        <InputEditMotel onChangeText={(text) => setPrice(text)} value={price} placeholder="Giá phòng" />
+
                     </View>
                     <Text style={EditMotelStyle.label}> Diện tích</Text>
                     <View style={EditMotelStyle.inputContainer}>
-                        <FontAwesome6
-                            name="house"
-                            style={EditMotelStyle.icon}
-                            size={24}
-                            color="green"
-                        />
+                        <FontAwesome6 name="house" style={EditMotelStyle.icon} size={24} color="green" />
                         <TextInput
                             onChangeText={(text) => setArea(text)}
                             value={area}
@@ -404,12 +361,7 @@ const EditMotel = ({ navigation, route }) => {
                             size={24}
                             color="green"
                         />
-                        <TextInput
-                            onChangeText={(text) => setDesc(text)}
-                            value={desc}
-                            style={EditMotelStyle.input}
-                            placeholder="Mô tả"
-                        />
+                        <InputEditMotel onChangeText={(text) => setDesc(text)} value={desc} placeholder="Mô tả" />
                     </View>
                     <Text style={EditMotelStyle.label}> Số người</Text>
 
@@ -420,12 +372,7 @@ const EditMotel = ({ navigation, route }) => {
                             size={24}
                             color="green"
                         />
-                        <TextInput
-                            onChangeText={(text) => setMaxpeople(text)}
-                            value={maxpeople}
-                            style={EditMotelStyle.input}
-                            placeholder="Số người"
-                        />
+                        <InputEditMotel onChangeText={(text) => setMaxpeople(text)} value={maxpeople} placeholder="Số người" />
                     </View>
                 </View>
 
@@ -439,7 +386,22 @@ const EditMotel = ({ navigation, route }) => {
                             color={COLOR.PRIMARY}
                         />
                     </TouchableOpacity>
-
+                    {/* Hiển thị popup chỉ nhập giá tiền */}
+                    <Modal visible={!!editingService} transparent={true} animationType="slide">
+                        <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: 'rgba(0, 0, 0, 0.5)', }}>
+                            <View style={{ backgroundColor: 'white', padding: 20, borderRadius: 10, width: "80%" }}>
+                                <Text>Nhập giá tiền dịch vụ {editingService?.label}</Text>
+                                <TextInput
+                                    placeholder="Nhập giá mới"
+                                    value={newPrice}
+                                    onChangeText={setNewPrice}
+                                    style={{ borderWidth: 1, borderColor: 'gray', marginTop: 10, padding: 8, borderRadius: 5 }}
+                                />
+                                <ButtonAuth title="Thoát" onPress={exitModal} />
+                                <ButtonAuth title="Lưu dịch vụ" onPress={savePrice} />
+                            </View>
+                        </View>
+                    </Modal>
                     <View style={EditMotelStyle.serviceRow}>
                         {/* Hiển thị các dịch vụ mặc định */}
                         {defaultServices.map((item, index) => (
@@ -454,12 +416,10 @@ const EditMotel = ({ navigation, route }) => {
                                 <Text>
                                     {item.value} đ/{item.period}
                                 </Text>
-                                <AntDesign
-                                    style={EditMotelStyle.iconEdit}
-                                    name="edit"
-                                    size={24}
-                                    color="black"
-                                />
+                                <TouchableOpacity onPress={() => handleEdit(item)}>
+                                    <AntDesign style={EditMotelStyle.iconEdit} name="edit" size={24} color="black" />
+                                </TouchableOpacity>
+
                             </View>
                         ))}
                         {/* Hiển thị các dịch vụ từ mảng prices */}
@@ -487,12 +447,9 @@ const EditMotel = ({ navigation, route }) => {
                                 <Text>
                                     {item.value} đ/{item.period}
                                 </Text>
-                                <AntDesign
-                                    style={EditMotelStyle.iconEdit}
-                                    name="edit"
-                                    size={24}
-                                    color="black"
-                                />
+                                <TouchableOpacity onPress={() => handleEdit(item)}>
+                                    <AntDesign style={EditMotelStyle.iconEdit} name="edit" size={24} color="black" />
+                                </TouchableOpacity>
                             </View>
                         ))}
                     </View>
