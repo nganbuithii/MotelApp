@@ -111,9 +111,9 @@ const PlusOwner = () => {
         console.log("ID Motel KHI EDIT", motel.id)
         console.log("Motel khi giá cả", motel.prices)
         setTriggerRender(!triggerRender);
-        // navigation.addListener('focus', async () => {
-        //     await fetchMotels(); // Cập nhật lại danh sách nhà trọ sau khi thêm mới
-        // });
+        navigation.addListener('focus', async () => {
+            await fetchMotels(); // Cập nhật lại danh sách nhà trọ sau khi thêm mới
+        });
     };
 
     const handleDelete = async (idMotel) => {

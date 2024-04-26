@@ -46,22 +46,61 @@ const EditMotel = ({ navigation, route }) => {
     const [prices, setPrices] = useState([]);
     const [render, setRender] = useState(false);
     // const [valuesChanged, setValuesChanged] = useState(false); // Biến cờ để kiểm tra xem giá trị đã thay đổi hay không
-
-    const handleDeleteImage = (index) => {
-        Alert.alert(
-            "Xóa ảnh",
-            "Bạn có chắc chắn muốn xóa ảnh này?",
-            [
-                { text: "Hủy", onPress: () => console.log("Cancel Pressed") },
-                {
-                    text: "Xóa",
-                    onPress: () => deleteImage(index),
-                    style: "destructive",
-                },
-            ],
-            { cancelable: false }
-        );
+    const canDeleteImage = (index) => {
+        return images.length > 3;
     };
+    const fetchApiDeleteImg = async (idImage) => {
+        try {
+            const token = await AsyncStorage.getItem("access-token");
+            console.log("token", token);
+            //const imageId = images[index].id; // Lấy ID của ảnh từ mảng images
+            console.log("ID ẢNH", idImage);
+            const formData = new FormData();
+            formData.append("id", idImage); // Thêm ID của ảnh vào formData
+            console.log(idMotel);
+
+            const response = await authApi(token).delete(endpoints["deleteImgMotel"](idMotel), formData, {
+                headers: {
+                    'Content-Type': 'multipart/form-data',
+                },
+            });
+
+            console.log("Xóa ảnh thành công");
+            //setRender(!render);
+        } catch (ex) {
+            console.log("xóa ảnh thất bại");
+            console.error(ex);
+        }
+
+    }
+    const handleDeleteImage = (idImage) => {
+        //console.log("id ảnh xóa:", index);
+        if (!canDeleteImage()) {
+            Alert.alert(
+                "Thông báo",
+                "Phải có ít nhất 3 ảnh, không thể xóa.",
+                [
+                    { text: "OK", onPress: () => console.log("OK Pressed") }
+                ],
+                { cancelable: false }
+            );
+        } else {
+            Alert.alert(
+                "Xóa ảnh",
+                "Bạn có chắc chắn muốn xóa ảnh này?",
+                [
+                    { text: "Hủy", onPress: () => console.log("Cancel Pressed") },
+                    {
+                        text: "Xóa",
+                        onPress: () => fetchApiDeleteImg(idImage),
+                        style: "destructive",
+                    },
+                ],
+                { cancelable: false }
+            );
+        }
+    };
+
 
     useEffect(() => {
         // Gọi hàm để lấy dữ liệu từ API khi component được render
@@ -176,28 +215,29 @@ const EditMotel = ({ navigation, route }) => {
                     name: `image_${index}.jpg`,
                 });
             });
-            let res = await authApi(token).post(endpoints['upImgMotel'](idMotel), formData, {
+            const res = await authApi(token).post(endpoints['upImgMotel'](idMotel), formData, {
                 headers: {
                     'Content-Type': 'multipart/form-data',
                 },
             });
-            console.log("UP ANH MOI THANH CONG :",res.data);
+            console.log("UP ANH MOI THANH CONG :", res.data);
             console.log("Uploaded images successfully");
-            setRender(true);
+            setRender(!render);
         } catch (ex) {
             console.error(ex);
         }
 
     };
 
-    const renderImageItem = ({ item, index }) => {
+    const renderImageItem = ({ item }) => {
         if (item.url) {
+            // console.log("id ảnh:", item.id);
             // Nếu có thuộc tính url, giả sử đây là ảnh từ URL
             return (
                 <View style={{ position: "relative" }}>
                     <Image source={{ uri: item.url }} style={EditMotelStyle.imageMotel} />
                     <TouchableOpacity
-                        onPress={() => handleDeleteImage(index)}
+                        onPress={() => handleDeleteImage(item.id)} // Truyền id của ảnh vào hàm handleDeleteImage
                         style={EditMotelStyle.deleteButton}
                     >
                         <AntDesign name="close" size={10} color="white" />
@@ -205,8 +245,38 @@ const EditMotel = ({ navigation, route }) => {
                 </View>
             );
         }
-
     };
+
+    const handleUpdate = async () => {
+        try {
+            const token = await AsyncStorage.getItem("access-token");
+            const formData = new FormData();
+            formData.append("ward", ward);
+            formData.append("district", district);
+            formData.append("city", city);
+            formData.append("other_address", other);
+            formData.append("price", price);
+            formData.append("area", area);
+            formData.append("max_people", maxpeople);
+            formData.append("description", desc);
+            const response = await authApi(token).patch(endpoints["updateMotel"](idMotel), formData, {
+                headers: {
+                    'Content-Type': 'multipart/form-data',
+                },
+            });
+    
+            console.log("Update thành công");
+            console.log(response.data);
+            // Hiển thị thông báo thành công
+            showToast1();
+            // Bật cờ render để render lại component
+            setRender(!render);
+        } catch (ex) {
+            console.error(ex);
+            showToast2();
+        }
+
+    }
 
     return (
         <View style={EditMotelStyle.container}>
@@ -455,6 +525,7 @@ const EditMotel = ({ navigation, route }) => {
                     ) : (
                         <TouchableOpacity
                             style={[EditMotelStyle.button, EditMotelStyle.saveButton]}
+                            onPress={handleUpdate}
                         >
                             <Text style={EditMotelStyle.buttonText}> Lưu thông tin</Text>
                         </TouchableOpacity>
