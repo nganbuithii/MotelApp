@@ -18,17 +18,20 @@ import { Button } from "react-native-paper";
 import ButtonAuth from "../common/ButtonAuth";
 const EditMotel = ({ navigation, route }) => {
     const defaultServices = [
-        { label: "Điện", value: "Giá điện", period: "Tháng" },
-        { label: "Nước", value: "Giá nước", period: "m3" },
-        { label: "Internet", value: "Giá mạng", period: "Tháng" },
+        { label: "Điện", value: "0", period: "Kwh" },
+        { label: "Nước", value: "0", period: "m3" },
+        { label: "Internet", value: "0", period: "Tháng" },
     ];
-    const [editingService, setEditingService] = useState(null);
+    const [editingService, setEditingService] = useState(null);// Để xem đang chỉnh sửa dịch vụ nào
     const [newPrice, setNewPrice] = useState('');
+    const [editingPrice, setEditingPrice] = useState(null);
+
 
     // Hàm này được gọi khi người dùng ấn vào biểu tượng chỉnh sửa
     const handleEdit = (service) => {
         setEditingService(service);
-        setNewPrice(''); // Đặt giá mới về trạng thái ban đầu
+        setEditingPrice(service.value);
+        setNewPrice(service.value); // Cập nhật giá trị mới cho newPrice khi mở modal
     };
     const { idMotel } = route.params;
     const [price, setPrice] = useState("");
@@ -43,9 +46,47 @@ const EditMotel = ({ navigation, route }) => {
     const [images, setImages] = useState([]);
     const [prices, setPrices] = useState([]);
     const [render, setRender] = useState(false);
+    const addNewPrice = async ({ label, value, period }) => {
+        const token = await AsyncStorage.getItem("access-token");
+        console.log(token);
+        console.log(idMotel);
+        const formData = new FormData();
+        formData.append("label", label);
+        formData.append("value", value);
+        formData.append("period", period);
 
-    const savePrice = () => {
+        let res = await authApi(token).post(endpoints['addPrice'](idMotel), formData, {
+            headers: {
+                'Content-Type': 'multipart/form-data',
+            },
+        });
+        console.log(res.data);
+        console.log("Thanh công add price");
 
+    }
+
+    const savePrice = async () => {
+        const token = await AsyncStorage.getItem("access-token");
+        const { idMotel } = route.params;
+        if (editingService) {
+            const { label, period } = editingService;
+            const formData = new FormData();
+            formData.append("label", label);
+            formData.append("value", newPrice);
+            formData.append("period", period);
+            console.log("FORRM DATA:", formData);
+            try {
+                // const res = await authApi(token).post(endpoints['addPrice'](idMotel), formData, {
+                //     headers: {
+                //         'Content-Type': 'multipart/form-data',
+                //     },
+                // });
+                // console.log(res.data);
+                console.log("Thêm giá tiền dịch vụ thành công");
+            } catch (error) {
+                console.error("Lỗi khi thêm giá tiền dịch vụ:", error);
+            }
+        }
     }
     const exitModal = () => {
         setEditingService("");
@@ -392,9 +433,8 @@ const EditMotel = ({ navigation, route }) => {
                             <View style={{ backgroundColor: 'white', padding: 20, borderRadius: 10, width: "80%" }}>
                                 <Text>Nhập giá tiền dịch vụ {editingService?.label}</Text>
                                 <TextInput
-                                    placeholder="Nhập giá mới"
-                                    value={newPrice}
-                                    onChangeText={setNewPrice}
+                                    onChangeText={(text) => setNewPrice(text)}
+                                    value={newPrice} // Bind giá trị của newPrice với TextInput
                                     style={{ borderWidth: 1, borderColor: 'gray', marginTop: 10, padding: 8, borderRadius: 5 }}
                                 />
                                 <ButtonAuth title="Thoát" onPress={exitModal} />
@@ -404,7 +444,7 @@ const EditMotel = ({ navigation, route }) => {
                     </Modal>
                     <View style={EditMotelStyle.serviceRow}>
                         {/* Hiển thị các dịch vụ mặc định */}
-                        {defaultServices.map((item, index) => (
+                        {/* {defaultServices.map((item, index) => (
                             <View key={index} style={EditMotelStyle.serviceIt}>
                                 {item.period === "Tháng" && (
                                     <MaterialIcons name="event" size={24} color="green" />
@@ -421,28 +461,10 @@ const EditMotel = ({ navigation, route }) => {
                                 </TouchableOpacity>
 
                             </View>
-                        ))}
+                        ))} */}
                         {/* Hiển thị các dịch vụ từ mảng prices */}
                         {prices.map((item, index) => (
                             <View key={index} style={EditMotelStyle.serviceIt}>
-                                {/* Thay đổi icon tùy thuộc vào loại dịch vụ */}
-                                {item.type === "electricity" && (
-                                    <MaterialCommunityIcons
-                                        name="power-plug"
-                                        size={24}
-                                        color="green"
-                                    />
-                                )}
-                                {item.type === "water" && (
-                                    <MaterialCommunityIcons
-                                        name="water"
-                                        size={24}
-                                        color="green"
-                                    />
-                                )}
-                                {item.type === "internet" && (
-                                    <FontAwesome name="wifi" size={24} color="green" />
-                                )}
                                 <Text>{item.label}</Text>
                                 <Text>
                                     {item.value} đ/{item.period}
