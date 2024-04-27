@@ -1,4 +1,4 @@
-import React, { useContext, useState } from "react";
+import React, { useContext, useState, useEffect } from "react";
 import {
     View, Text, TextInput, TouchableOpacity, StyleSheet, ScrollView, Image, ActivityIndicator,
     Alert,
@@ -15,9 +15,13 @@ import { AntDesign } from '@expo/vector-icons';
 import API, { authApi, endpoints } from "../../configs/API";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import MyContext from '../../configs/MyContext';
-
+import axios from 'axios';
 
 const RegisterMotel = ({ navigation }) => {
+    const [cities, setCities] = useState([]); // State để lưu trữ danh sách các tỉnh/thành phố
+    const [districts, setDistricts] = useState([]); // State để lưu trữ danh sách các quận/huyện
+    const [wards, setWards] = useState([]);
+
     const [user, dispatch] = useContext(MyContext);
     const [loading, setLoading] = useState(false);
     const [price, setPrice] = useState('');
@@ -39,6 +43,82 @@ const RegisterMotel = ({ navigation }) => {
         area: '',
     });
 
+    // Hàm để lấy danh sách quận/huyện dựa trên tỉnh/thành phố được chọn
+    const fetchDistricts = async (cityId) => {
+        try {
+            const response = await axios.get(`https://esgoo.net/api-tinhthanh/2/${cityId}.htm`);
+            if (response.data.error === 0) {
+                setDistricts(response.data.data); // Cập nhật state với danh sách quận/huyện
+            }
+        } catch (error) {
+            console.error('Error fetching districts:', error);
+        }
+    };
+
+    // Hàm để lấy danh sách xã/phường dựa trên quận/huyện được chọn
+    const fetchWards = async (districtId) => {
+        try {
+            const response = await axios.get(`https://esgoo.net/api-tinhthanh/3/${districtId}.htm`);
+            if (response.data.error === 0) {
+                setWards(response.data.data); // Cập nhật state với danh sách xã/phường
+            }
+        } catch (error) {
+            console.error('Error fetching wards:', error);
+        }
+    };
+    // Hàm xử lý khi tỉnh/thành phố được chọn
+    const handleCityChange = (cityId) => {
+        fetchDistricts(cityId); // Gọi hàm để lấy danh sách quận/huyện dựa trên tỉnh/thành phố được chọn
+    };
+
+    // Hàm xử lý khi quận/huyện được chọn
+    const handleDistrictChange = (districtId) => {
+        fetchWards(districtId); // Gọi hàm để lấy danh sách xã/phường dựa trên quận/huyện được chọn
+    };
+
+    // Lấy danh sách tỉnh/thành phố khi component được render
+    useEffect(() => {
+        const fetchCities = async () => {
+            try {
+                const response = await axios.get('https://esgoo.net/api-tinhthanh/1/0.htm');
+                if (response.data.error === 0) {
+                    setCities(response.data.data); // Cập nhật state với danh sách tỉnh/thành phố
+                }
+            } catch (error) {
+                console.error('Error fetching cities:', error);
+            }
+        };
+        fetchCities();
+    }, []);
+    // Tạo bảng dữ liệu ánh xạ ID và tên của tỉnh/thành phố, quận/huyện
+    const cityMapping = {};
+    cities.forEach(city => {
+        cityMapping[city.id] = city.full_name;
+    });
+
+    const districtMapping = {};
+    districts.forEach(district => {
+        districtMapping[district.id] = district.full_name;
+    });
+
+    // Hàm để chuyển đổi ID thành tên tỉnh/thành phố, quận/huyện
+    const getCityNameById = (cityId) => {
+        return cityMapping[cityId] || '';
+    };
+
+    const getDistrictNameById = (districtId) => {
+        return districtMapping[districtId] || '';
+    };
+    // Tạo bảng dữ liệu ánh xạ ID và tên của xã/phường
+    const wardMapping = {};
+    wards.forEach(ward => {
+        wardMapping[ward.id] = ward.full_name;
+    });
+
+    // Hàm để chuyển đổi ID thành tên xã/phường
+    const getWardNameById = (wardId) => {
+        return wardMapping[wardId] || '';
+    };
     const handleSubmit = async () => {
         try {
             const newErrors = {};
@@ -78,9 +158,9 @@ const RegisterMotel = ({ navigation }) => {
                 formData.append('price', price);
                 formData.append('description', desc);
                 formData.append('max_people', people);
-                formData.append('ward', ward);
-                formData.append('district', district);
-                formData.append('city', city);
+                formData.append('ward', getWardNameById(ward));
+                formData.append('district', getDistrictNameById(district));
+                formData.append('city', getCityNameById(city));
                 formData.append('area', area);
                 formData.append('other_address', other);
                 formData.append('lat', "1");
@@ -189,17 +269,10 @@ const RegisterMotel = ({ navigation }) => {
                 {error.ward && <Text style={styles.errorMsg}><AntDesign name="exclamation" size={13} color="red" />{error.ward}</Text>}
                 <View style={styles.selectContainer}>
                     <RNPickerSelect
-                        style={styles}
                         value={ward}
-
                         onValueChange={(value) => setWard(value)}
-                        placeholder={{ label: "Chọn xã/phường", value: null }}
-                        items={[
-                            { label: "Xã/Phường 1", value: "XaPhuong1" },
-                            { label: "Xã/Phường 2", value: "XaPhuong2" },
-                            { label: "Xã/Phường 3", value: "XaPhuong3" },
-                            // Thêm các xã/phường khác vào đây
-                        ]}
+                        placeholder={{ label: 'Chọn xã/phường', value: null }}
+                        items={wards.map(ward => ({ label: ward.full_name, value: ward.id }))}
                     />
                 </View>
 
@@ -207,28 +280,26 @@ const RegisterMotel = ({ navigation }) => {
                 <View style={styles.selectContainer}>
                     <RNPickerSelect
                         value={district}
-                        style={styles}
-                        onValueChange={(value) => setDistrict(value)}
-                        placeholder={{ label: "Chọn quận/huyện", value: null }}
-
-                        items={DataXaPhuong["Thành phố Hồ Chí Minh"]["Quận 1"]}
-
+                        onValueChange={(value) => {
+                            setDistrict(value);
+                            handleDistrictChange(value); // Gọi hàm xử lý khi quận/huyện được chọn
+                        }}
+                        placeholder={{ label: 'Chọn quận/huyện', value: null }}
+                        items={districts.map(district => ({ label: district.full_name, value: district.id }))}
                     />
                 </View>
 
                 {error.city && <Text style={styles.errorMsg}><AntDesign name="exclamation" size={13} color="red" />{error.city}</Text>}
                 <View style={styles.selectContainer}>
+                    {/* <Text>Chọn tỉnh/thành phố:</Text> */}
                     <RNPickerSelect
-                        style={styles}
                         value={city}
-                        onValueChange={(value) => setCity(value)}
-                        placeholder={{ label: "Chọn tỉnh/thành phố", value: null }}
-                        items={[
-                            { label: "Tỉnh/Thành phố 1", value: "TinhThanhPho1" },
-                            { label: "Tỉnh/Thành phố 2", value: "TinhThanhPho2" },
-                            { label: "Tỉnh/Thành phố 3", value: "TinhThanhPho3" },
-                            // Thêm các tỉnh/thành phố khác vào đây
-                        ]}
+                        onValueChange={(value) => {
+                            setCity(value);
+                            handleCityChange(value); // Gọi hàm xử lý khi tỉnh/thành phố được chọn
+                        }}
+                        placeholder={{ label: 'Chọn tỉnh/thành phố', value: null }}
+                        items={cities.map(city => ({ label: city.full_name, value: city.id }))}
                     />
                 </View>
                 <View style={styles.inputContainer}>
