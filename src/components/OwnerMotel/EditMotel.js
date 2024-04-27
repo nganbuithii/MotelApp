@@ -27,12 +27,7 @@ const EditMotel = ({ navigation, route }) => {
     const [editingPrice, setEditingPrice] = useState(null);
 
 
-    // Hàm này được gọi khi người dùng ấn vào biểu tượng chỉnh sửa
-    const handleEdit = (service) => {
-        setEditingService(service);
-        setEditingPrice(service.value);
-        setNewPrice(service.value); // Cập nhật giá trị mới cho newPrice khi mở modal
-    };
+    
     const { idMotel } = route.params;
     const [price, setPrice] = useState("");
     const [area, setArea] = useState("");
@@ -153,7 +148,18 @@ const EditMotel = ({ navigation, route }) => {
         loadDetailMotel();
         console.log("USE EFFECT ĐƯỢC GỌI LẠI");
     }, [render]);
-
+    // Hàm này được gọi khi người dùng ấn vào biểu tượng chỉnh sửa
+    const handleEdit = async(prices) => {
+        // setEditingService(service);
+        // setEditingPrice(service.value);
+        // setNewPrice(service.value); // Cập nhật giá trị mới cho newPrice khi mở modal
+        console.log("Thông tin truyền qua:",prices);
+        navigation.navigate("DetailPrices", { infoPrice:prices, idMotel:idMotel });
+        // setRender(!render);
+        navigation.addListener('focus', async () => {
+            await loadDetailMotel();
+        });
+    };
     const loadDetailMotel = async () => {
         try {
             // Gọi API để lấy dữ liệu chi tiết của nhà trọ với idMotel
@@ -453,26 +459,6 @@ const EditMotel = ({ navigation, route }) => {
                         </View>
                     </Modal>
                     <View style={EditMotelStyle.serviceRow}>
-                        {/* Hiển thị các dịch vụ mặc định */}
-                        {/* {defaultServices.map((item, index) => (
-                            <View key={index} style={EditMotelStyle.serviceIt}>
-                                {item.period === "Tháng" && (
-                                    <MaterialIcons name="event" size={24} color="green" />
-                                )}
-                                {item.period === "m3" && (
-                                    <MaterialIcons name="local-drink" size={24} color="green" />
-                                )}
-                                <Text>{item.label}</Text>
-                                <Text>
-                                    {item.value} đ/{item.period}
-                                </Text>
-                                <TouchableOpacity onPress={() => handleEdit(item)}>
-                                    <AntDesign style={EditMotelStyle.iconEdit} name="edit" size={24} color="black" />
-                                </TouchableOpacity>
-
-                            </View>
-                        ))} */}
-                        {/* Hiển thị các dịch vụ từ mảng prices */}
                         {prices.map((item, index) => (
                             <View key={index} style={EditMotelStyle.serviceIt}>
                                 <Text>{item.label}</Text>

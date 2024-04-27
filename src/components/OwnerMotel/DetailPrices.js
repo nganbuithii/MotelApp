@@ -11,19 +11,27 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import Toast from "react-native-toast-message";
 
 const DetailPrices = ({ route }) => {
-    const { idMotel, label, period } = route.params;
+    const { idMotel } = route.params;
+    const { infoPrice } = route.params;
 
     const [selectedIcon, setSelectedIcon] = useState("");
     const [selectedService, setSelectedService] = useState("");
     const [modalVisible, setModalVisible] = useState(false);
     const [modalIconVisible, setModalIconVisible] = useState(false); // State cho modal chọn icon
     const [showUnitInput, setShowUnitInput] = useState(false); // State cho việc hiển thị input đơn vị đo
+    const [modalTypeVisible, setModalTypeVisible] = useState(false);
 
-    const [tenDichVu, setTenDichVu] = useState("");
-    const [phiDichVu, setPhiDichVu] = useState("");
+    const [selectedType, setSelectedType] = useState(infoPrice.label);
+    const [tenDichVu, setTenDichVu] = useState(infoPrice.label);
+    const [phiDichVu, setPhiDichVu] = useState(infoPrice.value);
     const [donViDo, setDonViDo] = useState("");
+    const [period, setPeriod] = useState(infoPrice.period);
 
-
+    const [tenDichVuError, setTenDichVuError] = useState("");
+    const [phiError, setPhiError] = useState("");
+    const [serviceError, setServiceError] = useState("");
+    const [iconError, setIconError] = useState("");
+    const [donviError, setDonviError] = useState("");
 
     const openModal = () => {
         setModalVisible(true);
@@ -31,10 +39,29 @@ const DetailPrices = ({ route }) => {
     const openIconModal = () => {
         setModalIconVisible(true); // Mở modal chọn icon
     };
+    const openModalType = () => {
+        setModalTypeVisible(true);
+    };
+
     const selectIcon = (icon) => {
         setSelectedIcon(icon);
         setModalIconVisible(false); // Đóng modal chọn icon
     };
+    const selectType = (type) => {
+        setSelectedType(type);
+        setTenDichVu(type); // Update the service name based on the selected type
+        setModalTypeVisible(false);
+    };
+    useEffect(() => {
+        // Thiết lập selectedService ban đầu dựa trên infoPrice.period
+        if (infoPrice.period === "Tháng") {
+            setSelectedService("Người hoặc số lượng");
+        } else if (infoPrice.period === "Phòng") {
+            setSelectedService("Phòng");
+        }else{
+            setSelectedService("Theo chỉ số đồng hồ");
+        }
+    }, []);
     const showToast1 = () => {
         Toast.show({
             type: 'success',
@@ -44,6 +71,7 @@ const DetailPrices = ({ route }) => {
             autoHide: true, // Tự động ẩn toast sau khi hết thời gian tồn tại
         });
     }
+
     const showToast2 = () => {
         Toast.show({
             type: 'error',
@@ -62,50 +90,167 @@ const DetailPrices = ({ route }) => {
         }
         setModalVisible(false);
     };
-    const handleSubmit = async () => {
-        try {
-            
+    const handleExit = () => {
 
+    }
+    const updateInfo = async () => {
+        try {
+            if (!tenDichVu) {
+                setTenDichVuError("Tên dịch vụ không được để trống");
+                return;
+            } else {
+                setTenDichVuError("");
+            }
+
+            if (!phiDichVu || !/^\d+(\.\d+)?$/.test(phiDichVu)) {
+                setPhiError("Phí dịch vụ không hợp lệ");
+                return;
+            } else {
+                setPhiError("");
+            }
+
+            // if (!selectedService) {
+            //     setServiceError("Vui lòng chọn thu phí dựa trên");
+            //     return;
+            // } else {
+            //     setServiceError("");
+            // }
+
+            if (!selectedIcon) {
+                setIconError("Vui lòng chọn icon");
+                return;
+            } else {
+                setIconError("");
+            }
+
+
+
+            // if (!selectedService || (selectedService === "Theo chỉ số đồng hồ" && !donViDo)) {
+            //     showToast2();
+            //     return;
+            // }
+            const serviceLabels = {
+                "Điện": "ELECTRICITY",
+                "Nước": "WATER",
+                "Mạng": "INTERNET",
+                "Khác": "OTHER"
+            };
+
+            const token = await AsyncStorage.getItem("access-token");
+            console.log(token);
+            console.log(idMotel);
+            const formData = new FormData();
+            console.log("id price", infoPrice.id);
+            formData.append("id", infoPrice.id);
+            console.log(tenDichVu);
+
+            // Ánh xạ tên dịch vụ sang label tương ứng
+            const label = serviceLabels[tenDichVu] || infoPrice.label; // Sử dụng label hiện tại nếu không tìm thấy tên dịch vụ trong serviceLabels
+
+            if (label !== infoPrice.label) {
+                formData.append("label", label);
+            }
+
+            if (phiDichVu !== infoPrice.value) {
+                formData.append("value", phiDichVu);
+            }
+            let period = "";
+            if (selectedService === "Theo chỉ số đồng hồ") {
+                period = donViDo;
+            } else if (selectedService === "Người hoặc số lượng") {
+                period = "Tháng";
+            } else if (selectedService === "Phòng") {
+                period = "Phòng";
+            }
+            if (period !== infoPrice.period) {
+                formData.append("period", period);
+            }
+
+            let res = await authApi(token).patch(endpoints["updatePrice"](idMotel), formData, {
+                headers: {
+                    'Content-Type': 'multipart/form-data',
+                },
+            });
+            console.log(res.data);
             
+            showToast1();
+            console.log("CẬP NHẬT THÀNH CÔNG");
+
 
         } catch (ex) {
             console.error(ex);
         }
     }
-
     return (
         <View style={styles.container}>
             <View style={modalVisible ? styles.modalBackground : null} />
             <View style={styles.box}>
-            <Text>ID Motel: {idMotel}</Text>
-            <Text>Label: {label}</Text>
-            <Text>Period: {period}</Text>
+                <Text style={EditMotelStyle.label}>Loại dịch vụ</Text>
+                <View style={EditMotelStyle.inputContainer}>
+                    <MaterialCommunityIcons name="vector-arrange-below" style={EditMotelStyle.icon} size={24} color="green" />
+                    <TouchableOpacity style={EditMotelStyle.input} onPress={openModalType}>
+                        <Text>{selectedType || "Loại dịch vụ"}</Text>
+                    </TouchableOpacity>
 
+
+                </View>
+
+                {modalTypeVisible && (
+                    <Modal
+                        animationType="slide"
+                        transparent={true}
+                        visible={modalTypeVisible}
+                        onRequestClose={() => {
+                            setModalTypeVisible(false);
+                        }}
+                    >
+                        <View style={styles.centeredView}>
+                            <View style={styles.modalView1}>
+                                <TouchableOpacity style={styles.modalIt1} onPress={() => selectType("Điện")}>
+                                    <Text style={styles.modalText}>Điện</Text>
+                                </TouchableOpacity>
+                                <TouchableOpacity style={styles.modalIt1} onPress={() => selectType("Nước")}>
+                                    <Text style={styles.modalText}>Nước</Text>
+                                </TouchableOpacity>
+                                <TouchableOpacity style={styles.modalIt1} onPress={() => selectType("Mạng")}>
+                                    <Text style={styles.modalText}>Mạng</Text>
+                                </TouchableOpacity>
+                                <TouchableOpacity style={styles.modalIt1} onPress={() => selectType("Khác")}>
+                                    <Text style={styles.modalText}>Khác</Text>
+                                </TouchableOpacity>
+                            </View>
+                        </View>
+                    </Modal>
+                )}
                 <Text style={EditMotelStyle.label}>Tên dịch vụ</Text>
+                <Text style={EditMotelStyle.label}>{infoPrice.value}</Text>
+                {tenDichVuError ? <Text style={{ color: "red" }}>{tenDichVuError}</Text> : null}
                 <View style={EditMotelStyle.inputContainer}>
                     <FontAwesome6 name="hand-holding-heart" style={EditMotelStyle.icon} size={24} color="green" />
-                    <TextInput value={label}
+                    <TextInput value={tenDichVu}
                         onChangeText={(text) => setTenDichVu(text)} style={EditMotelStyle.input} placeholder="Nhập tên dịch vụ" />
 
                 </View>
                 <Text style={EditMotelStyle.label}>Phí dịch vụ</Text>
+                {phiError ? <Text style={{ color: "red" }}>{phiError}</Text> : null}
                 <View style={EditMotelStyle.inputContainer}>
                     <Fontisto name="money-symbol" style={EditMotelStyle.icon} size={24} color="green" />
-                    <TextInput value={phiDichVu}
+                    <TextInput value={phiDichVu.toString()}
                         onChangeText={(text) => setPhiDichVu(text)} style={EditMotelStyle.input} placeholder="Nhập phí dịch vụ" />
                 </View>
                 <Text style={EditMotelStyle.label}>Thu phí dựa trên</Text>
+                {serviceError ? <Text style={{ color: "red" }}>{serviceError}</Text> : null}
                 <View style={EditMotelStyle.inputContainer}>
                     <MaterialCommunityIcons name="vector-arrange-below" style={EditMotelStyle.icon} size={24} color="green" />
                     <TouchableOpacity style={EditMotelStyle.input} onPress={openModal}>
-                        <Text>{selectedService || "Chọn dịch vụ"}</Text>
+                        <Text>{ selectedService || "Chọn dịch vụ"}</Text>
                     </TouchableOpacity>
                 </View>
                 {/* Hiển thị input đơn vị đo khi chọn "Theo chỉ số đồng hồ" */}
-                
+
                 {showUnitInput && (
-                    
-                    
+
+
                     <View style={EditMotelStyle.inputContainer}>
                         <Entypo name="ruler" style={EditMotelStyle.icon} size={24} color="green" />
 
@@ -143,6 +288,7 @@ const DetailPrices = ({ route }) => {
                 </Modal>
                 {/* Button chọn icon */}
                 <Text style={EditMotelStyle.label}>Icon dịch vụ</Text>
+                {iconError ? <Text style={{ color: "red" }}>{iconError}</Text> : null}
                 <TouchableOpacity style={styles.inputContainer} onPress={openIconModal}>
                     {selectedIcon ? (
                         <View style={styles.iconContainer}>
@@ -191,7 +337,20 @@ const DetailPrices = ({ route }) => {
                         </View>
                     </View>
                 </Modal>
-                <ButtonAuth title="Thêm dịch vụ" onPress={handleSubmit} />
+                <View style={EditMotelStyle.containerBtn}>
+                    <TouchableOpacity style={EditMotelStyle.button} onPress={handleExit}>
+                        <Text style={EditMotelStyle.buttonText}> Thoát</Text>
+                    </TouchableOpacity>
+
+
+                    <TouchableOpacity
+                        style={[EditMotelStyle.button, EditMotelStyle.saveButton]}
+                        onPress={updateInfo}
+                    >
+                        <Text style={EditMotelStyle.buttonText}> Cập nhật thông tin</Text>
+                    </TouchableOpacity>
+
+                </View>
             </View>
         </View>
     );
@@ -205,7 +364,7 @@ const styles = StyleSheet.create({
     },
     box: {
         // flex: 0.7,
-        width: "94%",
+        width: "95%",
         alignContent: "center",
         backgroundColor: "#fff",
         padding: 20,
@@ -233,6 +392,15 @@ const styles = StyleSheet.create({
         borderTopLeftRadius: 20,
         borderTopRightRadius: 20,
     },
+    modalView1: {
+        backgroundColor: "#fff",
+        padding: 20,
+        alignItems: "center",
+        ...SHADOWS.medium,
+        borderTopLeftRadius: 20,
+        borderTopRightRadius: 20,
+        flexDirection: "row"
+    },
     modalICView: {
         backgroundColor: COLOR.color12,
         padding: 20,
@@ -257,6 +425,18 @@ const styles = StyleSheet.create({
         width: "100%",
         borderBottomColor: "#fff",
         borderBottomWidth: 2,
+    },
+    modalIt1: {
+        width: "24%",
+        // borderRightColor: "#fff",
+        // borderRightWidth: 1,
+        borderColor: "#fff",
+        borderWidth: 1,
+        marginRight: 5,
+        paddingVertical: 10,
+        borderRadius: 20,
+        ...SHADOWS.medium,
+        backgroundColor: COLOR.PRIMARY
     },
     smText: {
         fontSize: 13,

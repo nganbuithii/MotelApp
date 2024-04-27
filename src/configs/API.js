@@ -15,7 +15,8 @@ export const endpoints = {
     updateMotel:(idMotel) => `/motels/${idMotel}/`, //PATCH
     addPrice:(idMotel) => `/motels/${idMotel}/prices/`, //POST
     detailMotel:(idMotel) => `/motels/${idMotel}/`, //GET
-    deleteImgMotel:(idMotel) => `/motels/${idMotel}/images/`  //DELETE
+    deleteImgMotel:(idMotel) => `/motels/${idMotel}/images/`,  //DELETE
+    updatePrice:(idMotel) =>`/motels/${idMotel}/prices/`, //PATCH
 };
 
 // Tạo một phiên bản axios với các cài đặt đã được cung cấp

@@ -176,17 +176,17 @@ const AddPrice = ({ route }) => {
                         }}
                     >
                         <View style={styles.centeredView}>
-                            <View style={styles.modalView}>
-                                <TouchableOpacity style={styles.modalIt} onPress={() => selectType("Điện")}>
+                            <View style={styles.modalView1}>
+                                <TouchableOpacity style={styles.modalIt1} onPress={() => selectType("Điện")}>
                                     <Text style={styles.modalText}>Điện</Text>
                                 </TouchableOpacity>
-                                <TouchableOpacity style={styles.modalIt} onPress={() => selectType("Nước")}>
+                                <TouchableOpacity style={styles.modalIt1} onPress={() => selectType("Nước")}>
                                     <Text style={styles.modalText}>Nước</Text>
                                 </TouchableOpacity>
-                                <TouchableOpacity style={styles.modalIt} onPress={() => selectType("Mạng")}>
+                                <TouchableOpacity style={styles.modalIt1} onPress={() => selectType("Mạng")}>
                                     <Text style={styles.modalText}>Mạng</Text>
                                 </TouchableOpacity>
-                                <TouchableOpacity style={styles.modalIt} onPress={() => selectType("Khác")}>
+                                <TouchableOpacity style={styles.modalIt1} onPress={() => selectType("Khác")}>
                                     <Text style={styles.modalText}>Khác</Text>
                                 </TouchableOpacity>
                             </View>
@@ -349,6 +349,15 @@ const styles = StyleSheet.create({
         borderTopLeftRadius: 20,
         borderTopRightRadius: 20,
     },
+    modalView1: {
+        backgroundColor: "#fff",
+        padding: 20,
+        alignItems: "center",
+        ...SHADOWS.medium,
+        borderTopLeftRadius: 20,
+        borderTopRightRadius: 20,
+        flexDirection:"row"
+    },
     modalICView: {
         backgroundColor: COLOR.color12,
         padding: 20,
@@ -373,6 +382,18 @@ const styles = StyleSheet.create({
         width: "100%",
         borderBottomColor: "#fff",
         borderBottomWidth: 2,
+    },
+    modalIt1: {
+        width: "24%",
+        // borderRightColor: "#fff",
+        // borderRightWidth: 1,
+        borderColor:"#fff",
+        borderWidth:1,
+        marginRight:5,
+        paddingVertical:10,
+        borderRadius:20,
+        ...SHADOWS.medium,
+        backgroundColor:COLOR.PRIMARY
     },
     smText: {
         fontSize: 13,
