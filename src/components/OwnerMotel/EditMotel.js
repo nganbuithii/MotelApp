@@ -27,7 +27,7 @@ const EditMotel = ({ navigation, route }) => {
     const [editingPrice, setEditingPrice] = useState(null);
 
 
-    
+
     const { idMotel } = route.params;
     const [price, setPrice] = useState("");
     const [area, setArea] = useState("");
@@ -41,48 +41,48 @@ const EditMotel = ({ navigation, route }) => {
     const [images, setImages] = useState([]);
     const [prices, setPrices] = useState([]);
     const [render, setRender] = useState(false);
-    const addNewPrice = async ({ label, value, period }) => {
-        const token = await AsyncStorage.getItem("access-token");
-        console.log(token);
-        console.log(idMotel);
-        const formData = new FormData();
-        formData.append("label", label);
-        formData.append("value", value);
-        formData.append("period", period);
+    // const addNewPrice = async ({ label, value, period }) => {
+    //     const token = await AsyncStorage.getItem("access-token");
+    //     // console.log(token);
+    //     // console.log(idMotel);
+    //     const formData = new FormData();
+    //     formData.append("label", label);
+    //     formData.append("value", value);
+    //     formData.append("period", period);
 
-        let res = await authApi(token).post(endpoints['addPrice'](idMotel), formData, {
-            headers: {
-                'Content-Type': 'multipart/form-data',
-            },
-        });
-        console.log(res.data);
-        console.log("Thanh công add price");
+    //     let res = await authApi(token).post(endpoints['addPrice'](idMotel), formData, {
+    //         headers: {
+    //             'Content-Type': 'multipart/form-data',
+    //         },
+    //     });
+    //     console.log(res.data);
+    //     console.log("Thanh công add price");
 
-    }
+    // }
 
-    const savePrice = async () => {
-        const token = await AsyncStorage.getItem("access-token");
-        const { idMotel } = route.params;
-        if (editingService) {
-            const { label, period } = editingService;
-            const formData = new FormData();
-            formData.append("label", label);
-            formData.append("value", newPrice);
-            formData.append("period", period);
-            console.log("FORRM DATA:", formData);
-            try {
-                // const res = await authApi(token).post(endpoints['addPrice'](idMotel), formData, {
-                //     headers: {
-                //         'Content-Type': 'multipart/form-data',
-                //     },
-                // });
-                // console.log(res.data);
-                console.log("Thêm giá tiền dịch vụ thành công");
-            } catch (error) {
-                console.error("Lỗi khi thêm giá tiền dịch vụ:", error);
-            }
-        }
-    }
+    // const savePrice = async () => {
+    //     const token = await AsyncStorage.getItem("access-token");
+    //     const { idMotel } = route.params;
+    //     if (editingService) {
+    //         const { label, period } = editingService;
+    //         const formData = new FormData();
+    //         formData.append("label", label);
+    //         formData.append("value", newPrice);
+    //         formData.append("period", period);
+    //         console.log("FORRM DATA:", formData);
+    //         try {
+    //             // const res = await authApi(token).post(endpoints['addPrice'](idMotel), formData, {
+    //             //     headers: {
+    //             //         'Content-Type': 'multipart/form-data',
+    //             //     },
+    //             // });
+    //             // console.log(res.data);
+    //             console.log("Thêm giá tiền dịch vụ thành công");
+    //         } catch (error) {
+    //             console.error("Lỗi khi thêm giá tiền dịch vụ:", error);
+    //         }
+    //     }
+    // }
     const exitModal = () => {
         setEditingService("");
     }
@@ -94,7 +94,7 @@ const EditMotel = ({ navigation, route }) => {
             const token = await AsyncStorage.getItem("access-token");
             console.log("token", token);
             //const imageId = images[index].id; // Lấy ID của ảnh từ mảng images
-            console.log("ID ẢNH", idImage);
+            //console.log("ID ẢNH", idImage);
             const formData = new FormData();
             formData.append("id", idImage); // Thêm ID của ảnh vào formData
             console.log(idMotel);
@@ -149,12 +149,12 @@ const EditMotel = ({ navigation, route }) => {
         console.log("USE EFFECT ĐƯỢC GỌI LẠI");
     }, [render]);
     // Hàm này được gọi khi người dùng ấn vào biểu tượng chỉnh sửa
-    const handleEdit = async(prices) => {
+    const handleEdit = async (prices) => {
         // setEditingService(service);
         // setEditingPrice(service.value);
         // setNewPrice(service.value); // Cập nhật giá trị mới cho newPrice khi mở modal
-        console.log("Thông tin truyền qua:",prices);
-        navigation.navigate("DetailPrices", { infoPrice:prices, idMotel:idMotel });
+        console.log("Thông tin truyền qua:", prices);
+        navigation.navigate("DetailPrices", { infoPrice: prices, idMotel: idMotel });
         // setRender(!render);
         navigation.addListener('focus', async () => {
             await loadDetailMotel();
@@ -163,7 +163,7 @@ const EditMotel = ({ navigation, route }) => {
     const loadDetailMotel = async () => {
         try {
             // Gọi API để lấy dữ liệu chi tiết của nhà trọ với idMotel
-            const token = await AsyncStorage.getItem("access-token");
+            let token = await AsyncStorage.getItem("access-token");
             const res = await authApi(token).get(endpoints["detailMotel"](idMotel));
 
             console.log("DATA API:", res.data);
@@ -180,8 +180,8 @@ const EditMotel = ({ navigation, route }) => {
             setMaxpeople(String(res.data.max_people));
             setDesc(res.data.description);
 
-            console.log("Mảng ảnh:", res.data.motel_images);
-            console.log("Mảng prices:", res.data.prices);
+            // console.log("Mảng ảnh:", res.data.motel_images);
+            // console.log("Mảng prices:", res.data.prices);
             setPrices(res.data.prices);
             setImages(res.data.motel_images);
         } catch (error) {
@@ -193,7 +193,57 @@ const EditMotel = ({ navigation, route }) => {
             );
         }
     };
+    const fetchApiDeletePrice = async (item) => {
+        try {
+            let token = await AsyncStorage.getItem("access-token");
+            const formData = new FormData();
+            formData.append("id", "44")
+            console.log(token);
+            console.log("ID XÓA:", item.id);
+            console.log("ID MOTEL:", idMotel);
+            console.log("FORRM:", formData);
+            const idMotel = item.idMotel; // Lấy idMotel từ item
+            const priceId = item.id; // Lấy id của giá cần xóa
+            await authApi(token).delete(endpoints.deletePrice(idMotel), {
+                data: { id: priceId }, // Truyền id qua dưới dạng dữ liệu JSON
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+            });
+            console.log("Xóa thành công prices");
+            console.log("xóa thành công prices");
 
+            setRender(!render);
+            showToast1();
+
+
+
+        } catch (ex) {
+            console.error(ex);
+        }
+    }
+    const deletePrices = async (item) => {
+        console.log("ID:", item.id);
+        Alert.alert(
+            "Xác nhận",
+            "Bạn có chắc chắn muốn xóa không?",
+            [
+                {
+                    text: "Hủy",
+                    onPress: () => console.log("Hủy xóa"),
+                    style: "cancel"
+                },
+                {
+                    text: "Xóa",
+                    onPress: async () => {
+                        // Gọi API xóa ở đây
+                        await fetchApiDeletePrice(item);
+
+                    }
+                }
+            ]
+        );
+    }
     const showToast1 = () => {
         Toast.show({
             type: "success",
@@ -213,8 +263,8 @@ const EditMotel = ({ navigation, route }) => {
         });
     };
     const handleExit = () => {
-        console.log("Thoát");
-        console.log("dỮ LIỆU KHI THOÁT");
+        // console.log("Thoát");
+        // console.log("dỮ LIỆU KHI THOÁT");
         // console.log(motel.images);
         console.log("id", idMotel);
         //console.log(motel.images)
@@ -277,19 +327,19 @@ const EditMotel = ({ navigation, route }) => {
             });
             console.log("FORM DTAA:", formData);
 
-            
-                // Chỉ gửi formData nếu có ảnh mới được thêm vào
-                const res = await authApi(token).post(endpoints['upImgMotel'](idMotel), formData, {
-                    headers: {
-                        'Content-Type': 'multipart/form-data',
-                    },
-                });
-                console.log("UP ANH MOI THANH CONG :", res.data);
-                console.log("Uploaded images successfully");
-                setRender(!render);
-            
-                
-            
+
+            // Chỉ gửi formData nếu có ảnh mới được thêm vào
+            const res = await authApi(token).post(endpoints['upImgMotel'](idMotel), formData, {
+                headers: {
+                    'Content-Type': 'multipart/form-data',
+                },
+            });
+            console.log("UP ANH MOI THANH CONG :", res.data);
+            console.log("Uploaded images successfully");
+            setRender(!render);
+
+
+
         } catch (ex) {
             console.error(ex);
         }
@@ -443,21 +493,7 @@ const EditMotel = ({ navigation, route }) => {
                             color={COLOR.PRIMARY}
                         />
                     </TouchableOpacity>
-                    {/* Hiển thị popup chỉ nhập giá tiền */}
-                    <Modal visible={!!editingService} transparent={true} animationType="slide">
-                        <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: 'rgba(0, 0, 0, 0.5)', }}>
-                            <View style={{ backgroundColor: 'white', padding: 20, borderRadius: 10, width: "80%" }}>
-                                <Text>Nhập giá tiền dịch vụ {editingService?.label}</Text>
-                                <TextInput
-                                    onChangeText={(text) => setNewPrice(text)}
-                                    value={newPrice} // Bind giá trị của newPrice với TextInput
-                                    style={{ borderWidth: 1, borderColor: 'gray', marginTop: 10, padding: 8, borderRadius: 5 }}
-                                />
-                                <ButtonAuth title="Thoát" onPress={exitModal} />
-                                <ButtonAuth title="Lưu dịch vụ" onPress={savePrice} />
-                            </View>
-                        </View>
-                    </Modal>
+
                     <View style={EditMotelStyle.serviceRow}>
                         {prices.map((item, index) => (
                             <View key={index} style={EditMotelStyle.serviceIt}>
@@ -465,9 +501,15 @@ const EditMotel = ({ navigation, route }) => {
                                 <Text>
                                     {item.value} đ/{item.period}
                                 </Text>
-                                <TouchableOpacity onPress={() => handleEdit(item)}>
-                                    <AntDesign style={EditMotelStyle.iconEdit} name="edit" size={24} color="black" />
-                                </TouchableOpacity>
+                                <View style={{ flexDirection: "row" }}>
+                                    <TouchableOpacity onPress={() => handleEdit(item)}>
+                                        <AntDesign style={EditMotelStyle.iconEdit} name="edit" size={24} color="green" />
+                                    </TouchableOpacity>
+                                    <TouchableOpacity onPress={() => deletePrices(item)}>
+                                        <MaterialCommunityIcons style={EditMotelStyle.iconEdit} name="delete-circle-outline" size={24} color="red" />
+                                    </TouchableOpacity>
+                                </View>
+
                             </View>
                         ))}
                     </View>

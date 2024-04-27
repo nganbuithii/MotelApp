@@ -65,9 +65,9 @@ export default StyleSheet.create({
         alignItems: "center", // Căn giữa theo chiều dọc
         borderColor: COLOR.PRIMARY,
         borderWidth: 1,
-        width: "30%", // Chiều rộng mỗi ô điện
+        width: "45%", // Chiều rộng mỗi ô điện
         borderRadius: 10,
-        height: 150,
+        height: 140,
         justifyContent: "center", // Căn các phần tử đều nhau theo chiều ngang
         paddingHorizontal: 10, // Khoảng cách ngang bên trong
         marginVertical: 5, // Khoảng cách dọc
@@ -78,7 +78,8 @@ export default StyleSheet.create({
         backgroundColor: COLOR.color6,
         borderRadius: 20,
         marginTop: 5,
-        paddingHorizontal: 10
+        paddingHorizontal: 10,
+        marginLeft:15,
     },
     addButton: {
         flexDirection: "row",

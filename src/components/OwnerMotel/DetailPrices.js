@@ -10,7 +10,7 @@ import { authApi, endpoints } from "../../configs/API";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import Toast from "react-native-toast-message";
 
-const DetailPrices = ({ route }) => {
+const DetailPrices = ({ route, navigation }) => {
     const { idMotel } = route.params;
     const { infoPrice } = route.params;
 
@@ -91,7 +91,7 @@ const DetailPrices = ({ route }) => {
         setModalVisible(false);
     };
     const handleExit = () => {
-
+        navigation.goBack();
     }
     const updateInfo = async () => {
         try {
