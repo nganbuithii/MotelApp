@@ -266,28 +266,9 @@ const RegisterMotel = ({ navigation }) => {
                     <TextInput value={desc} style={styles.input} onChangeText={setDesc} placeholder="Mô tả" />
                 </View>
 
-                {error.ward && <Text style={styles.errorMsg}><AntDesign name="exclamation" size={13} color="red" />{error.ward}</Text>}
-                <View style={styles.selectContainer}>
-                    <RNPickerSelect
-                        value={ward}
-                        onValueChange={(value) => setWard(value)}
-                        placeholder={{ label: 'Chọn xã/phường', value: null }}
-                        items={wards.map(ward => ({ label: ward.full_name, value: ward.id }))}
-                    />
-                </View>
 
-                {error.district && <Text style={styles.errorMsg}><AntDesign name="exclamation" size={13} color="red" />{error.district}</Text>}
-                <View style={styles.selectContainer}>
-                    <RNPickerSelect
-                        value={district}
-                        onValueChange={(value) => {
-                            setDistrict(value);
-                            handleDistrictChange(value); // Gọi hàm xử lý khi quận/huyện được chọn
-                        }}
-                        placeholder={{ label: 'Chọn quận/huyện', value: null }}
-                        items={districts.map(district => ({ label: district.full_name, value: district.id }))}
-                    />
-                </View>
+
+
 
                 {error.city && <Text style={styles.errorMsg}><AntDesign name="exclamation" size={13} color="red" />{error.city}</Text>}
                 <View style={styles.selectContainer}>
@@ -300,6 +281,27 @@ const RegisterMotel = ({ navigation }) => {
                         }}
                         placeholder={{ label: 'Chọn tỉnh/thành phố', value: null }}
                         items={cities.map(city => ({ label: city.full_name, value: city.id }))}
+                    />
+                </View>
+                {error.district && <Text style={styles.errorMsg}><AntDesign name="exclamation" size={13} color="red" />{error.district}</Text>}
+                <View style={styles.selectContainer}>
+                    <RNPickerSelect
+                        value={district}
+                        onValueChange={(value) => {
+                            setDistrict(value);
+                            handleDistrictChange(value); // Gọi hàm xử lý khi quận/huyện được chọn
+                        }}
+                        placeholder={{ label: 'Chọn quận/huyện', value: null }}
+                        items={districts.map(district => ({ label: district.full_name, value: district.id }))}
+                    />
+                </View>
+                {error.ward && <Text style={styles.errorMsg}><AntDesign name="exclamation" size={13} color="red" />{error.ward}</Text>}
+                <View style={styles.selectContainer}>
+                    <RNPickerSelect
+                        value={ward}
+                        onValueChange={(value) => setWard(value)}
+                        placeholder={{ label: 'Chọn xã/phường', value: null }}
+                        items={wards.map(ward => ({ label: ward.full_name, value: ward.id }))}
                     />
                 </View>
                 <View style={styles.inputContainer}>

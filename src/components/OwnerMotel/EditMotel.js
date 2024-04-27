@@ -259,24 +259,32 @@ const EditMotel = ({ navigation, route }) => {
             const token = await AsyncStorage.getItem("access-token");
             const formData = new FormData();
             newImages.forEach((image, index) => {
-                formData.append(`images`, {
-                    uri: image.uri,
-                    type: 'image/jpeg',
-                    name: `image_${index}.jpg`,
+                // Kiểm tra xem ảnh đã tồn tại trong mảng images chưa
+                const existingImage = images.find(img => img.url === image.uri);
+                if (!existingImage) {
+                    formData.append(`images`, {
+                        uri: image.uri,
+                        type: 'image/jpeg',
+                        name: `image_${index}.jpg`,
+                    });
+                }
+            });
+            if (formData.length > 0) {
+                // Chỉ gửi formData nếu có ảnh mới được thêm vào
+                const res = await authApi(token).post(endpoints['upImgMotel'](idMotel), formData, {
+                    headers: {
+                        'Content-Type': 'multipart/form-data',
+                    },
                 });
-            });
-            const res = await authApi(token).post(endpoints['upImgMotel'](idMotel), formData, {
-                headers: {
-                    'Content-Type': 'multipart/form-data',
-                },
-            });
-            console.log("UP ANH MOI THANH CONG :", res.data);
-            console.log("Uploaded images successfully");
-            setRender(!render);
+                console.log("UP ANH MOI THANH CONG :", res.data);
+                console.log("Uploaded images successfully");
+                setRender(!render);
+            } else {
+                console.log("Không có ảnh mới được tải lên.");
+            }
         } catch (ex) {
             console.error(ex);
         }
-
     };
 
     const renderImageItem = ({ item }) => {
