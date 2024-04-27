@@ -98,13 +98,16 @@ const EditMotel = ({ navigation, route }) => {
             const formData = new FormData();
             formData.append("id", idImage); // Thêm ID của ảnh vào formData
             console.log(idMotel);
+            console.log(" ẢNH CẦN XÓA:", idImage);
 
-            const response = await authApi(token).delete(endpoints["deleteImgMotel"](idMotel), formData, {
-                headers: {
-                    'Content-Type': 'multipart/form-data',
-                },
-            });
-
+            await authApi(token).delete(endpoints["deleteImgMotel"](idMotel), {
+                    data: { id:idImage }, // Truyền id qua dưới dạng dữ liệu JSON
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                });
+            setRender(!render);
+            showToast1();
             console.log("Xóa ảnh thành công");
             //setRender(!render);
         } catch (ex) {
