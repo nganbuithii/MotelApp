@@ -247,6 +247,7 @@ const EditMotel = ({ navigation, route }) => {
             console.log(JSON.stringify(selectedImages));
             if (!selectedImages.canceled) {
                 const newImages = selectedImages.assets.filter((asset) => asset.uri);
+                console.log("NEW IMG:", newImages);
                 // Upload new images to the server
                 await uploadImages(newImages);
             }
@@ -258,18 +259,19 @@ const EditMotel = ({ navigation, route }) => {
         try {
             const token = await AsyncStorage.getItem("access-token");
             const formData = new FormData();
-            newImages.forEach((image, index) => {
-                // Kiểm tra xem ảnh đã tồn tại trong mảng images chưa
-                const existingImage = images.find(img => img.url === image.uri);
-                if (!existingImage) {
-                    formData.append(`images`, {
-                        uri: image.uri,
-                        type: 'image/jpeg',
-                        name: `image_${index}.jpg`,
-                    });
-                }
+            console.log("new img 2:", newImages);
+
+            // Loop through each new image and append it to formData
+            newImages.forEach((image) => {
+                formData.append('images', {
+                    uri: image.uri,
+                    type: image.mimeType, // Sử dụng mimeType từ ảnh đã chọn
+                    name: 'image.jpg',
+                });
             });
-            if (formData.length > 0) {
+            console.log("FORM DTAA:", formData);
+
+            
                 // Chỉ gửi formData nếu có ảnh mới được thêm vào
                 const res = await authApi(token).post(endpoints['upImgMotel'](idMotel), formData, {
                     headers: {
@@ -279,9 +281,9 @@ const EditMotel = ({ navigation, route }) => {
                 console.log("UP ANH MOI THANH CONG :", res.data);
                 console.log("Uploaded images successfully");
                 setRender(!render);
-            } else {
-                console.log("Không có ảnh mới được tải lên.");
-            }
+            
+                
+            
         } catch (ex) {
             console.error(ex);
         }
