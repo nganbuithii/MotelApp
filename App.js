@@ -27,6 +27,8 @@ import CreatePost from './src/components/Home/CreatePost';
 import EditMotel from './src/components/OwnerMotel/EditMotel';
 import AddPrice from './src/components/OwnerMotel/AddPrice';
 import DetailPrices from './src/components/OwnerMotel/DetailPrices';
+import { COLOR } from './src/components/common/color';
+import Payment from './src/components/Tenant/Payment';
 //Điều hướng kiểu stack
 const Stack = createStackNavigator();
 
@@ -66,9 +68,13 @@ export default function App() {
           <Stack.Screen name="ChatSc" component={ChatSc}
             options={{ headerShown: true }} />
           <Stack.Screen name="CreatePost" component={CreatePost}
-            options={{ headerTitle: 'Tạo bài viết' }} />
+            options={{ headerTitle: 'Bài viết mới' }} />
           <Stack.Screen name="AddPrice" component={AddPrice}
             options={{ headerTitle: 'Thêm dịch vụ' }} />
+          
+          <Stack.Screen name="Payment" component={Payment}
+            options={{ headerTitle: 'Thanh toán' }} />
+          
           
           <Stack.Screen name="DetailPrices" component={DetailPrices}
             options={{ headerTitle: 'Sửa dịch vụ' }} />
@@ -82,13 +88,21 @@ export default function App() {
             component={DetailOwner}
             options={{
               headerShown: true,// Tắt header cho màn hình Slider
-              headerTitle: 'Ngan xxjk'
+              headerTitle: 'Thông tin chủ trọ',
+              headerTintColor:COLOR.PRIMARY,
             }}
           />
           <Stack.Screen
             name="PostDetail"
             component={PostDetail}
-            options={{ headerShown: false }} // Tắt header cho màn hình Slider
+            options={{
+              headerShown: true,// Tắt header cho màn hình Slider
+              headerTitle: 'Chi tiết phòng trọ',
+              headerTintColor:COLOR.PRIMARY,
+              
+            
+            }}
+            // options={{ headerShown: false }} // Tắt header cho màn hình Slider
           />
           <Stack.Screen
             name="UploadImgHouse"

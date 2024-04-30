@@ -28,8 +28,10 @@ const Login = ({ navigation }) => {
                 'Content-Type': 'application/x-www-form-urlencoded' // Change Content-Type
             };
             let data = {
-                username: username,
-                password: password,
+                // username: username,
+                // password: password,
+                username:"M",
+                password:"Meomeo@123",
                 client_id: "8OdjuOvhjzLFCigIbuw3mbDAlhWTirzeM7s1W1g2",
                 client_secret:
                     "8pj5yZzwnH0vN3hflMrJJ7QBENDCsMKfIUlGQ15Gyg9GPTRCFXsIxm7iiF7xmcPf2IOz5uIXmfD9TjXJI3mKWHIQQ1HStaY3duHkIrSc4GWJGcyg1ZQgKtYIOxRksXia",

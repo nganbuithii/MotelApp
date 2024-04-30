@@ -2,7 +2,7 @@ import { View, Text, StyleSheet, TouchableNativeFeedback, TouchableWithoutFeedba
 import React, { useContext, useEffect, useState } from "react";
 import HomeStyles from "../Home/HomeStyles";
 import { COLOR, SHADOWS } from "../common/color";
-import { Ionicons } from '@expo/vector-icons';
+import { Ionicons, Octicons } from '@expo/vector-icons';
 import { TouchableOpacity } from "react-native-gesture-handler";
 import { useNavigation } from '@react-navigation/native';
 import { Feather } from '@expo/vector-icons';
@@ -68,7 +68,7 @@ const PlusOwner = () => {
                 // Cập nhật state của nhà trọ với danh sách hình ảnh
                 setStoredMotels(prevMotels => prevMotels.map(prevMotel => {
                     if (prevMotel.id === idMotel) {
-                        return { ...prevMotel, images: motelImages, prices: motelPrices  };
+                        return { ...prevMotel, images: motelImages, prices: motelPrices };
                     }
                     return prevMotel;
                 }));
@@ -105,9 +105,9 @@ const PlusOwner = () => {
         navigation.navigate("Home"); // Quay lại trang trước đó
 
     };
-    const handleEdit= (motel) => {
+    const handleEdit = (motel) => {
         // Xử lý khi nút "Sửa" được nhấn
-        navigation.navigate("EditMotel", { idMotel:motel.id });
+        navigation.navigate("EditMotel", { idMotel: motel.id });
         console.log("ID Motel KHI EDIT", motel.id)
         console.log("Motel khi giá cả", motel.prices)
         setTriggerRender(!triggerRender);
@@ -122,7 +122,7 @@ const PlusOwner = () => {
             let token = await AsyncStorage.getItem("access-token");
             console.log("TOKEN", token);
             console.log("ID", idMotel);
-            
+
             // Hiển thị cửa sổ cảnh báo
             Alert.alert(
                 'Xác nhận xóa',
@@ -154,14 +154,14 @@ const PlusOwner = () => {
                 ],
                 { cancelable: true }
             );
-            
+
         } catch (ex) {
             console.error(ex);
         } finally {
             setIsLoading(false);
         }
     };
-    
+
     const handleAddRoomPress = async () => {
         navigation.navigate('RegisterMotel');
         setTriggerRender(!triggerRender);
@@ -176,13 +176,11 @@ const PlusOwner = () => {
 
     return (
         <View style={styles.container}>
-            <View style={styles.navContainer}>
-                <TouchableWithoutFeedback style={styles.nav} onPress={handlePress}>
-                    <View style={styles.tab}>
-                        <Ionicons name="arrow-back-outline" size={24} color={COLOR.PRIMARY} style={HomeStyles.bellIcon} />
-                        <Text style={styles.textHead}>Nhà trọ của tôi</Text>
-                    </View>
-                </TouchableWithoutFeedback>
+
+            <View style={HomeStyles.tab}>
+                <FontAwesome name="heart" size={24} color={COLOR.PRIMARY} style={HomeStyles.bellIcon} />
+                {/* <Ionicons name="arrow-back-outline" size={24} color={COLOR.PRIMARY} style={HomeStyles.bellIcon} /> */}
+                <Text style={styles.textHead}>Nhà trọ của tôi</Text>
             </View>
             <TouchableOpacity onPress={handleAddRoomPress}>
                 <View style={styles.buttonAdd}>
@@ -234,11 +232,11 @@ const PlusOwner = () => {
                             />
 
                             <View style={styles.buttonContainer}>
-                                <TouchableOpacity onPress={() => handleEdit(item)}  style={[styles.button, styles.editButton]}>
+                                <TouchableOpacity onPress={() => handleEdit(item)} style={[styles.button, styles.editButton]}>
                                     <FontAwesome name="edit" size={13} color="black" />
                                     <Text style={styles.buttonText}>Chỉnh sửa</Text>
                                 </TouchableOpacity>
-                                
+
                                 <TouchableOpacity onPress={() => handleDelete(item.id)} style={[styles.button, styles.deleteButton]}>
                                     <FontAwesome name="trash" size={13} color="black" />
                                     <Text style={styles.buttonText}>Xóa</Text>
@@ -265,10 +263,12 @@ const styles = StyleSheet.create({
     },
     nav: {
         width: "100%",
+        alignContent: "center"
     },
     tab: {
         flexDirection: "row",
         alignItems: "center",
+        justifyContent: "center",
         width: "100%",
         backgroundColor: COLOR.color11,
         paddingVertical: 15,
