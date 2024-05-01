@@ -1,4 +1,4 @@
-import { View, Text, Image, StyleSheet, TextInput, TouchableOpacity, FlatList } from "react-native";
+import { View, Text, Image, StyleSheet, TextInput, TouchableOpacity, FlatList, ScrollView } from "react-native";
 import React, { useState } from "react";
 import { Ionicons } from '@expo/vector-icons';
 import ButtonAuth from "../common/ButtonAuth";
@@ -7,10 +7,13 @@ import { COLOR, SHADOWS } from "../common/color";
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import * as ImagePicker from "expo-image-picker";
 import { SimpleLineIcons } from '@expo/vector-icons';
-
+import MapView, { PROVIDER_GOOGLE, Region } from "react-native-maps";
+import AnimatedMapRegion from "react-native-maps/lib/AnimatedRegion";
+import { AnimatedRegion } from "react-native-maps";
 
 const CreatePost = () => {
     const [selectedImages, setSelectedImages] = useState([]);
+    
     const dummyImages = [
         require("../../assets/images/2.png"),
         require("../../assets/images/3.png"),
@@ -49,9 +52,14 @@ const CreatePost = () => {
             </TouchableOpacity>
         </View>
     );
-
+    const onRegionChange = (region) =>{
+        console.log(region)
+    }
     return (
+        <ScrollView style={styles.scrollView}>
         <View style={styles.container}>
+            
+
             <View style={styles.userInfo}>
                 <Image source={require('../../assets/images/avt.png')} style={styles.avatar} />
                 <Text style={styles.username}>Ngan Bt</Text>
@@ -74,21 +82,39 @@ const CreatePost = () => {
                 <Text style={styles.imagePickerText}>Thêm ảnh</Text>
             </TouchableOpacity>
             <TouchableOpacity style={styles.imagePicker} >
-                <SimpleLineIcons name="location-pin" size={24} color="black" style={styles.inputIcon} />
-                <Text style={styles.imagePickerText}>Vị trí</Text>
-            </TouchableOpacity>
-            <TouchableOpacity style={styles.imagePicker} >
                 <MaterialCommunityIcons name="home-circle" size={24} color="black" style={styles.inputIcon} />
                 <Text style={styles.imagePickerText}>Nhà trọ</Text>
             </TouchableOpacity>
-        
+
+            <TouchableOpacity style={styles.imagePicker} >
+                <SimpleLineIcons name="location-pin" size={24} color="black" style={styles.inputIcon} />
+                <Text style={styles.imagePickerText}>Vị trí</Text>
+            </TouchableOpacity>
+            <MapView
+                style={{ width: "100%", height: 300 }}
+                initialRegion={{
+                    latitude: 37.78825,
+                    longitude: -122.4324,
+                    latitudeDelta: 0.0922,
+                    longitudeDelta: 0.0421,
+                }}
+                provider={PROVIDER_GOOGLE}
+                showsUserLocation={true}
+                showsMyLocationButton
+                onRegionChangeComplete={onRegionChange}
+            />
+            
 
             <ButtonAuth title="Đăng bài" />
         </View>
+        </ScrollView>
     );
 };
 
 const styles = StyleSheet.create({
+    scrollView: {
+        flex: 1,
+    },
     container: {
         flex: 1,
         padding: 10,
@@ -129,7 +155,7 @@ const styles = StyleSheet.create({
         padding: 10,
         borderRadius: 10,
         marginBottom: 8,
-        marginHorizontal:10,
+        marginHorizontal: 10,
         ...SHADOWS.small
     },
     imagePickerText: {
