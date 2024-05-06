@@ -167,6 +167,7 @@ const EditMotel = ({ navigation, route }) => {
         try {
             // Gọi API để lấy dữ liệu chi tiết của nhà trọ với idMotel
             let token = await AsyncStorage.getItem("access-token");
+            console.log("token:", token);
             const res = await authApi(token).get(endpoints["detailMotel"](idMotel));
 
             console.log("DATA API:", res.data);

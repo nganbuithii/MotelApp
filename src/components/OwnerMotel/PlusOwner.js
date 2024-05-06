@@ -45,40 +45,44 @@ const PlusOwner = () => {
 
     }
     const fetchMotels = async () => {
-        const motelData = await getMotel();
-        if (motelData.length > 0) {
-
-            //const parsedMotels = JSON.parse(motelData);
-            setMotels(motelData);
-            setStoredMotels(motelData);
-            let token = await AsyncStorage.getItem("access-token");
-            //console.log(token);
-
-            // Duyệt qua mỗi nhà trọ trong mảng storedMotels
-            motelData.forEach(async (motel) => {
-                // Lấy ID của nhà trọ
-                const idMotel = motel.id;
-
-                // Gọi API để lấy hình ảnh của nhà trọ dựa trên ID
-                const res = await authApi(token).get(endpoints['getImageMotel'](idMotel));
-                const motelImages = res.data.motel_images;
-                const motelPrices = res.data.prices;
-                // console.log("DTATA TEST",motelPrices);
-
-                // Cập nhật state của nhà trọ với danh sách hình ảnh
-                setStoredMotels(prevMotels => prevMotels.map(prevMotel => {
-                    if (prevMotel.id === idMotel) {
-                        return { ...prevMotel, images: motelImages, prices: motelPrices };
+        try {
+            const motelData = await getMotel();
+            if (motelData.length > 0) {
+                setMotels(motelData);
+                setStoredMotels(motelData);
+                
+                let token = await AsyncStorage.getItem("access-token");
+                console.log("token", token);
+                console.log("motel data:", motelData);
+                await Promise.all(motelData.map(async (motel) => {
+                    try {
+                        const idMotel = motel.id;
+                        const res = await authApi(token).get(endpoints['getImageMotel'](idMotel));
+                        console.log("IMAGES", res.data);
+                        const motelImages = res.data.motel_images;
+                        const motelPrices = res.data.prices;
+                        setStoredMotels(prevMotels => prevMotels.map(prevMotel => {
+                            if (prevMotel.id === idMotel) {
+                                return { ...prevMotel, images: motelImages, prices: motelPrices };
+                            }
+                            return prevMotel;
+                        }));
+                    } catch (error) {
+                        console.error("Error fetching images for motel", motel.id, error);
+                        // Xử lý lỗi ở đây nếu cần thiết
                     }
-                    return prevMotel;
                 }));
-            });
+                
+                setIsLoading(false);
+                setMotels(motelData);
+            }
+        } catch (ex) {
+            console.log("lỗi ở đây")
+            console.error(ex);
+            // Xử lý lỗi ở đây nếu cần thiết
+        } finally {
             setIsLoading(false);
-            setMotels(motelData);
         }
-        // console.log("STORE MOTELL", motelData);
-        // console.log("STORE MOTELL 222", motelData.prices);
-        // console.log(storedMotels);
     };
     useEffect(() => {
         fetchMotels();

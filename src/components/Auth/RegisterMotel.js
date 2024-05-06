@@ -16,6 +16,7 @@ import API, { authApi, endpoints } from "../../configs/API";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import MyContext from '../../configs/MyContext';
 import axios from 'axios';
+import { MaterialCommunityIcons } from '@expo/vector-icons';
 
 const RegisterMotel = ({ navigation }) => {
     const [cities, setCities] = useState([]); // State để lưu trữ danh sách các tỉnh/thành phố
@@ -32,6 +33,7 @@ const RegisterMotel = ({ navigation }) => {
     const [city, setCity] = useState(null);
     const [area, setArea] = useState(null);
     const [other, setOther] = useState(null);
+    const [cabinet, setCabinet] = useState(null);
 
     const [error, setError] = useState({
         price: '',
@@ -41,6 +43,7 @@ const RegisterMotel = ({ navigation }) => {
         district: '',
         city: '',
         area: '',
+        cabinet:''
     });
 
     // Hàm để lấy danh sách quận/huyện dựa trên tỉnh/thành phố được chọn
@@ -149,6 +152,9 @@ const RegisterMotel = ({ navigation }) => {
             if (!city) {
                 newErrors.city = "Vui lòng nhập tỉnh/thành phố";
             }
+            if(!cabinet){
+                newErrors.cabinet="Vui lòng nhập thông tin nội thất"
+            }
 
 
             try {
@@ -165,6 +171,8 @@ const RegisterMotel = ({ navigation }) => {
                 formData.append('other_address', other);
                 formData.append('lat', "1");
                 formData.append('lon', "1");
+                formData.append('furniture', cabinet);
+                console.log("form data:", formData);
                 // console.log(token);
                 // console.log("FORM DATA TRO", formData);
                 let res = await authApi(token).post(endpoints['postMotel'], formData, {
@@ -185,7 +193,6 @@ const RegisterMotel = ({ navigation }) => {
                 console.log("MOTEL Ở ĐK: ", motels);
                 console.info("TRỌ RES DATA đã được lưu vào AsyncStorage");
 
-                // // Kiểm tra dữ liệu đã được lưu vào AsyncStorage hay chưa
                 // const infoMotel = await AsyncStorage.getItem("infoMotel");
                 // console.log("INFOMOTELS", infoMotel);
 
@@ -254,6 +261,13 @@ const RegisterMotel = ({ navigation }) => {
                     <FontAwesome5 style={styles.icon} name="user-friends" size={24} color="black" />
                     <TextInput style={styles.input} value={people} onChangeText={setPeople} placeholder="Số lượng người " />
                 </View>
+
+                {error.cabinet && <Text style={styles.errorMsg}><AntDesign name="exclamation" size={13} color="red" />{error.cabinet}</Text>}
+                <View style={styles.inputContainer}>
+                <MaterialCommunityIcons style={styles.icon} name="file-cabinet" size={24} color="black" />
+                    <TextInput style={styles.input} value={cabinet} onChangeText={setCabinet} placeholder="Nội thất " />
+                </View>
+
 
                 {error.desc && <Text style={styles.errorMsg}><AntDesign name="exclamation" size={13} color="red" />{error.desc}</Text>}
                 <View style={styles.inputContainer}>

@@ -57,9 +57,9 @@ const UploadImgHouse = ({ navigation, route }) => {
             }
             // console.log("images", images)
             let token = await AsyncStorage.getItem("access-token");
-            // console.log(idMotel);
-            // console.log(formData);
-
+            console.log(idMotel);
+            console.log(formData);
+            console.log(token);
 
             let res = await authApi(token).post(endpoints['upImgMotel'](idMotel), formData, {
                 headers: {
