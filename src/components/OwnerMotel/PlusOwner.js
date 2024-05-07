@@ -54,24 +54,24 @@ const PlusOwner = () => {
                 let token = await AsyncStorage.getItem("access-token");
                 console.log("token", token);
                 console.log("motel data:", motelData);
-                await Promise.all(motelData.map(async (motel) => {
-                    try {
-                        const idMotel = motel.id;
-                        const res = await authApi(token).get(endpoints['getImageMotel'](idMotel));
-                        console.log("IMAGES", res.data);
-                        const motelImages = res.data.motel_images;
-                        const motelPrices = res.data.prices;
-                        setStoredMotels(prevMotels => prevMotels.map(prevMotel => {
-                            if (prevMotel.id === idMotel) {
-                                return { ...prevMotel, images: motelImages, prices: motelPrices };
-                            }
-                            return prevMotel;
-                        }));
-                    } catch (error) {
-                        console.error("Error fetching images for motel", motel.id, error);
-                        // Xử lý lỗi ở đây nếu cần thiết
-                    }
-                }));
+                // await Promise.all(motelData.map(async (motel) => {
+                //     try {
+                //         const idMotel = motel.id;
+                //         const res = await authApi(token).get(endpoints['getImageMotel'](idMotel));
+                //         console.log("IMAGES", res.data);
+                //         const motelImages = res.data.motel_images;
+                //         const motelPrices = res.data.prices;
+                //         setStoredMotels(prevMotels => prevMotels.map(prevMotel => {
+                //             if (prevMotel.id === idMotel) {
+                //                 return { ...prevMotel, images: motelImages, prices: motelPrices };
+                //             }
+                //             return prevMotel;
+                //         }));
+                //     } catch (error) {
+                //         console.error("Error fetching images for motel", motel.id, error);
+                //         // Xử lý lỗi ở đây nếu cần thiết
+                //     }
+                // }));
                 
                 setIsLoading(false);
                 setMotels(motelData);

@@ -18,6 +18,7 @@ export const endpoints = {
     deleteImgMotel:(idMotel) => `/motels/${idMotel}/images/`,  //DELETE
     updatePrice:(idMotel) =>`/motels/${idMotel}/prices/`, //PATCH
     deletePrice:(idMotel) => `/motels/${idMotel}/prices/`, //DELETE
+    createPost:"/post/for_lease/", //POST
 };
 
 // Tạo một phiên bản axios với các cài đặt đã được cung cấp

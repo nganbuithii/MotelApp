@@ -1,112 +1,147 @@
-import { View, Text, Image, StyleSheet, TextInput, TouchableOpacity, FlatList, ScrollView } from "react-native";
-import React, { useState } from "react";
-import { Ionicons } from '@expo/vector-icons';
+import { View, Text, Image, StyleSheet, TextInput, TouchableOpacity, ScrollView } from "react-native";
+import React, { useContext, useState } from "react";
 import ButtonAuth from "../common/ButtonAuth";
-import { Entypo } from '@expo/vector-icons';
 import { COLOR, SHADOWS } from "../common/color";
+import MyContext from "../../configs/MyContext";
 import { MaterialCommunityIcons } from '@expo/vector-icons';
-import * as ImagePicker from "expo-image-picker";
-import { SimpleLineIcons } from '@expo/vector-icons';
-import MapView, { PROVIDER_GOOGLE, Region } from "react-native-maps";
-import AnimatedMapRegion from "react-native-maps/lib/AnimatedRegion";
-import { AnimatedRegion } from "react-native-maps";
+import { FontAwesome } from '@expo/vector-icons';
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { authApi, endpoints } from "../../configs/API";
+import { Ionicons } from '@expo/vector-icons';
 
 const CreatePost = () => {
-    const [selectedImages, setSelectedImages] = useState([]);
-    
-    const dummyImages = [
-        require("../../assets/images/2.png"),
-        require("../../assets/images/3.png"),
-        require("../../assets/images/2.png"),
-        require("../../assets/images/3.png"),
-    ];
+    const [motels, setMotels] = useState([]);
+    const [user, dispatch] = useContext(MyContext);
 
-    const handleAddImage = async () => {
+    const [selectedHouse, setSelectedHouse] = useState(null);
+    const [showHouseList, setShowHouseList] = useState(true);
+    const [title, setTitle] = useState("");
+    const [content, setContent] = useState("");
+
+    const [titleError, setTitleError] = useState("");
+    const [contentError, setContentError] = useState("");
+    const [houseError, setHouseError] = useState("");
+
+
+    const getMotel = async () => {
         try {
-            const selectedImages = await ImagePicker.launchImageLibraryAsync({
-                mediaTypes: ImagePicker.MediaTypeOptions.Images,
-                allowsEditing: true,
-                aspect: [4, 3],
-                quality: 1,
-                multiple: true,
-            });
-            if (!selectedImages.cancelled) {
-                setSelectedImages([...selectedImages, ...selectedImages.assets]);
-            }
-        } catch (error) {
-            console.log("Error selecting images: ", error);
+            const token = await AsyncStorage.getItem("access-token");
+            let response = await authApi(token).get(endpoints['detailMotelOwner'](user.id));
+            let motelData = response.data;
+            setMotels(response.data);
+            console.log("Get data nhà trọ của user:", response.data);
+            return motelData;
+        } catch (ex) {
+            console.error(ex);
         }
-    };
-
-    const removeImage = (index) => {
-        const updatedImages = [...selectedImages];
-        updatedImages.splice(index, 1);
-        setSelectedImages(updatedImages);
-    };
-
-    const renderItem = ({ item, index }) => (
-        <View style={styles.imageContainer}>
-            <Image source={item} style={styles.image} />
-            <TouchableOpacity onPress={() => removeImage(index)} style={styles.deleteButton}>
-                <Ionicons name="close-circle" size={24} color="red" />
-            </TouchableOpacity>
-        </View>
-    );
-    const onRegionChange = (region) =>{
-        console.log(region)
     }
+
+    const selectHouse = (house) => {
+        setSelectedHouse(house);
+        setShowHouseList(false);
+    };
+
+    const handleSubmit = async () => {
+        try {
+            if (!title) {
+                setTitleError("Vui lòng nhập tiêu đề");
+            } else {
+                setTitleError("");
+            }
+            if (!content) {
+                setContentError("Vui lòng nhập mô tả");
+            } else {
+                setContentError("");
+            }
+            if (!selectedHouse) {
+                setHouseError("Vui lòng chọn nhà trọ");
+            } else {
+                setHouseError("");
+            }
+            // Kiểm tra xem tất cả các trường đều đã hợp lệ
+        if (title && content && selectedHouse) {
+            const token = await AsyncStorage.getItem("access-token");
+            const formData = new FormData();
+            formData.append("title", title);
+            formData.append("content", content);
+            formData.append("motel", selectedHouse.id);
+            console.log("ID", selectedHouse.id);
+            console.log("form", formData);
+            console.log(token);
+            let res = await authApi(token).post(endpoints['createPost'], formData, {
+                headers: {
+                    'Content-Type': 'multipart/form-data',
+                },
+            });
+            console.log("Đăng bài thành công");
+            console.log("res daata post:", res.data);
+        }
+        } catch (ex) {
+            console.error(ex);
+        }
+    }
+
     return (
         <ScrollView style={styles.scrollView}>
-        <View style={styles.container}>
-            
+            <View style={styles.container}>
+                <View style={styles.userInfo}>
+                    <Image source={require('../../assets/images/avt.png')} style={styles.avatar} />
+                    <Text style={styles.username}>Ngan Bt</Text>
+                </View>
+                <View style={styles.containerBody}>
 
-            <View style={styles.userInfo}>
-                <Image source={require('../../assets/images/avt.png')} style={styles.avatar} />
-                <Text style={styles.username}>Ngan Bt</Text>
-            </View>
+                    <Text style={styles.sectionTitle}>Tiêu đề</Text>
+                    {!!titleError && <Text style={styles.errorText}><Ionicons name="warning" size={12} color="red" />{titleError}</Text>}
+                    <View style={styles.inputContainer}>
+                        <TextInput placeholder="Tiêu đề" style={styles.input1} value={title} onChangeText={(text) => setTitle(text)} onFocus={() => setTitleError("")} />
+                    </View>
 
-            <View style={styles.inputContainer}>
-                <TextInput placeholder="Bạn đang nghĩ gì?" style={styles.input} multiline={true} />
-            </View>
+                    <Text style={styles.sectionTitle}>Mô tả</Text>
+                    {!!contentError && <Text style={styles.errorText}><Ionicons name="warning" size={12} color="red" />{contentError}</Text>}
 
-            <FlatList
-                horizontal
-                data={dummyImages}
-                renderItem={renderItem}
-                keyExtractor={(item, index) => index.toString()}
-                contentContainerStyle={styles.imageList}
-            />
+                    <View style={styles.inputContainer}>
+                        <TextInput placeholder="Hãy mô tả bài đăng nhà trọ của bạn?" style={styles.input} multiline={true} value={content} onChangeText={(text) => setContent(text)}
+                            onFocus={() => setContentError("")} />
+                    </View>
+                    {!!houseError && <Text style={styles.errorText}><Ionicons name="warning" size={12} color="red" />{houseError}</Text>}
 
-            <TouchableOpacity style={styles.imagePicker} onPress={handleAddImage}>
-                <Entypo name="images" size={24} color="black" style={styles.inputIcon} />
-                <Text style={styles.imagePickerText}>Thêm ảnh</Text>
-            </TouchableOpacity>
-            <TouchableOpacity style={styles.imagePicker} >
-                <MaterialCommunityIcons name="home-circle" size={24} color="black" style={styles.inputIcon} />
-                <Text style={styles.imagePickerText}>Nhà trọ</Text>
-            </TouchableOpacity>
+                    <TouchableOpacity style={styles.imagePicker} onPress={() => {
+                        getMotel();
+                        setHouseError(""); // Ẩn thông báo lỗi cho nhà trọ khi người dùng chọn
+                    }} >
+                        <MaterialCommunityIcons name="home-circle" size={24} color="black" style={styles.inputIcon} />
+                        <Text style={styles.imagePickerText}>Nhà trọ</Text>
+                    </TouchableOpacity>
 
-            <TouchableOpacity style={styles.imagePicker} >
-                <SimpleLineIcons name="location-pin" size={24} color="black" style={styles.inputIcon} />
-                <Text style={styles.imagePickerText}>Vị trí</Text>
-            </TouchableOpacity>
-            <MapView
-                style={{ width: "100%", height: 300 }}
-                initialRegion={{
-                    latitude: 37.78825,
-                    longitude: -122.4324,
-                    latitudeDelta: 0.0922,
-                    longitudeDelta: 0.0421,
-                }}
-                provider={PROVIDER_GOOGLE}
-                showsUserLocation={true}
-                showsMyLocationButton
-                onRegionChangeComplete={onRegionChange}
-            />
-            
+                    {selectedHouse && (
+                        <View style={styles.houseDetailContainer}>
+                            <Text style={styles.houseTitle}>{selectedHouse.title}</Text>
+                            <TouchableOpacity style={styles.houseItem} >
+                                <Image source={{ uri: selectedHouse.images[0].url }} style={styles.thumbnail} />
+                                <View style={styles.houseInfo}>
+                                    <Text style={styles.ItemTitle}>Nhà trọ đã chọn <FontAwesome name="check-circle" size={20} color="green" /></Text>
+                                    <Text style={styles.houseAddress}>Địa chỉ: {selectedHouse.ward}, {selectedHouse.district},{selectedHouse.city}</Text>
+                                </View>
+                            </TouchableOpacity>
+                        </View>
+                    )}
 
-            <ButtonAuth title="Đăng bài" />
-        </View>
+                    {showHouseList && (
+                        <View style={styles.houseListContainer}>
+                            {motels.map((house, index) => (
+                                <TouchableOpacity key={house.id} style={styles.houseItem} onPress={() => selectHouse(house)}>
+                                    <Image source={{ uri: house.images[0].url }} style={styles.thumbnail} />
+                                    <View style={styles.houseInfo}>
+                                        <Text style={styles.ItemTitle}>{`Nhà trọ ${index + 1}`}</Text>
+                                        <Text style={styles.itemAddress}>Địa chỉ: {house.ward}, {house.district}, {house.city}</Text>
+                                    </View>
+                                </TouchableOpacity>
+                            ))}
+                        </View>
+                    )}
+
+                    <ButtonAuth title="Đăng bài" onPress={handleSubmit} />
+                </View></View>
         </ScrollView>
     );
 };
@@ -114,21 +149,36 @@ const CreatePost = () => {
 const styles = StyleSheet.create({
     scrollView: {
         flex: 1,
+        backgroundColor: COLOR.bg_color1,
     },
     container: {
         flex: 1,
         padding: 10,
-        backgroundColor: '#fff',
+
+        alignItems: 'center',
+
+    },
+    containerBody: {
+        backgroundColor: COLOR.offWhite,
+        // padding:10,
+        borderRadius: 15,
+        marginTop: 20,
+        width: "100%",
+        paddingBottom: 20,
+        alignContent: "center",
+        alignItems: "center",
+        ...SHADOWS.medium
     },
     userInfo: {
         flexDirection: 'row',
         alignItems: 'center',
         marginBottom: 10,
+        marginRight: 'auto'
     },
     avatar: {
-        width: 40,
-        height: 40,
-        borderRadius: 20,
+        width: 50,
+        height: 50,
+        borderRadius: 30,
         marginRight: 10,
     },
     username: {
@@ -137,14 +187,23 @@ const styles = StyleSheet.create({
         color: '#000',
     },
     inputContainer: {
-        borderWidth: 0, // Tắt viền của input
+        borderWidth: 0,
         marginBottom: 10,
+        width: "100%",
     },
     input: {
         padding: 10,
         fontSize: 18,
         minHeight: 100,
-        backgroundColor: 'rgba(0, 0, 0, 0.05)', // Màu nền của input
+        backgroundColor: 'rgba(0, 0, 0, 0.05)',
+        borderRadius: 10,
+        marginHorizontal: 12
+    },
+    input1: {
+        padding: 10,
+        fontSize: 18,
+        minHeight: 60,
+        backgroundColor: 'rgba(0, 0, 0, 0.05)',
         borderRadius: 10,
         marginHorizontal: 12
     },
@@ -156,7 +215,8 @@ const styles = StyleSheet.create({
         borderRadius: 10,
         marginBottom: 8,
         marginHorizontal: 10,
-        ...SHADOWS.small
+        ...SHADOWS.small,
+        width: "94%"
     },
     imagePickerText: {
         marginLeft: 10,
@@ -167,27 +227,51 @@ const styles = StyleSheet.create({
         marginRight: 10,
         color: COLOR.PRIMARY
     },
-    imageContainer: {
-        position: 'relative',
+    houseItem: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        backgroundColor: COLOR.bg_color1,
+        borderRadius: 10,
+        marginBottom: 10,
+        padding: 10,
+        ...SHADOWS.small,
+        width: "94%",
+        alignContent: "center",
+        paddingVertical: 10,
+        paddingHorizontal: 10,
+        marginHorizontal: 10,
+    },
+    thumbnail: {
+        width: 80,
+        height: 80,
+        borderRadius: 10,
         marginRight: 10,
     },
-    deleteButton: {
-        position: 'absolute',
-        top: 5,
-        right: 5,
-        backgroundColor: 'rgba(255,255,255,0.7)',
-        borderRadius: 12,
-        padding: 5,
+    houseInfo: {
+        flex: 1,
     },
-    image: {
-        width: 340,
-        height: 340,
-        borderRadius: 10,
-        marginLeft: 13
+    ItemTitle: {
+        fontSize: 18,
+        fontWeight: 'bold',
+        marginBottom: 5,
     },
-    imageList: {
-        marginBottom: 10,
+    itemAddress: {
+        fontSize: 16,
+        color: '#333333',
     },
+    sectionTitle: {
+        fontSize: 18,
+        fontWeight: 'bold',
+        marginBottom: 5,
+        alignSelf: 'flex-start',
+        marginLeft: 12,
+        marginTop: 15
+    },
+    errorText: {
+        color: "red",
+        fontWeight: "500",
+        textAlign: "right"
+    }
 });
 
 export default CreatePost;
