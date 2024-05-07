@@ -9,16 +9,13 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { authApi, endpoints } from "../../configs/API";
 import { Ionicons } from '@expo/vector-icons';
 
-const CreatePost = () => {
+const CreatePost = ({navigation}) => {
     const [motels, setMotels] = useState([]);
     const [user, dispatch] = useContext(MyContext);
 
     const [selectedHouse, setSelectedHouse] = useState(null);
     const [showHouseList, setShowHouseList] = useState(true);
-    const [title, setTitle] = useState("");
     const [content, setContent] = useState("");
-
-    const [titleError, setTitleError] = useState("");
     const [contentError, setContentError] = useState("");
     const [houseError, setHouseError] = useState("");
 
@@ -43,11 +40,6 @@ const CreatePost = () => {
 
     const handleSubmit = async () => {
         try {
-            if (!title) {
-                setTitleError("Vui lòng nhập tiêu đề");
-            } else {
-                setTitleError("");
-            }
             if (!content) {
                 setContentError("Vui lòng nhập mô tả");
             } else {
@@ -59,10 +51,10 @@ const CreatePost = () => {
                 setHouseError("");
             }
             // Kiểm tra xem tất cả các trường đều đã hợp lệ
-        if (title && content && selectedHouse) {
+        if ( content && selectedHouse) {
             const token = await AsyncStorage.getItem("access-token");
             const formData = new FormData();
-            formData.append("title", title);
+            // formData.append("title", title);
             formData.append("content", content);
             formData.append("motel", selectedHouse.id);
             console.log("ID", selectedHouse.id);
@@ -75,6 +67,8 @@ const CreatePost = () => {
             });
             console.log("Đăng bài thành công");
             console.log("res daata post:", res.data);
+            navigation.navigate("HomeIndex",{myPost: res.data})
+            
         }
         } catch (ex) {
             console.error(ex);
@@ -85,16 +79,12 @@ const CreatePost = () => {
         <ScrollView style={styles.scrollView}>
             <View style={styles.container}>
                 <View style={styles.userInfo}>
-                    <Image source={require('../../assets/images/avt.png')} style={styles.avatar} />
-                    <Text style={styles.username}>Ngan Bt</Text>
+                    <Image
+        source={{uri:user.avatar}} // Thay đổi đường dẫn của ảnh mặc định
+        style={styles.avatar} />
+                    <Text style={styles.username}>{user.username}</Text>
                 </View>
                 <View style={styles.containerBody}>
-
-                    <Text style={styles.sectionTitle}>Tiêu đề</Text>
-                    {!!titleError && <Text style={styles.errorText}><Ionicons name="warning" size={12} color="red" />{titleError}</Text>}
-                    <View style={styles.inputContainer}>
-                        <TextInput placeholder="Tiêu đề" style={styles.input1} value={title} onChangeText={(text) => setTitle(text)} onFocus={() => setTitleError("")} />
-                    </View>
 
                     <Text style={styles.sectionTitle}>Mô tả</Text>
                     {!!contentError && <Text style={styles.errorText}><Ionicons name="warning" size={12} color="red" />{contentError}</Text>}
@@ -176,10 +166,12 @@ const styles = StyleSheet.create({
         marginRight: 'auto'
     },
     avatar: {
-        width: 50,
-        height: 50,
-        borderRadius: 30,
+        width: 70,
+        height: 70,
+        borderRadius: 40,
         marginRight: 10,
+        borderWidth:2,
+        borderColor:COLOR.PRIMARY
     },
     username: {
         fontSize: 16,

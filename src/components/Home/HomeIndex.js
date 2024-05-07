@@ -1,4 +1,4 @@
-import React, { useContext, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { View, Text, Image, StyleSheet, TextInput, Dimensions, TouchableWithoutFeedback } from 'react-native';
 import MyStyles from '../../Styles/MyStyles'
 import { FlatList, ScrollView, TouchableOpacity } from 'react-native-gesture-handler';
@@ -13,6 +13,7 @@ import { COLOR, SHADOWS } from '../common/color';
 import { FontAwesome6 } from '@expo/vector-icons';
 import { MaterialIcons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
+import API, { endpoints } from '../../configs/API';
 
 
 const images = [
@@ -20,10 +21,12 @@ const images = [
   { id: '2', uri: require('../../assets/images/1.jpg') },
   { id: '3', uri: require('../../assets/images/4.jpg') },
 ];
-const HomeIndex = () => {
+const HomeIndex = ({ route }) => {
   const [postContent, setPostContent] = useState('');
   const [user, dispatch] = useContext(MyContext);
   const navigation = useNavigation();
+  const [posts, setPosts] = useState([]);
+
 
 
   const handlePostChange = (text) => {
@@ -31,10 +34,13 @@ const HomeIndex = () => {
   };
   const renderItem = ({ item }) => (
     <Image
-      source={item.uri}
+      source={{ uri: item.url }}
       style={[styles.image, { width: Dimensions.get('window').width }]}
     />
   );
+  
+  
+  
   const [currentIndex, setCurrentIndex] = useState(0);
   // Hàm được gọi mỗi khi người dùng thay đổi ảnh hiện tại
   const onViewableItemsChanged = ({ viewableItems }) => {
@@ -42,13 +48,24 @@ const HomeIndex = () => {
     const index = viewableItems[0]?.index ?? 0;
     setCurrentIndex(index);
   };
+
+  const fetchDataGetAllPost = async () => {
+    try {
+      let res = await API.get(endpoints["getAllPostForOwner"]);
+      console.log(res.data);
+      setPosts(res.data.results);
+    } catch (ex) {
+      console.error(ex);
+    }
+
+  }
+  useEffect(() => {
+    fetchDataGetAllPost();
+  }, []);
+
   return (
     <View style={MyStyles.container}>
-      {/* <Text>Trang chủ</Text>
-
-
-
-      {/* Bài đăng */}
+      {/* Bài viết */}
       <ScrollView style={styles.scrollContainer}>
         {/* Thanh đăng bài nằm ngang */}
         <View style={HomeStyles.postBar}>
@@ -56,144 +73,73 @@ const HomeIndex = () => {
             source={{ uri: user.avatar }} // Thay đổi đường dẫn của ảnh mặc định
             style={HomeStyles.image}
           />
-
-
-<TouchableOpacity onPress={() => navigation.navigate("CreatePost")}>
-  <View style={HomeStyles.postInputContainer}>
-    <TextInput
-      style={HomeStyles.postInput}
-      placeholder="Bạn muốn đăng bài?"
-      value={postContent}
-      multiline
-      editable={false}
-    />
-    <TouchableOpacity style={HomeStyles.plusButton} onPress={() => navigation.navigate("CreatePost")} >
-      <AntDesign name="pluscircleo" size={24} color="black" />
-    </TouchableOpacity>
-  </View>
-</TouchableOpacity>
-
-
+          <TouchableOpacity onPress={() => navigation.navigate("CreatePost")}>
+            <View style={HomeStyles.postInputContainer}>
+              <TextInput
+                style={HomeStyles.postInput}
+                placeholder="Bạn muốn đăng bài?"
+                value={postContent}
+                multiline
+                editable={false}
+              />
+              <TouchableOpacity style={HomeStyles.plusButton} onPress={() => navigation.navigate("CreatePost")} >
+                <AntDesign name="pluscircleo" size={24} color="black" />
+              </TouchableOpacity>
+            </View>
+          </TouchableOpacity>
         </View>
         {/* Bài viết */}
-        <View style={styles.myPost}>
-          {/* Phần đầu bài đăngg */}
-          <TouchableOpacity></TouchableOpacity>
-          <View style={styles.postContainer}>
-            {/* Phần hiển thị ảnh, tên và icon */}
-            <View style={styles.userInfoContainer}>
-              <TouchableOpacity onPress={() => navigation.navigate("DetailOwner")}>
-                <Image
-                  source={{ uri: user.avatar }}
-                  style={styles.userAvatar}
+        {posts.map((post) => (
+          <View key={post.id} style={styles.myPost}>
+            <TouchableOpacity>
+              <View style={styles.postContainer}>
+                <View style={styles.userInfoContainer}>
+                  <TouchableOpacity onPress={() => navigation.navigate("DetailOwner", { userId: post.user.id })}>
+                    <Image
+                      source={{ uri: post.user.avatar }}
+                      style={styles.userAvatar}
+                    />
+                  </TouchableOpacity>
+                  <Text style={styles.userName}>{post.user.username}</Text>
+                </View>
+                <TouchableOpacity style={styles.btnFollow}>
+                  <Text style={{ color: "#fff" }}> Theo dõi</Text>
+                  <Entypo name="plus" size={12} color="#fff" />
+                </TouchableOpacity>
+              </View>
+              <View>
+                <Text style={styles.desc}>{post.content}</Text>
+                {/* Ảnh bài đăng */}
+                <FlatList
+                  data={post.motel.images}
+                  renderItem={renderItem}
+                  keyExtractor={(item) => item.id.toString()}
+                  horizontal // Hiển thị ngang
+                  pagingEnabled // Cuộn trang theo trang
+                  showsHorizontalScrollIndicator={false} // Ẩn thanh trượt ngang
+                  onViewableItemsChanged={onViewableItemsChanged}
                 />
-              </TouchableOpacity>
-
-
-              <Text style={styles.userName}>{user.username}</Text>
-            </View>
-            <TouchableOpacity style={styles.btnFollow}>
-              <Text style={{ color: "#fff" }}> Theo dõi</Text>
-              <Entypo name="plus" size={12} color="#fff" />
+              </View>
+              {/* Hiển thị badge */}
+              <View style={styles.badgeContainer}>
+                <Text style={styles.badgeText}>{currentIndex + 1}/{post.motel.images.length}</Text>
+              </View>
+              {/* icon */}
+              <View style={styles.iconContainer}>
+                <View style={MyStyles.flex}>
+                  <Feather style={HomeStyles.iconPost} name="heart" size={24} color="black" />
+                  <Feather style={HomeStyles.iconPost} name="message-circle" size={24} color="black" />
+                  <Feather name="send" size={24} color="black" />
+                </View>
+                <Feather name="bookmark" size={24} color="black" />
+              </View>
             </TouchableOpacity>
           </View>
-          <View>
-            <View style={MyStyles.flex}>
-              <FontAwesome6 style={HomeStyles.iconPost} name="location-dot" size={18} color="gray" />
-              <Text>371 Nguyễn Kiệm, Phú Nhuận, TP. Hồ Chí Minh</Text>
-            </View>
-            <View style={MyStyles.flex}>
-              <MaterialCommunityIcons style={HomeStyles.iconPost} name="city-variant-outline" size={18} color="gray" />
-              <Text>100000 mét vuông</Text>
-            </View>
-            <View style={MyStyles.flex}>
-              <MaterialIcons style={HomeStyles.iconPost} name="attach-money" size={18} color="gray" />
-              <Text>100000 VNĐ</Text>
-            </View>
-          </View>
-          {/* Mô tả */}
-          <TouchableWithoutFeedback onPress={() => navigation.navigate("PostDetail")}>
-            <View>
-              <Text style={styles.desc}>gềuhfiqlffhliqwfhilgfuqgfqlliqfwhfiqlffhliqwfhilgfuqgfqlliqfwkhfiqlffhliqwfhilgfuqgfqlliqfwkhfiqlffhliqwfhilgfuqgfqlliqfwkkuwgu</Text>
-              {/* img post */}
-              <FlatList
-                data={images}
-                renderItem={renderItem}
-                keyExtractor={(item) => item.id}
-                horizontal // Hiển thị ngang
-                pagingEnabled // Cuộn trang theo trang
-                showsHorizontalScrollIndicator={false} // Ẩn thanh trượt ngang
-                onViewableItemsChanged={onViewableItemsChanged}
-              /></View>
-          </TouchableWithoutFeedback>
-          {/* Hiển thị badge */}
-          <View style={styles.badgeContainer}>
-            <Text style={styles.badgeText}>{currentIndex + 1}/{images.length}</Text>
-          </View>
-
-          {/* icon */}
-          <View style={styles.iconContainer}>
-            <View style={MyStyles.flex}>
-              <Feather style={HomeStyles.iconPost} name="heart" size={24} color="black" />
-              <Feather style={HomeStyles.iconPost} name="message-circle" size={24} color="black" />
-              <Feather name="send" size={24} color="black" />
-            </View>
-
-            <Feather name="bookmark" size={24} color="black" />
-          </View>
-
-        </View>
-        <View style={styles.myPost}>
-          {/* Phần hiển thị bài đăng */}
-          <View style={styles.postContainer}>
-            {/* Phần hiển thị ảnh, tên và icon */}
-            <View style={styles.userInfoContainer}>
-              <Image
-                source={{ uri: user.avatar }}
-                style={styles.userAvatar}
-              />
-              <Text style={styles.userName}>{user.username}</Text>
-            </View>
-            <View style={styles.dotsIconContainer}>
-              <MaterialCommunityIcons name="dots-vertical" size={24} color="black" />
-            </View>
-          </View>
-          {/* description */}
-          <Text style={styles.desc}>gềuhfiqlffhliqwfhilgfuqgfqlliqfwhfiqlffhliqwfhilgfuqgfqlliqfwkhfiqlffhliqwfhilgfuqgfqlliqfwkhfiqlffhliqwfhilgfuqgfqlliqfwkkuwgu</Text>
-          {/* img post */}
-          <FlatList
-            data={images}
-            renderItem={renderItem}
-            keyExtractor={(item) => item.id}
-            horizontal // Hiển thị ngang
-            pagingEnabled // Cuộn trang theo trang
-            showsHorizontalScrollIndicator={false} // Ẩn thanh trượt ngang
-            onViewableItemsChanged={onViewableItemsChanged}
-          />
-          {/* Hiển thị badge */}
-          {/* Hiển thị badge */}
-          <View style={styles.badgeContainer}>
-            <Text style={styles.badgeText}>{currentIndex + 1}/{images.length}</Text>
-          </View>
-
-          {/* icon */}
-          <View style={styles.iconContainer}>
-            <View style={MyStyles.flex}>
-              <Feather style={styles.iconPost} name="heart" size={24} color="black" />
-              <Feather style={styles.iconPost} name="message-circle" size={24} color="black" />
-              <Feather name="send" size={24} color="black" />
-            </View>
-
-            <Feather name="bookmark" size={24} color="black" />
-          </View>
-
-        </View>
+        ))}
       </ScrollView>
-
-
-
     </View>
   );
+  
 };
 
 const styles = StyleSheet.create({

@@ -29,6 +29,7 @@ import AddPrice from './src/components/OwnerMotel/AddPrice';
 import DetailPrices from './src/components/OwnerMotel/DetailPrices';
 import { COLOR } from './src/components/common/color';
 import Payment from './src/components/Tenant/Payment';
+import HomeIndex from './src/components/Home/HomeIndex';
 //Điều hướng kiểu stack
 const Stack = createStackNavigator();
 
@@ -54,6 +55,8 @@ export default function App() {
 
           <Stack.Screen name="ProfileDetail" component={ProfileDetail}
             options={{ headerTitle: 'Tài khoản của bạn' }} />
+          <Stack.Screen name="HomeIndex" component={HomeIndex}
+            options={{ headerShown: false }} />
           <Stack.Screen name="SearchFilter" component={SearchFilter}
             options={{ headerTitle: 'Lọc kết quả tìm kiếm' }} />
           <Stack.Screen name="NotificationsSc" component={NotificationsSc}
@@ -71,11 +74,11 @@ export default function App() {
             options={{ headerTitle: 'Bài viết mới' }} />
           <Stack.Screen name="AddPrice" component={AddPrice}
             options={{ headerTitle: 'Thêm dịch vụ' }} />
-          
+
           <Stack.Screen name="Payment" component={Payment}
             options={{ headerTitle: 'Thanh toán' }} />
-          
-          
+
+
           <Stack.Screen name="DetailPrices" component={DetailPrices}
             options={{ headerTitle: 'Sửa dịch vụ' }} />
           {/* <Stack.Screen
@@ -89,7 +92,7 @@ export default function App() {
             options={{
               headerShown: true,// Tắt header cho màn hình Slider
               headerTitle: 'Thông tin chủ trọ',
-              headerTintColor:COLOR.PRIMARY,
+              headerTintColor: COLOR.PRIMARY,
             }}
           />
           <Stack.Screen
@@ -98,11 +101,11 @@ export default function App() {
             options={{
               headerShown: true,// Tắt header cho màn hình Slider
               headerTitle: 'Chi tiết phòng trọ',
-              headerTintColor:COLOR.PRIMARY,
-              
-            
+              headerTintColor: COLOR.PRIMARY,
+
+
             }}
-            // options={{ headerShown: false }} // Tắt header cho màn hình Slider
+          // options={{ headerShown: false }} // Tắt header cho màn hình Slider
           />
           <Stack.Screen
             name="UploadImgHouse"
