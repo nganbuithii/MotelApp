@@ -1,33 +1,37 @@
-import React, { useContext, useEffect, useState } from 'react';
-import { View, Text, Image, StyleSheet, TextInput, Dimensions, TouchableWithoutFeedback } from 'react-native';
-import MyStyles from '../../Styles/MyStyles'
-import { FlatList, ScrollView, TouchableOpacity } from 'react-native-gesture-handler';
-import { AntDesign } from '@expo/vector-icons';
-import HomeStyles from './HomeStyles';
-import MyContext from '../../configs/MyContext';
-import { Entypo } from '@expo/vector-icons';
-import { MaterialCommunityIcons } from '@expo/vector-icons';
-import { Feather } from '@expo/vector-icons';
-import { Fontisto } from '@expo/vector-icons';
-import { COLOR, SHADOWS } from '../common/color';
-import { FontAwesome6 } from '@expo/vector-icons';
-import { MaterialIcons } from '@expo/vector-icons';
-import { useNavigation } from '@react-navigation/native';
-import API, { endpoints } from '../../configs/API';
+import React, { useContext, useEffect, useState } from "react";
+import {
+  View,
+  Text,
+  Image,
+  StyleSheet,
+  TextInput,
+  Dimensions,
+  TouchableWithoutFeedback,
+} from "react-native";
+import MyStyles from "../../Styles/MyStyles";
+import {
+  FlatList,
+  ScrollView,
+  TouchableOpacity,
+} from "react-native-gesture-handler";
+import { AntDesign } from "@expo/vector-icons";
+import HomeStyles from "./HomeStyles";
+import MyContext from "../../configs/MyContext";
+import { Entypo } from "@expo/vector-icons";
+import { Feather } from "@expo/vector-icons";
+import { COLOR, SHADOWS } from "../common/color";
+import { useNavigation } from "@react-navigation/native";
+import API, { authApi, endpoints } from "../../configs/API";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
-
-const images = [
-  { id: '1', uri: require('../../assets/images/2.png') },
-  { id: '2', uri: require('../../assets/images/1.jpg') },
-  { id: '3', uri: require('../../assets/images/4.jpg') },
-];
 const HomeIndex = ({ route }) => {
-  const [postContent, setPostContent] = useState('');
+  const [postContent, setPostContent] = useState("");
   const [user, dispatch] = useContext(MyContext);
   const navigation = useNavigation();
   const [posts, setPosts] = useState([]);
-
-
+  const [likedPosts, setLikedPosts] = useState(false);
+  const [likedState, setLikedState] = useState({});
+  const [render, setRender] = useState(false);
 
   const handlePostChange = (text) => {
     setPostContent(text);
@@ -35,12 +39,10 @@ const HomeIndex = ({ route }) => {
   const renderItem = ({ item }) => (
     <Image
       source={{ uri: item.url }}
-      style={[styles.image, { width: Dimensions.get('window').width }]}
+      style={[styles.image, { width: Dimensions.get("window").width }]}
     />
   );
-  
-  
-  
+
   const [currentIndex, setCurrentIndex] = useState(0);
   // Hàm được gọi mỗi khi người dùng thay đổi ảnh hiện tại
   const onViewableItemsChanged = ({ viewableItems }) => {
@@ -57,11 +59,50 @@ const HomeIndex = ({ route }) => {
     } catch (ex) {
       console.error(ex);
     }
-
-  }
+  };
   useEffect(() => {
     fetchDataGetAllPost();
+  }, [render]);
+   // Khôi phục likedState từ AsyncStorage khi tải trang
+  useEffect(() => {
+    const restoreLikedState = async () => {
+      try {
+        const storedLikedState = await AsyncStorage.getItem("likedState");
+        if (storedLikedState !== null) {
+          setLikedState(JSON.parse(storedLikedState));
+          console.log("Khôi phục trạng thái thành công");
+        }
+      } catch (error) {
+        console.error("Lỗi khôi phục trạng thái đã thích:", error);
+      }
+    };
+
+    restoreLikedState();
   }, []);
+  const handleLike = async (postId) => {
+    try {
+      const token = await AsyncStorage.getItem("access-token");
+      console.log(token);
+      console.log(postId);
+      await authApi(token).post(endpoints['likePost'](postId));
+      console.log("like bài thành công");
+      setRender(!render);
+      // Nếu bài viết đã được like trước đó, xoá nó khỏi state likedState
+      if (likedState[postId]) {
+        const newState = { ...likedState };
+        delete newState[postId];
+        setLikedState(newState);
+      } else {
+        // Nếu bài viết chưa được like trước đó, thêm nó vào state likedState
+        setLikedState({ ...likedState, [postId]: true });
+      }
+      // Lưu likedState vào AsyncStorage
+      await AsyncStorage.setItem("likedState", JSON.stringify(likedState));
+    } catch (ex) {
+      console.error(ex);
+      console.log("Lỗi like bài");
+    }
+  }
 
   return (
     <View style={MyStyles.container}>
@@ -75,71 +116,86 @@ const HomeIndex = ({ route }) => {
           />
           <TouchableOpacity onPress={() => navigation.navigate("CreatePost")}>
             <View style={HomeStyles.postInputContainer}>
-              <TextInput
-                style={HomeStyles.postInput}
-                placeholder="Bạn muốn đăng bài?"
-                value={postContent}
-                multiline
-                editable={false}
-              />
-              <TouchableOpacity style={HomeStyles.plusButton} onPress={() => navigation.navigate("CreatePost")} >
-                <AntDesign name="pluscircleo" size={24} color="black" />
-              </TouchableOpacity>
+              <Text style={HomeStyles.postInputPlaceholder}>
+                Bạn muốn đăng bài?
+              </Text>
+              <AntDesign name="pluscircleo" size={24} color="black" />
             </View>
           </TouchableOpacity>
+
         </View>
         {/* Bài viết */}
         {posts.map((post) => (
           <View key={post.id} style={styles.myPost}>
-            <TouchableOpacity>
-              <View style={styles.postContainer}>
-                <View style={styles.userInfoContainer}>
-                  <TouchableOpacity onPress={() => navigation.navigate("DetailOwner", { userId: post.user.id })}>
-                    <Image
-                      source={{ uri: post.user.avatar }}
-                      style={styles.userAvatar}
-                    />
-                  </TouchableOpacity>
-                  <Text style={styles.userName}>{post.user.username}</Text>
-                </View>
-                <TouchableOpacity style={styles.btnFollow}>
-                  <Text style={{ color: "#fff" }}> Theo dõi</Text>
-                  <Entypo name="plus" size={12} color="#fff" />
+            <Text>id: {post.id}</Text>
+
+            <View style={styles.postContainer}>
+              <View style={styles.userInfoContainer}>
+                <TouchableOpacity
+                  onPress={() => navigation.navigate("DetailOwner", { userId: post.user.id, })} >
+                  <Image
+                    source={{ uri: post.user.avatar }}
+                    style={styles.userAvatar}
+                  />
                 </TouchableOpacity>
+                <Text style={styles.userName}>{post.user.username}</Text>
               </View>
-              <View>
-                <Text style={styles.desc}>{post.content}</Text>
-                {/* Ảnh bài đăng */}
-                <FlatList
-                  data={post.motel.images}
-                  renderItem={renderItem}
-                  keyExtractor={(item) => item.id.toString()}
-                  horizontal // Hiển thị ngang
-                  pagingEnabled // Cuộn trang theo trang
-                  showsHorizontalScrollIndicator={false} // Ẩn thanh trượt ngang
-                  onViewableItemsChanged={onViewableItemsChanged}
+              <TouchableOpacity style={styles.btnFollow}>
+                <Text style={{ color: "#fff" }}> Theo dõi</Text>
+                <Entypo name="plus" size={12} color="#fff" />
+              </TouchableOpacity>
+            </View>
+            <View style={{ flexDirection: "row" }}>
+              <Entypo name="location-pin" size={20} color="orange" />
+              <Text style={{ color: "gray" }}>
+                {post.motel.ward}, {post.motel.district}, {post.motel.city}
+              </Text>
+            </View>
+            <View>
+              <Text style={styles.desc}>{post.content}</Text>
+              {/* Ảnh bài đăng */}
+              <FlatList
+                data={post.motel.images}
+                renderItem={renderItem}
+                keyExtractor={(item) => item.id.toString()}
+                horizontal // Hiển thị ngang
+                pagingEnabled // Cuộn trang theo trang
+                showsHorizontalScrollIndicator={false} // Ẩn thanh trượt ngang
+                onViewableItemsChanged={onViewableItemsChanged}
+              />
+            </View>
+            {/* Hiển thị badge */}
+            <View style={styles.badgeContainer}>
+              <Text style={styles.badgeText}>
+                {currentIndex + 1}/{post.motel.images.length}
+              </Text>
+            </View>
+            {/* icon */}
+            <View style={styles.iconContainer}>
+              <View style={MyStyles.flex}>
+                <Text>{post.like_count} </Text>
+                <TouchableWithoutFeedback onPress={() => handleLike(post.id)}>
+                  {likedState[post.id] ? <AntDesign name="heart" size={24} color="red" /> :
+                    <Feather style={HomeStyles.iconPost} name="heart" size={24} color="gray" />}
+                </TouchableWithoutFeedback>
+                <Text>{post.comment_count} </Text>
+
+                <Feather
+                  style={HomeStyles.iconPost}
+                  name="message-circle"
+                  size={24}
+                  color="black"
                 />
+                <Feather name="send" size={24} color="black" />
               </View>
-              {/* Hiển thị badge */}
-              <View style={styles.badgeContainer}>
-                <Text style={styles.badgeText}>{currentIndex + 1}/{post.motel.images.length}</Text>
-              </View>
-              {/* icon */}
-              <View style={styles.iconContainer}>
-                <View style={MyStyles.flex}>
-                  <Feather style={HomeStyles.iconPost} name="heart" size={24} color="black" />
-                  <Feather style={HomeStyles.iconPost} name="message-circle" size={24} color="black" />
-                  <Feather name="send" size={24} color="black" />
-                </View>
-                <Feather name="bookmark" size={24} color="black" />
-              </View>
-            </TouchableOpacity>
+              <Feather name="bookmark" size={24} color="black" />
+            </View>
+
           </View>
         ))}
       </ScrollView>
     </View>
   );
-  
 };
 
 const styles = StyleSheet.create({
@@ -147,15 +203,15 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   postContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     marginVertical: 10,
     paddingHorizontal: 10,
   },
   userInfoContainer: {
     width: "73%",
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
   },
   userAvatar: {
     width: 40,
@@ -166,7 +222,7 @@ const styles = StyleSheet.create({
     borderColor: COLOR.color3, // Màu sắc của viền
   },
   userName: {
-    fontWeight: 'bold',
+    fontWeight: "bold",
   },
   btnFollow: {
     backgroundColor: COLOR.input_default,
@@ -174,40 +230,39 @@ const styles = StyleSheet.create({
     paddingVertical: 5,
     borderRadius: 25,
     flexDirection: "row",
-    marginLeft: "auto"
+    marginLeft: "auto",
   },
   // ảnh bài đăng
   image: {
     // width: "100%", // Chiếm full chiều rộng
     height: 300, // Đặt chiều cao cố định hoặc có thể sử dụng "auto" để tự động tính toán chiều cao dựa trên tỷ lệ khung hình
-    resizeMode: "cover", // Hiển thị ảnh mà không làm méo hoặc biến dạng
-    position: "relative"
+    resizeMode: "cover",
+    position: "relative",
   },
   //ICON POST
   //ICON POST
   iconContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-between', // Sắp xếp các icon theo hai phía
+    flexDirection: "row",
+    justifyContent: "space-between", // Sắp xếp các icon theo hai phía
     paddingHorizontal: 15, // Khoảng cách giữa icon và mép
     borderTopWidth: 1, // Đường viền trên
-    borderColor: '#e0e0e0', // Màu đường viền
+    borderColor: "#e0e0e0", // Màu đường viền
     paddingVertical: 10, // Khoảng cách giữa icon và mép
   },
   iconPost: {
-    marginRight: 12
+    marginRight: 12,
   },
   myPost: {
     backgroundColor: COLOR.offWhite,
     width: "100%",
     borderRadius: 10,
     ...SHADOWS.small,
-    marginBottom: 10
-
+    marginBottom: 10,
   },
   //mô tả
   desc: {
     paddingHorizontal: 15,
-    paddingVertical: 5
+    paddingVertical: 5,
   },
   //BADGE
   badgeContainer: {
@@ -222,10 +277,8 @@ const styles = StyleSheet.create({
     top: "80%", // Thay vị trí cố định bằng phần trăm
   },
   badgeText: {
-    color: "#fff"
-  }
-
-
+    color: "#fff",
+  },
 });
 
 export default HomeIndex;

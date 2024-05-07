@@ -19,7 +19,8 @@ export const endpoints = {
     updatePrice:(idMotel) =>`/motels/${idMotel}/prices/`, //PATCH
     deletePrice:(idMotel) => `/motels/${idMotel}/prices/`, //DELETE
     createPost:"/post/for_lease/", //POST
-    getAllPostForOwner:"/post/for_lease/"  //GET
+    getAllPostForOwner:"/post/for_lease/",  //GET
+    likePost:(idPost) => `/post/${idPost}/like/`,  //POST
 };
 
 // Tạo một phiên bản axios với các cài đặt đã được cung cấp
