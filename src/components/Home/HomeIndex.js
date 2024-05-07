@@ -7,6 +7,7 @@ import {
   TextInput,
   Dimensions,
   TouchableWithoutFeedback,
+  Alert,
 } from "react-native";
 import MyStyles from "../../Styles/MyStyles";
 import {
@@ -23,6 +24,7 @@ import { COLOR, SHADOWS } from "../common/color";
 import { useNavigation } from "@react-navigation/native";
 import API, { authApi, endpoints } from "../../configs/API";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { SimpleLineIcons } from '@expo/vector-icons';
 
 const HomeIndex = ({ route }) => {
   const [postContent, setPostContent] = useState("");
@@ -32,6 +34,8 @@ const HomeIndex = ({ route }) => {
   const [likedPosts, setLikedPosts] = useState(false);
   const [likedState, setLikedState] = useState({});
   const [render, setRender] = useState(false);
+  const [showOptions, setShowOptions] = useState({});
+
 
 
   const handlePostChange = (text) => {
@@ -64,7 +68,7 @@ const HomeIndex = ({ route }) => {
   useEffect(() => {
     fetchDataGetAllPost();
   }, [render]);
-   // Khôi phục likedState từ AsyncStorage khi tải trang
+  // Khôi phục likedState từ AsyncStorage khi tải trang
   useEffect(() => {
     const restoreLikedState = async () => {
       try {
@@ -90,17 +94,17 @@ const HomeIndex = ({ route }) => {
       setRender(!render);
       // Nếu bài viết đã được like trước đó, xoá nó khỏi state likedState
       // Tạo một bản sao mới của likedState để cập nhật
-    const newLikedState = { ...likedState };
-    // Nếu bài viết đã được like trước đó, xoá nó khỏi newLikedState
-    if (likedState[postId]) {
-      delete newLikedState[postId];
-    } else {
-      // Nếu bài viết chưa được like trước đó, thêm nó vào newLikedState
-      newLikedState[postId] = true;
-    }
-    setLikedState(newLikedState);
-    // Lưu likedState mới vào AsyncStorage
-    await AsyncStorage.setItem("liked", JSON.stringify(newLikedState));
+      const newLikedState = { ...likedState };
+      // Nếu bài viết đã được like trước đó, xoá nó khỏi newLikedState
+      if (likedState[postId]) {
+        delete newLikedState[postId];
+      } else {
+        // Nếu bài viết chưa được like trước đó, thêm nó vào newLikedState
+        newLikedState[postId] = true;
+      }
+      setLikedState(newLikedState);
+      // Lưu likedState mới vào AsyncStorage
+      await AsyncStorage.setItem("liked", JSON.stringify(newLikedState));
     } catch (ex) {
       console.error(ex);
       console.log("Lỗi like bài");
@@ -108,8 +112,43 @@ const HomeIndex = ({ route }) => {
   }
   const handleComment = (postId) => {
     console.log(postId);
-    navigation.navigate("Comment", {postId:postId});
+    navigation.navigate("Comment", { postId: postId });
   };
+  const deletePost = async (postId) => {
+    try {
+      const token = await AsyncStorage.getItem("access-token");
+      await authApi(token).delete(endpoints["deletePost"](postId));
+      console.log("Xóa bài thành công");
+      setRender(!render);
+    } catch (ex) {
+      console.error(ex);
+      console.log("Lỗi xóa bài");
+    }
+  }
+  
+  const handleDelete = async (postId) => {
+    Alert.alert(
+      'Xác nhận',
+      'Bạn có chắc muốn xóa bài viết này?',
+      [
+        {
+          text: 'Hủy',
+          onPress: () => {
+            // Ẩn modal box khi người dùng nhấn hủy
+            setShowOptions({ ...showOptions, [postId]: false });
+          },
+          style: 'cancel'
+        },
+        { text: 'OK', onPress: () => deletePost(postId) }
+      ],
+      { cancelable: false }
+    );
+    
+  }
+  const handleEdit = async (postId) => {
+
+  }
+
   return (
     <View style={MyStyles.container}>
       {/* Bài viết */}
@@ -135,6 +174,7 @@ const HomeIndex = ({ route }) => {
           <View key={post.id} style={styles.myPost}>
             <Text>id: {post.id}</Text>
 
+
             <View style={styles.postContainer}>
               <View style={styles.userInfoContainer}>
                 <TouchableOpacity
@@ -150,7 +190,25 @@ const HomeIndex = ({ route }) => {
                 <Text style={{ color: "#fff" }}> Theo dõi</Text>
                 <Entypo name="plus" size={12} color="#fff" />
               </TouchableOpacity>
+              {post.user.id === user.id && (
+                <TouchableWithoutFeedback onPress={() => setShowOptions({ ...showOptions, [post.id]: !showOptions[post.id] })}>
+                  <SimpleLineIcons name="options-vertical" size={20} color="black" />
+                </TouchableWithoutFeedback>
+              )}
+
+
             </View>
+            {showOptions[post.id] && (
+              <View style={styles.modalContainer}>
+                <TouchableOpacity onPress={() => handleEdit(post.id)}>
+                  <Text style={styles.optionText}>Sửa bài</Text>
+                </TouchableOpacity>
+                <TouchableOpacity onPress={() => handleDelete(post.id)}>
+                  <Text style={styles.optionText}>Xóa bài</Text>
+                </TouchableOpacity>
+              </View>
+            )}
+
             <View style={{ flexDirection: "row" }}>
               <Entypo name="location-pin" size={20} color="orange" />
               <Text style={{ color: "gray" }}>
@@ -187,12 +245,12 @@ const HomeIndex = ({ route }) => {
                 <Text>{post.comment_count} </Text>
 
                 <TouchableWithoutFeedback onPress={() => handleComment(post.id)}>
-                <Feather
-                  style={HomeStyles.iconPost}
-                  name="message-circle"
-                  size={24}
-                  color="black"
-                /></TouchableWithoutFeedback>
+                  <Feather
+                    style={HomeStyles.iconPost}
+                    name="message-circle"
+                    size={24}
+                    color="black"
+                  /></TouchableWithoutFeedback>
                 <Feather name="send" size={24} color="black" />
               </View>
               <Feather name="bookmark" size={24} color="black" />
@@ -216,7 +274,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
   },
   userInfoContainer: {
-    width: "73%",
+    width: "70%",
     flexDirection: "row",
     alignItems: "center",
   },
@@ -237,7 +295,7 @@ const styles = StyleSheet.create({
     paddingVertical: 5,
     borderRadius: 25,
     flexDirection: "row",
-    marginLeft: "auto",
+    // marginLeft: "auto",
   },
   // ảnh bài đăng
   image: {
@@ -285,6 +343,25 @@ const styles = StyleSheet.create({
   },
   badgeText: {
     color: "#fff",
+  },
+  //modal box
+  modalContainer: {
+    position: "absolute",
+    top: 80,
+    right: 20,
+    backgroundColor: COLOR.bg_color1,
+    // borderRadius: 10,
+    padding: 10,
+    zIndex: 9999,
+    elevation: 5, // Độ đục của modal (Android)
+    borderBottomRightRadius: 20,
+    borderTopLeftRadius: 20,
+    borderBottomLeftRadius: 20,
+  },
+  optionText: {
+    fontSize: 16,
+    paddingVertical: 10,
+    paddingHorizontal: 20,
   },
 });
 
