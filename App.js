@@ -30,6 +30,7 @@ import DetailPrices from './src/components/OwnerMotel/DetailPrices';
 import { COLOR } from './src/components/common/color';
 import Payment from './src/components/Tenant/Payment';
 import HomeIndex from './src/components/Home/HomeIndex';
+import Comment from './src/components/Home/Comment';
 //Điều hướng kiểu stack
 const Stack = createStackNavigator();
 
@@ -77,6 +78,8 @@ export default function App() {
 
           <Stack.Screen name="Payment" component={Payment}
             options={{ headerTitle: 'Thanh toán' }} />
+          <Stack.Screen name="Comment" component={Comment}
+            options={{ headerTitle: 'Bình luận' }} />
 
 
           <Stack.Screen name="DetailPrices" component={DetailPrices}

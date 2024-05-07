@@ -21,6 +21,7 @@ export const endpoints = {
     createPost:"/post/for_lease/", //POST
     getAllPostForOwner:"/post/for_lease/",  //GET
     likePost:(idPost) => `/post/${idPost}/like/`,  //POST
+    commentPost:(idPost) => `/post/${idPost}/comments/`, //POST
 };
 
 // Tạo một phiên bản axios với các cài đặt đã được cung cấp

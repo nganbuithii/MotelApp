@@ -33,6 +33,7 @@ const HomeIndex = ({ route }) => {
   const [likedState, setLikedState] = useState({});
   const [render, setRender] = useState(false);
 
+
   const handlePostChange = (text) => {
     setPostContent(text);
   };
@@ -67,9 +68,9 @@ const HomeIndex = ({ route }) => {
   useEffect(() => {
     const restoreLikedState = async () => {
       try {
-        const storedLikedState = await AsyncStorage.getItem("likedState");
-        if (storedLikedState !== null) {
-          setLikedState(JSON.parse(storedLikedState));
+        const likeStateArr = await AsyncStorage.getItem("liked");
+        if (likeStateArr !== null) {
+          setLikedState(JSON.parse(likeStateArr));
           console.log("Khôi phục trạng thái thành công");
         }
       } catch (error) {
@@ -88,22 +89,27 @@ const HomeIndex = ({ route }) => {
       console.log("like bài thành công");
       setRender(!render);
       // Nếu bài viết đã được like trước đó, xoá nó khỏi state likedState
-      if (likedState[postId]) {
-        const newState = { ...likedState };
-        delete newState[postId];
-        setLikedState(newState);
-      } else {
-        // Nếu bài viết chưa được like trước đó, thêm nó vào state likedState
-        setLikedState({ ...likedState, [postId]: true });
-      }
-      // Lưu likedState vào AsyncStorage
-      await AsyncStorage.setItem("likedState", JSON.stringify(likedState));
+      // Tạo một bản sao mới của likedState để cập nhật
+    const newLikedState = { ...likedState };
+    // Nếu bài viết đã được like trước đó, xoá nó khỏi newLikedState
+    if (likedState[postId]) {
+      delete newLikedState[postId];
+    } else {
+      // Nếu bài viết chưa được like trước đó, thêm nó vào newLikedState
+      newLikedState[postId] = true;
+    }
+    setLikedState(newLikedState);
+    // Lưu likedState mới vào AsyncStorage
+    await AsyncStorage.setItem("liked", JSON.stringify(newLikedState));
     } catch (ex) {
       console.error(ex);
       console.log("Lỗi like bài");
     }
   }
-
+  const handleComment = (postId) => {
+    console.log(postId);
+    navigation.navigate("Comment", {postId:postId});
+  };
   return (
     <View style={MyStyles.container}>
       {/* Bài viết */}
@@ -180,12 +186,13 @@ const HomeIndex = ({ route }) => {
                 </TouchableWithoutFeedback>
                 <Text>{post.comment_count} </Text>
 
+                <TouchableWithoutFeedback onPress={() => handleComment(post.id)}>
                 <Feather
                   style={HomeStyles.iconPost}
                   name="message-circle"
                   size={24}
                   color="black"
-                />
+                /></TouchableWithoutFeedback>
                 <Feather name="send" size={24} color="black" />
               </View>
               <Feather name="bookmark" size={24} color="black" />
