@@ -4,8 +4,7 @@ import { COLOR, SHADOWS } from '../common/color';
 import { Octicons } from '@expo/vector-icons';
 import MyContext from '../../configs/MyContext';
 import { ScrollView } from 'react-native-gesture-handler';
-import HomeStyles from './HomeStyles';
-
+import HomeStyles from '../../Styles/HomeStyles';
 const NotificationsSc = () => {
   const [user] = useContext(MyContext);
 

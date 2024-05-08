@@ -1,5 +1,5 @@
 import { View, Text, StyleSheet, TextInput, FlatList, TouchableOpacity, Image, ScrollView, Alert, ActivityIndicator, Modal, } from "react-native";
-import HomeStyles from "../Home/HomeStyles";
+import HomeStyles from "../../Styles/HomeStyles";
 import { Entypo, MaterialIcons } from "@expo/vector-icons";
 import { COLOR } from "../common/color";
 import { AntDesign } from "@expo/vector-icons";
@@ -411,7 +411,7 @@ const EditMotel = ({ navigation, route }) => {
                     {/* <Text>Thông tin phòng</Text> */}
 
                     <Text style={EditMotelStyle.labelService}> Thông tin phòng</Text>
-                    <Text> {idMotel}</Text>
+                    {/* <Text> {idMotel}</Text> */}
                     <Text style={EditMotelStyle.label}>Xã/Phường</Text>
                     <View style={EditMotelStyle.inputContainer}>
                         <FontAwesome5 name="location-arrow" style={EditMotelStyle.icon} size={24} color="green" />

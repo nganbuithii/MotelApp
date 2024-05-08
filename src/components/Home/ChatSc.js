@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { View, Text, TextInput, FlatList, TouchableOpacity, Image, StyleSheet } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { COLOR, SHADOWS } from '../common/color';
-import HomeStyles from './HomeStyles';
+import HomeStyles from '../../Styles/HomeStyles';
 import { Searchbar } from 'react-native-paper';
 import { useNavigation } from '@react-navigation/native';
 

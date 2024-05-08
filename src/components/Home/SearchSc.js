@@ -4,9 +4,8 @@ import { FontAwesome } from '@expo/vector-icons';
 import MyStyles from '../../Styles/MyStyles';
 import { COLOR } from '../common/color';
 import { Entypo } from '@expo/vector-icons';
-import HomeStyles from './HomeStyles';
 import { useNavigation } from '@react-navigation/native';
-
+import HomeStyles from '../../Styles/HomeStyles';
 const SearchSc = () => {
   const navigation = useNavigation();
   return (

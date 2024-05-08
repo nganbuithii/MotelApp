@@ -4,7 +4,7 @@ import { MaterialIcons } from '@expo/vector-icons';
 import { AntDesign } from '@expo/vector-icons';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
-import HomeStyles from './HomeStyles';
+import HomeStyles from '../../Styles/HomeStyles';
 import MyContext from '../../configs/MyContext';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 

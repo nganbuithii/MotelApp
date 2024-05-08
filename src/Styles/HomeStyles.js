@@ -1,5 +1,5 @@
 import { StyleSheet } from "react-native";
-import { SHADOWS, COLOR } from "../common/color";
+import { SHADOWS, COLOR } from "../components/common/color";
 
 export default StyleSheet.create({
     flex: {

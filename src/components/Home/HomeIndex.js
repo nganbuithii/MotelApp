@@ -16,7 +16,6 @@ import {
   TouchableOpacity,
 } from "react-native-gesture-handler";
 import { AntDesign, MaterialCommunityIcons } from "@expo/vector-icons";
-import HomeStyles from "./HomeStyles";
 import MyContext from "../../configs/MyContext";
 import { Entypo } from "@expo/vector-icons";
 import { Feather } from "@expo/vector-icons";
@@ -27,7 +26,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { SimpleLineIcons } from '@expo/vector-icons';
 import Modal from 'react-native-modalbox';
 import { Button } from "react-native-paper";
-import Toast from "react-native-toast-message";
+import HomeStyles from "../../Styles/HomeStyles";
 import showToast from "../common/ToastMessage";
 const HomeIndex = ({ route }) => {
   const [postContent, setPostContent] = useState("");
@@ -257,7 +256,7 @@ const HomeIndex = ({ route }) => {
             <View style={styles.postContainer}>
               <View style={styles.userInfoContainer}>
                 <TouchableOpacity
-                  onPress={() => navigation.navigate("DetailOwner", { userId: post.user.id, })} >
+                  onPress={() => navigation.navigate("DetailOwner", { ownerId: post.user.id, })} >
                   <Image
                     source={{ uri: post.user.avatar }}
                     style={styles.userAvatar}

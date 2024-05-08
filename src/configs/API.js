@@ -9,21 +9,24 @@ export const endpoints = {
     postMotel:"/motels/",
     upImgMotel:(idMotel) => `/motels/${idMotel}/images/`,  //POST
     updateUser:"/user/current_user/",  //PATCH
-    detailMotelOwner:(idUser) => `/user/${idUser}/motels/`,   //GET
+    detailMotelOwner:(idUser) => `/user/${idUser}/motels/`,   //lấy tất cả nhà trọ của user
     getImageMotel:(idMotel) => `/motels/${idMotel}/`, //GET
     deleteMotel:(idMotel) =>`/motels/${idMotel}/`,   //DELETE
     updateMotel:(idMotel) => `/motels/${idMotel}/`, //PATCH
     addPrice:(idMotel) => `/motels/${idMotel}/prices/`, //POST
-    detailMotel:(idMotel) => `/motels/${idMotel}/`, //GET
+    detailMotel:(idMotel) => `/motels/${idMotel}/`, //chi tiết nhà trọ
     deleteImgMotel:(idMotel) => `/motels/images/${idMotel}/`,  //DELETE
     updatePrice:(idMotel) =>`/motels/${idMotel}/prices/`, //PATCH
     deletePrice:(idPrice) => `/motels/prices/${idPrice}/`, //DELETE
     createPost:"/post/for_lease/", //POST
-    getAllPostForOwner:"/post/for_lease/",  //GET
-    likePost:(idPost) => `/post/${idPost}/like/`,  //POST
+    getAllPostForOwner:"/post/for_lease/",  //lấy tất cả bài đăng
+    likePost:(idPost) => `/post/${idPost}/like/`,  //like bài
     commentPost:(idPost) => `/post/${idPost}/comments/`, //POST
     deletePost:(idPost) => `/post/${idPost}/`, //DELETE
-    updatePost:(idPost) => `/post/for_lease/${idPost}/`  //PATCH
+    updatePost:(idPost) => `/post/for_lease/${idPost}/`,  //PATCH
+
+    detailOwner:(idOwner) => `/user/${idOwner}/` ,//get
+    follow:(idUser) => `/user/${idUser}/follow/`  // theo dõi - post
 };
 
 // Tạo một phiên bản axios với các cài đặt đã được cung cấp

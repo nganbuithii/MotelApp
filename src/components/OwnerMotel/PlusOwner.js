@@ -1,8 +1,8 @@
 import { View, Text, StyleSheet, TouchableNativeFeedback, TouchableWithoutFeedback, Image, FlatList, Dimensions, ScrollView, ActivityIndicator, Alert } from "react-native";
 import React, { useContext, useEffect, useState } from "react";
-import HomeStyles from "../Home/HomeStyles";
+
 import { COLOR, SHADOWS } from "../common/color";
-import { Ionicons, Octicons } from '@expo/vector-icons';
+import HomeStyles from "../../Styles/HomeStyles";
 import { TouchableOpacity } from "react-native-gesture-handler";
 import { useNavigation } from '@react-navigation/native';
 import { Feather } from '@expo/vector-icons';
@@ -10,8 +10,6 @@ import { FontAwesome } from '@expo/vector-icons';
 import { FontAwesome6 } from '@expo/vector-icons';
 import { MaterialIcons } from '@expo/vector-icons';
 import MyContext from "../../configs/MyContext";
-import { FontAwesome5 } from '@expo/vector-icons';
-import { Entypo } from '@expo/vector-icons';
 import { authApi } from "../../configs/API";
 import { endpoints } from "../../configs/API";
 import AsyncStorage from "@react-native-async-storage/async-storage";

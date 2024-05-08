@@ -3,7 +3,6 @@ import {View,FlatList,Image,StyleSheet,Dimensions,Text,
 } from "react-native";
 import { COLOR, SHADOWS } from "../common/color";
 import { MaterialIcons } from "@expo/vector-icons";
-import HomeStyles from "./HomeStyles";
 import { FontAwesome5 } from "@expo/vector-icons";
 import { AntDesign } from "@expo/vector-icons";
 import { FontAwesome6 } from "@expo/vector-icons";
