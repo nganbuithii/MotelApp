@@ -11,16 +11,16 @@ const Comment = () => {
     const [content, setContent] = useState();
 
     const handleSend = async() => {
-        // try{
-        //     const token = await AsyncStorage.getItem("access-token");
-        //     console.log(token);
-        //     const formData = new FormData();
-        //     formData.append("content", content);
-        //     await authApi(token).post(endpoints['commentPost'], formData);
-        // }catch(ex){
-        //     console.error(ex);
-        //     console.log("comment thất bại");
-        // }
+        try{
+            const token = await AsyncStorage.getItem("access-token");
+            console.log(token);
+            const formData = new FormData();
+            formData.append("content", content);
+            await authApi(token).post(endpoints['commentPost'], formData);
+        }catch(ex){
+            console.error(ex);
+            console.log("comment thất bại");
+        }
     };
 
     return (
