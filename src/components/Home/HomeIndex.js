@@ -15,7 +15,7 @@ import {
   ScrollView,
   TouchableOpacity,
 } from "react-native-gesture-handler";
-import { AntDesign } from "@expo/vector-icons";
+import { AntDesign, MaterialCommunityIcons } from "@expo/vector-icons";
 import HomeStyles from "./HomeStyles";
 import MyContext from "../../configs/MyContext";
 import { Entypo } from "@expo/vector-icons";
@@ -25,18 +25,30 @@ import { useNavigation } from "@react-navigation/native";
 import API, { authApi, endpoints } from "../../configs/API";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { SimpleLineIcons } from '@expo/vector-icons';
+import Modal from 'react-native-modalbox';
+import { Button } from "react-native-paper";
+import Toast from "react-native-toast-message";
 
 const HomeIndex = ({ route }) => {
   const [postContent, setPostContent] = useState("");
   const [user, dispatch] = useContext(MyContext);
   const navigation = useNavigation();
   const [posts, setPosts] = useState([]);
-  const [likedPosts, setLikedPosts] = useState(false);
   const [likedState, setLikedState] = useState({});
   const [render, setRender] = useState(false);
   const [showOptions, setShowOptions] = useState({});
+  const [selectedHouse, setSelectedHouse] = useState(null);
 
+  // const [showHouseList, setShowHouseList] = useState(true);
+  const [modalsEdit, setModalsEdit] = useState({});
+  const [content, setContent] = useState();
 
+  const [motels, setMotels] = useState([]);
+
+  const selectHouse = (house) => {
+    setSelectedHouse(house);
+    console.log("Selected House:", house); // Log house thay vì selectedHouse
+  };
 
   const handlePostChange = (text) => {
     setPostContent(text);
@@ -125,7 +137,7 @@ const HomeIndex = ({ route }) => {
       console.log("Lỗi xóa bài");
     }
   }
-  
+
   const handleDelete = async (postId) => {
     Alert.alert(
       'Xác nhận',
@@ -143,12 +155,88 @@ const HomeIndex = ({ route }) => {
       ],
       { cancelable: false }
     );
-    
-  }
-  const handleEdit = async (postId) => {
 
   }
+  const handleEdit = async (postId, post) => {
+    // Lưu thông tin về bài đăng được chọn vào state modalsEdit
+    setModalsEdit({ ...modalsEdit, [postId]: post });
+    setShowOptions({ ...showOptions, [postId]: false });
+    let motels = await getMotel();
 
+    // Cập nhật nội dung bài đăng và nhà trọ trước đó
+    setContent(post.content);
+    setSelectedHouse(post.motel);
+
+  };
+
+  const handleModalClose = () => {
+    // Đặt modalsEdit thành một đối tượng rỗng khi đóng modal box
+    setModalsEdit({});
+
+  };
+  const showToast = () => {
+    Toast.show({type: 'success',text1: 'Thành công',text2: 'Bài viết được cập nhật.',visibilityTime: 5000, autoHide: true, 
+    });
+}
+  const showToastFail = () => {
+    Toast.show({type: 'error',text1: 'Lỗi',text2: 'Bạn chưa cập nhật thông tin mới.',visibilityTime: 5000, autoHide: true, 
+    });
+}
+  const handleUpdatePost = async (postId) => {
+    try {
+      const token = await AsyncStorage.getItem("access-token");
+      console.log(token);
+      console.log(postId);
+      // Kiểm tra xem có sự thay đổi nào không
+      const currentPost = posts.find(post => post.id === postId);
+      const formData = new FormData();
+
+      // Kiểm tra sự thay đổi trong nội dung và thêm trường content vào formData nếu có
+      if (currentPost.content !== content) {
+        formData.append('content', content);
+      }
+
+      // Kiểm tra sự thay đổi trong nhà trọ và thêm trường motel vào formData nếu có
+      if (currentPost.motel.id !== selectedHouse.id) {
+        formData.append('motel', selectedHouse.id);
+      }
+      if(currentPost.content === content && currentPost.motel.id === selectedHouse.id)
+        {
+          showToastFail();
+          handleModalClose();
+          return;
+        }
+      // Nếu có sự thay đổi, gọi API cập nhật
+      let res = await authApi(token).patch(endpoints["updatePost"](postId), formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      });
+
+      setRender(!render);
+      showToast();
+  
+      console.log("Cập nhật bài đăng:", postId);
+      handleModalClose();
+
+    } catch (error) {
+      console.error("Lỗi khi cập nhật bài đăng:", error);
+    }
+  };
+
+  const getMotel = async () => {
+    try {
+      const token = await AsyncStorage.getItem("access-token");
+      let response = await authApi(token).get(endpoints['detailMotelOwner'](user.id));
+      let motelData = response.data;
+      setMotels(response.data);
+      console.log("Get data nhà trọ của user:", response.data);
+      setMotels(response.data);
+      return motelData;
+    } catch (ex) {
+      console.error(ex);
+    }
+  }
   return (
     <View style={MyStyles.container}>
       {/* Bài viết */}
@@ -199,15 +287,67 @@ const HomeIndex = ({ route }) => {
 
             </View>
             {showOptions[post.id] && (
-              <View style={styles.modalContainer}>
-                <TouchableOpacity onPress={() => handleEdit(post.id)}>
-                  <Text style={styles.optionText}>Sửa bài</Text>
+              <View style={HomeStyles.modalContainer}>
+                <TouchableOpacity onPress={() => handleEdit(post.id, post)}>
+                  <Text style={HomeStyles.optionText}>Sửa bài</Text>
                 </TouchableOpacity>
                 <TouchableOpacity onPress={() => handleDelete(post.id)}>
-                  <Text style={styles.optionText}>Xóa bài</Text>
+                  <Text style={HomeStyles.optionText}>Xóa bài</Text>
                 </TouchableOpacity>
               </View>
             )}
+
+            {/* Ẩn hiện Modal chỉnh sửa */}
+            {modalsEdit[post.id] && (
+              <Modal
+                isOpen={true}
+                onClosed={handleModalClose}
+                style={styles.modal}
+              >
+                <View>
+                  <Text style={{ color: "#fff" }}>Mô tả</Text>
+                  <TextInput
+                    style={styles.input}
+                    onChangeText={(text) => setContent(text)}
+                    value={content}
+                    placeholder="Nội dung mới"
+                  />
+                  <Text style={{ color: "#fff" }}>Chọn nhà trọ khác</Text>
+                  <View style={styles.container}>
+                    {motels.map((item) => (
+                      <TouchableOpacity
+                        key={item.id.toString()}
+                        onPress={() => selectHouse(item)}
+                      >
+                        <Text style={styles.houseItem}>
+                          {item.title}: {item.ward}, {item.district}, {item.city}
+                          {selectedHouse && selectedHouse.id === item.id && (
+                            <MaterialCommunityIcons
+                              name="check"
+                              size={24}
+                              color="green"
+                              style={{ position: "absolute", right: 10 }}
+                            />
+                          )}
+                        </Text>
+                      </TouchableOpacity>
+                    ))}
+
+                  </View>
+
+                  <View style={{ flexDirection: "row" }}>
+                    <Button mode="contained" onPress={() => handleUpdatePost(post.id)} style={styles.button}>
+                      Cập nhật
+                    </Button>
+                    <Button mode="outlined" onPress={handleModalClose} style={styles.button} >
+                      Hủy
+                    </Button>
+                  </View>
+                </View>
+              </Modal>
+
+            )}
+
 
             <View style={{ flexDirection: "row" }}>
               <Entypo name="location-pin" size={20} color="orange" />
@@ -216,7 +356,7 @@ const HomeIndex = ({ route }) => {
               </Text>
             </View>
             <View>
-              <Text style={styles.desc}>{post.content}</Text>
+              <Text style={HomeStyles.desc}>{post.content}</Text>
               {/* Ảnh bài đăng */}
               <FlatList
                 data={post.motel.images}
@@ -229,8 +369,8 @@ const HomeIndex = ({ route }) => {
               />
             </View>
             {/* Hiển thị badge */}
-            <View style={styles.badgeContainer}>
-              <Text style={styles.badgeText}>
+            <View style={HomeStyles.badgeContainer}>
+              <Text style={HomeStyles.badgeText}>
                 {currentIndex + 1}/{post.motel.images.length}
               </Text>
             </View>
@@ -258,6 +398,7 @@ const HomeIndex = ({ route }) => {
 
           </View>
         ))}
+
       </ScrollView>
     </View>
   );
@@ -299,13 +440,10 @@ const styles = StyleSheet.create({
   },
   // ảnh bài đăng
   image: {
-    // width: "100%", // Chiếm full chiều rộng
-    height: 300, // Đặt chiều cao cố định hoặc có thể sử dụng "auto" để tự động tính toán chiều cao dựa trên tỷ lệ khung hình
+    height: 300,
     resizeMode: "cover",
     position: "relative",
   },
-  //ICON POST
-  //ICON POST
   iconContainer: {
     flexDirection: "row",
     justifyContent: "space-between", // Sắp xếp các icon theo hai phía
@@ -324,45 +462,38 @@ const styles = StyleSheet.create({
     ...SHADOWS.small,
     marginBottom: 10,
   },
-  //mô tả
-  desc: {
-    paddingHorizontal: 15,
-    paddingVertical: 5,
+  modal: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "rgba(0, 0, 0, 0.5)", // Mờ mờ
+    padding: 20, // Thêm padding để tạo khoảng cách với mép của Modal
+    width: "100%",
   },
-  //BADGE
-  badgeContainer: {
-    backgroundColor: COLOR.color12,
-    width: "12%",
-    padding: 7,
-    borderRadius: 15,
-    paddingVertical: 7,
-    paddingHorizontal: 10,
-    position: "absolute",
-    right: "4%", // Thay vị trí cố định bằng phần trăm
-    top: "80%", // Thay vị trí cố định bằng phần trăm
-  },
-  badgeText: {
-    color: "#fff",
-  },
-  //modal box
-  modalContainer: {
-    position: "absolute",
-    top: 80,
-    right: 20,
-    backgroundColor: COLOR.bg_color1,
-    // borderRadius: 10,
-    padding: 10,
-    zIndex: 9999,
-    elevation: 5, // Độ đục của modal (Android)
-    borderBottomRightRadius: 20,
-    borderTopLeftRadius: 20,
-    borderBottomLeftRadius: 20,
-  },
-  optionText: {
-    fontSize: 16,
-    paddingVertical: 10,
+  input: {
+    // flex: 1,
+
+    marginBottom: 10,
+    height: 80, // Hoặc một giá trị phù hợp
+    // paddingVertical:20,
     paddingHorizontal: 20,
+    // height:50,
+    // padding: 5,
+    backgroundColor: "#fff",
   },
+
+  button: {
+    width: "48%", // Sử dụng một phần trăm của chiều rộng của Modal
+    marginTop: 10,
+    marginRight: 10
+  },
+  houseItem: {
+    padding: 10,
+    backgroundColor: "#fff",
+    marginTop: 5,
+    borderRadius: 15
+  }
+
 });
 
 export default HomeIndex;

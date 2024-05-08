@@ -23,6 +23,7 @@ export const endpoints = {
     likePost:(idPost) => `/post/${idPost}/like/`,  //POST
     commentPost:(idPost) => `/post/${idPost}/comments/`, //POST
     deletePost:(idPost) => `/post/${idPost}/`, //DELETE
+    updatePost:(idPost) => `/post/for_lease/${idPost}/`  //PATCH
 };
 
 // Tạo một phiên bản axios với các cài đặt đã được cung cấp

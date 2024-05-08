@@ -120,4 +120,112 @@ export default StyleSheet.create({
         marginTop: 10
     },
 
+    postContainer: {
+        flexDirection: "row",
+        alignItems: "center",
+        marginVertical: 10,
+        paddingHorizontal: 10,
+    },
+    userInfoContainer: {
+        width: "70%",
+        flexDirection: "row",
+        alignItems: "center",
+    },
+    userAvatar: {
+        width: 40,
+        height: 40,
+        borderRadius: 20,
+        marginRight: 10,
+        borderWidth: 2,
+        borderColor: COLOR.color3,
+    },
+    userName: {
+        fontWeight: "bold",
+    },
+    btnFollow: {
+        backgroundColor: COLOR.input_default,
+        padding: 5,
+        paddingVertical: 5,
+        borderRadius: 25,
+        flexDirection: "row",
+    },
+    //BADGE
+    badgeContainer: {
+        backgroundColor: COLOR.color12,
+        width: "12%",
+        padding: 7,
+        borderRadius: 15,
+        paddingVertical: 7,
+        paddingHorizontal: 10,
+        position: "absolute",
+        right: "4%",
+        top: "80%",
+    },
+    badgeText: {
+        color: "#fff",
+    },
+    //modal box
+    modalContainer: {
+        position: "absolute",
+        top: 80,
+        right: 20,
+        backgroundColor: COLOR.bg_color1,
+        padding: 10,
+        zIndex: 9999,
+        elevation: 5,
+        borderBottomRightRadius: 20,
+        borderTopLeftRadius: 20,
+        borderBottomLeftRadius: 20,
+    },
+    optionText: {
+        fontSize: 16,
+        paddingVertical: 10,
+        paddingHorizontal: 20,
+    },
+    //mô tả
+    desc: {
+        paddingHorizontal: 15,
+        paddingVertical: 5,
+        fontSize: 16,
+    },
+    //modal box
+    modalContainer: {
+        position: "absolute",
+        top: 80,
+        right: 20,
+        backgroundColor: COLOR.bg_color1,
+        // borderRadius: 10,
+        padding: 10,
+        zIndex: 9999,
+        elevation: 5, // Độ đục của modal (Android)
+        borderBottomRightRadius: 20,
+        borderTopLeftRadius: 20,
+        borderBottomLeftRadius: 20,
+    },
+    optionText: {
+        fontSize: 16,
+        paddingVertical: 10,
+        paddingHorizontal: 20,
+    },
+    //mô tả
+    desc: {
+        paddingHorizontal: 15,
+        paddingVertical: 5,
+    },
+    //BADGE
+    badgeContainer: {
+        backgroundColor: COLOR.color12,
+        width: "12%",
+        padding: 7,
+        borderRadius: 15,
+        paddingVertical: 7,
+        paddingHorizontal: 10,
+        position: "absolute",
+        right: "4%", // Thay vị trí cố định bằng phần trăm
+        top: "80%", // Thay vị trí cố định bằng phần trăm
+    },
+    badgeText: {
+        color: "#fff",
+    },
+
 })
