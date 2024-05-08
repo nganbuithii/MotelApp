@@ -28,6 +28,7 @@ const AddPrice = ({ route }) => {
     const [tenDichVuError, setTenDichVuError] = useState("");
     const [phiError, setPhiError] = useState("");
     const [serviceError, setServiceError] = useState("");
+    const [name, setName] = useState("");
     const [iconError, setIconError] = useState("");
     const [donviError, setDonviError] = useState("");
 
@@ -50,7 +51,7 @@ const AddPrice = ({ route }) => {
         setTenDichVu(type); // Cập nhật tên dịch vụ dựa trên loại dịch vụ được chọn
         setModalTypeVisible(false);
     };
-    
+
     const showToast1 = () => {
         Toast.show({
             type: 'success',
@@ -101,14 +102,13 @@ const AddPrice = ({ route }) => {
                 setServiceError("");
             }
 
-            if (!selectedIcon) {
-                setIconError("Vui lòng chọn icon");
-                return;
-            } else {
-                setIconError("");
-            }
-
-
+            const resetInputFields = () => {
+                setName("");
+                setPhiDichVu("");
+                setSelectedType("");
+                setSelectedService("");
+                setDonViDo("");
+            };
 
             if (!selectedService || (selectedService === "Theo chỉ số đồng hồ" && !donViDo)) {
                 showToast2();
@@ -120,7 +120,7 @@ const AddPrice = ({ route }) => {
                 "Mạng": "INTERNET",
                 "Khác": "OTHER"
             };
-            
+
             const token = await AsyncStorage.getItem("access-token");
             console.log(token);
             console.log(idMotel);
@@ -128,6 +128,7 @@ const AddPrice = ({ route }) => {
             formData.append("label", serviceLabels[selectedType]);
 
             formData.append("value", phiDichVu);
+            formData.append("name", name);
             let period = "";
             if (selectedService === "Theo chỉ số đồng hồ") {
                 period = donViDo;
@@ -144,6 +145,7 @@ const AddPrice = ({ route }) => {
                 },
             });
             console.log(res.data);
+            resetInputFields();
             console.log("Thanh công add price");
             showToast1();
 
@@ -197,8 +199,8 @@ const AddPrice = ({ route }) => {
                 {tenDichVuError ? <Text style={{ color: "red" }}>{tenDichVuError}</Text> : null}
                 <View style={EditMotelStyle.inputContainer}>
                     <FontAwesome6 name="hand-holding-heart" style={EditMotelStyle.icon} size={24} color="green" />
-                    <TextInput value={tenDichVu}
-                        onChangeText={(text) => setTenDichVu(text)} style={EditMotelStyle.input} placeholder="Nhập tên dịch vụ" />
+                    <TextInput value={name}
+                        onChangeText={(text) => setName(text)} style={EditMotelStyle.input} placeholder="Nhập tên dịch vụ" />
 
                 </View>
                 <Text style={EditMotelStyle.label}>Phí dịch vụ</Text>
@@ -252,61 +254,10 @@ const AddPrice = ({ route }) => {
                                 <Text style={styles.modalText}>Phòng</Text>
                                 <Text style={styles.smText}>Tính theo phòng (Thu rác 100.000đ/Phòng)</Text>
                             </TouchableOpacity>
-                            {/* Add more service options as needed */}
                         </View>
                     </View>
                 </Modal>
-                {/* Button chọn icon */}
-                <Text style={EditMotelStyle.label}>Icon dịch vụ</Text>
-                {iconError ? <Text style={{ color: "red" }}>{iconError}</Text> : null}
-                <TouchableOpacity style={styles.inputContainer} onPress={openIconModal}>
-                    {selectedIcon ? (
-                        <View style={styles.iconContainer}>
-                            {/* Hiển thị icon được chọn */}
-                            {selectedIcon === "IC1" && <MaterialIcons name="electric-bolt" size={24} color="black" />}
-                            {selectedIcon === "IC2" && <MaterialIcons name="garage" size={24} color="black" />}
-                            {selectedIcon === "IC3" && <MaterialIcons name="cleaning-services" size={24} color="black" />}
-                            {selectedIcon === "IC4" && <MaterialIcons name="cell-wifi" size={24} color="black" />}
-                            {selectedIcon === "IC5" && <FontAwesome5 name="fan" size={24} color="black" />}
-                            {selectedIcon === "IC6" && <Entypo name="fingerprint" size={24} color="black" />}
-                        </View>
-                    ) : (
-                        <Text style={EditMotelStyle.input}>Chọn icon</Text>
-                    )}
-                </TouchableOpacity>
-                {/* Modal chọn icon */}
-                <Modal
-                    animationType="slide"
-                    transparent={true}
-                    visible={modalIconVisible}
-                    onRequestClose={() => {
-                        setModalIconVisible(false);
-                    }}
-                >
-                    <View style={styles.centeredView}>
-                        <View style={styles.modalICView}>
-                            <TouchableOpacity style={styles.modalIc} onPress={() => selectIcon("IC1")}>
-                                <MaterialIcons name="electric-bolt" size={30} color="black" />
-                            </TouchableOpacity>
-                            <TouchableOpacity style={styles.modalIc} onPress={() => selectIcon("IC2")}>
-                                <MaterialIcons name="garage" size={30} color="black" />
-                            </TouchableOpacity>
-                            <TouchableOpacity style={styles.modalIc} onPress={() => selectIcon("IC3")}>
-                                <MaterialIcons name="cleaning-services" size={30} color="black" />
-                            </TouchableOpacity>
-                            <TouchableOpacity style={styles.modalIc} onPress={() => selectIcon("IC4")}>
-                                <MaterialIcons name="cell-wifi" size={30} color="black" />
-                            </TouchableOpacity>
-                            <TouchableOpacity style={styles.modalIc} onPress={() => selectIcon("IC5")}>
-                                <FontAwesome5 name="fan" size={30} color="black" />
-                            </TouchableOpacity>
-                            <TouchableOpacity style={styles.modalIc} onPress={() => selectIcon("IC6")}>
-                                <Entypo name="fingerprint" size={30} color="black" />
-                            </TouchableOpacity>
-                            {/* Add more icon options as needed */}
-                        </View>
-                    </View>
-                </Modal>
+
                 <ButtonAuth title="Thêm dịch vụ" onPress={handleSubmit} />
             </View>
         </View>
@@ -356,7 +307,7 @@ const styles = StyleSheet.create({
         ...SHADOWS.medium,
         borderTopLeftRadius: 20,
         borderTopRightRadius: 20,
-        flexDirection:"row"
+        flexDirection: "row"
     },
     modalICView: {
         backgroundColor: COLOR.color12,
@@ -387,13 +338,13 @@ const styles = StyleSheet.create({
         width: "24%",
         // borderRightColor: "#fff",
         // borderRightWidth: 1,
-        borderColor:"#fff",
-        borderWidth:1,
-        marginRight:5,
-        paddingVertical:10,
-        borderRadius:20,
+        borderColor: "#fff",
+        borderWidth: 1,
+        marginRight: 5,
+        paddingVertical: 10,
+        borderRadius: 20,
         ...SHADOWS.medium,
-        backgroundColor:COLOR.PRIMARY
+        backgroundColor: COLOR.PRIMARY
     },
     smText: {
         fontSize: 13,

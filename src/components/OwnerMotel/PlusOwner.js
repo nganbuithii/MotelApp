@@ -50,7 +50,7 @@ const PlusOwner = () => {
             if (motelData.length > 0) {
                 setMotels(motelData);
                 setStoredMotels(motelData);
-                
+
                 let token = await AsyncStorage.getItem("access-token");
                 console.log("token", token);
                 console.log("motel data:", motelData);
@@ -72,7 +72,7 @@ const PlusOwner = () => {
                 //         // Xử lý lỗi ở đây nếu cần thiết
                 //     }
                 // }));
-                
+
                 setIsLoading(false);
                 setMotels(motelData);
             }
@@ -88,14 +88,24 @@ const PlusOwner = () => {
         fetchMotels();
     }, [triggerRender]);
 
-    const renderHouseItem = ({ item }) => (
-        <View style={styles.imageContainer}>
-            <Image
-                source={{ uri: item.url }}
-                style={styles.imgMotel}
-            />
-        </View>
-    );
+    useEffect(() => {
+        // Gọi hàm fetchMotels khi component được render và sau mỗi phút
+        const interval = setInterval(() => {
+            fetchMotels();
+        }, 60000); // 60000 milliseconds = 1 phút
+    
+        // Xóa interval khi component bị unmount để tránh memory leak
+        return () => clearInterval(interval);
+    }, []); // Dùng mảng rỗng để chỉ chạy useEffect một lần sau khi component được render
+    
+    // const renderHouseItem = ({ item }) => (
+    //     <View style={styles.imageContainer}>
+    //         <Image
+    //             source={{ uri: item.url }}
+    //             style={styles.imgMotel}
+    //         />
+    //     </View>
+    // );
     const showToast = () => {
         Toast.show({
             type: 'success',
@@ -186,12 +196,12 @@ const PlusOwner = () => {
                 {/* <Ionicons name="arrow-back-outline" size={24} color={COLOR.PRIMARY} style={HomeStyles.bellIcon} /> */}
                 <Text style={styles.textHead}>Nhà trọ của tôi</Text>
             </View>
-            <TouchableOpacity onPress={handleAddRoomPress}>
+            <TouchableWithoutFeedback onPress={handleAddRoomPress}>
                 <View style={styles.buttonAdd}>
                     <Feather name="plus" style={{ marginTop: 8 }} size={24} color="#fff" />
                     <Text style={styles.textAdd}>Thêm mới</Text>
                 </View>
-            </TouchableOpacity>
+            </TouchableWithoutFeedback>
             {isLoading ? ( // Kiểm tra nếu đang tải dữ liệu
                 <ActivityIndicator size="large" color={COLOR.PRIMARY} /> // Hiển thị biểu tượng loading
             ) : (
@@ -199,7 +209,7 @@ const PlusOwner = () => {
                     {storedMotels.map((item, index) => (
 
                         <View key={index} style={styles.containerMotel}>
-                            {/* <Text>Id: {item.id}</Text> */}
+                            <Text>Id: {item.id}</Text>
                             <Text style={{ textAlign: "center", marginBottom: 5 }}>{item.name}</Text>
                             <View >
                                 <View style={{ flexDirection: "row" }}>
@@ -236,10 +246,17 @@ const PlusOwner = () => {
                             />
 
                             <View style={styles.buttonContainer}>
-                                <TouchableOpacity onPress={() => handleEdit(item)} style={[styles.button, styles.editButton]}>
-                                    <FontAwesome name="edit" size={13} color="black" />
-                                    <Text style={styles.buttonText}>Chỉnh sửa</Text>
-                                </TouchableOpacity>
+                                {item.approved ? (
+                                    <TouchableOpacity onPress={() => handleEdit(item)} style={[styles.button, styles.editButton]}>
+                                        <FontAwesome name="edit" size={13} color="black" />
+                                        <Text style={styles.buttonText}>Chỉnh sửa</Text>
+                                    </TouchableOpacity>
+                                ) : (
+                                    <TouchableOpacity style={[styles.button, styles.editButton]}>
+                                        <FontAwesome name="hourglass-half" size={13} color="black" />
+                                        <Text style={styles.buttonText}>Đang chờ duyệt</Text>
+                                    </TouchableOpacity>
+                                )}
 
                                 <TouchableOpacity onPress={() => handleDelete(item.id)} style={[styles.button, styles.deleteButton]}>
                                     <FontAwesome name="trash" size={13} color="black" />

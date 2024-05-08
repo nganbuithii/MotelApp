@@ -9,6 +9,7 @@ import EditMotelStyle from "../../Styles/EditMotelStyle";
 import { authApi, endpoints } from "../../configs/API";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import Toast from "react-native-toast-message";
+import showToast from "../common/ToastMessage";
 
 const DetailPrices = ({ route, navigation }) => {
     const { idMotel } = route.params;
@@ -25,6 +26,7 @@ const DetailPrices = ({ route, navigation }) => {
     const [tenDichVu, setTenDichVu] = useState(infoPrice.label);
     const [phiDichVu, setPhiDichVu] = useState(infoPrice.value);
     const [donViDo, setDonViDo] = useState("");
+    const [name, setName] = useState(infoPrice.name);
     const [period, setPeriod] = useState(infoPrice.period);
 
     const [tenDichVuError, setTenDichVuError] = useState("");
@@ -62,25 +64,6 @@ const DetailPrices = ({ route, navigation }) => {
             setSelectedService("Theo chỉ số đồng hồ");
         }
     }, []);
-    const showToast1 = () => {
-        Toast.show({
-            type: 'success',
-            text1: 'Thành công',
-            text2: 'Thêm thông tin thành công.',
-            visibilityTime: 3000, // Thời gian tồn tại của toast (milliseconds)
-            autoHide: true, // Tự động ẩn toast sau khi hết thời gian tồn tại
-        });
-    }
-
-    const showToast2 = () => {
-        Toast.show({
-            type: 'error',
-            text1: 'Thất bại',
-            text2: 'Thêm thông tin thất bại.',
-            visibilityTime: 3000, // Thời gian tồn tại của toast (milliseconds)
-            autoHide: true, // Tự động ẩn toast sau khi hết thời gian tồn tại
-        });
-    }
     const selectService = (service) => {
         setSelectedService(service);
         if (service === "Theo chỉ số đồng hồ") {
@@ -109,26 +92,6 @@ const DetailPrices = ({ route, navigation }) => {
                 setPhiError("");
             }
 
-            // if (!selectedService) {
-            //     setServiceError("Vui lòng chọn thu phí dựa trên");
-            //     return;
-            // } else {
-            //     setServiceError("");
-            // }
-
-            if (!selectedIcon) {
-                setIconError("Vui lòng chọn icon");
-                return;
-            } else {
-                setIconError("");
-            }
-
-
-
-            // if (!selectedService || (selectedService === "Theo chỉ số đồng hồ" && !donViDo)) {
-            //     showToast2();
-            //     return;
-            // }
             const serviceLabels = {
                 "Điện": "ELECTRICITY",
                 "Nước": "WATER",
@@ -137,8 +100,8 @@ const DetailPrices = ({ route, navigation }) => {
             };
 
             const token = await AsyncStorage.getItem("access-token");
-            console.log(token);
-            console.log(idMotel);
+            // console.log(token);
+            // console.log(idMotel);
             const formData = new FormData();
             console.log("id price", infoPrice.id);
             formData.append("id", infoPrice.id);
@@ -149,6 +112,9 @@ const DetailPrices = ({ route, navigation }) => {
 
             if (label !== infoPrice.label) {
                 formData.append("label", label);
+            }
+            if(name !== infoPrice.name){
+            formData.append("name",name);
             }
 
             if (phiDichVu !== infoPrice.value) {
@@ -173,12 +139,14 @@ const DetailPrices = ({ route, navigation }) => {
             });
             console.log(res.data);
             
-            showToast1();
+            showToast({ type: "success", text1: "Thành công", text2: "cập nhật thông tin  " });
             console.log("CẬP NHẬT THÀNH CÔNG");
 
 
         } catch (ex) {
             console.error(ex);
+            showToast({ type: "error", text1: "Lỗi", text2: "Lỗi cập nhật" });
+
         }
     }
     return (
@@ -227,8 +195,8 @@ const DetailPrices = ({ route, navigation }) => {
                 {tenDichVuError ? <Text style={{ color: "red" }}>{tenDichVuError}</Text> : null}
                 <View style={EditMotelStyle.inputContainer}>
                     <FontAwesome6 name="hand-holding-heart" style={EditMotelStyle.icon} size={24} color="green" />
-                    <TextInput value={tenDichVu}
-                        onChangeText={(text) => setTenDichVu(text)} style={EditMotelStyle.input} placeholder="Nhập tên dịch vụ" />
+                    <TextInput value={name}
+                        onChangeText={(text) => setName(text)} style={EditMotelStyle.input} placeholder="Nhập tên dịch vụ" />
 
                 </View>
                 <Text style={EditMotelStyle.label}>Phí dịch vụ</Text>
@@ -286,57 +254,8 @@ const DetailPrices = ({ route, navigation }) => {
                         </View>
                     </View>
                 </Modal>
-                {/* Button chọn icon */}
-                <Text style={EditMotelStyle.label}>Icon dịch vụ</Text>
-                {iconError ? <Text style={{ color: "red" }}>{iconError}</Text> : null}
-                <TouchableOpacity style={styles.inputContainer} onPress={openIconModal}>
-                    {selectedIcon ? (
-                        <View style={styles.iconContainer}>
-                            {/* Hiển thị icon được chọn */}
-                            {selectedIcon === "IC1" && <MaterialIcons name="electric-bolt" size={24} color="black" />}
-                            {selectedIcon === "IC2" && <MaterialIcons name="garage" size={24} color="black" />}
-                            {selectedIcon === "IC3" && <MaterialIcons name="cleaning-services" size={24} color="black" />}
-                            {selectedIcon === "IC4" && <MaterialIcons name="cell-wifi" size={24} color="black" />}
-                            {selectedIcon === "IC5" && <FontAwesome5 name="fan" size={24} color="black" />}
-                            {selectedIcon === "IC6" && <Entypo name="fingerprint" size={24} color="black" />}
-                        </View>
-                    ) : (
-                        <Text style={EditMotelStyle.input}>Chọn icon</Text>
-                    )}
-                </TouchableOpacity>
-                {/* Modal chọn icon */}
-                <Modal
-                    animationType="slide"
-                    transparent={true}
-                    visible={modalIconVisible}
-                    onRequestClose={() => {
-                        setModalIconVisible(false);
-                    }}
-                >
-                    <View style={styles.centeredView}>
-                        <View style={styles.modalICView}>
-                            <TouchableOpacity style={styles.modalIc} onPress={() => selectIcon("IC1")}>
-                                <MaterialIcons name="electric-bolt" size={30} color="black" />
-                            </TouchableOpacity>
-                            <TouchableOpacity style={styles.modalIc} onPress={() => selectIcon("IC2")}>
-                                <MaterialIcons name="garage" size={30} color="black" />
-                            </TouchableOpacity>
-                            <TouchableOpacity style={styles.modalIc} onPress={() => selectIcon("IC3")}>
-                                <MaterialIcons name="cleaning-services" size={30} color="black" />
-                            </TouchableOpacity>
-                            <TouchableOpacity style={styles.modalIc} onPress={() => selectIcon("IC4")}>
-                                <MaterialIcons name="cell-wifi" size={30} color="black" />
-                            </TouchableOpacity>
-                            <TouchableOpacity style={styles.modalIc} onPress={() => selectIcon("IC5")}>
-                                <FontAwesome5 name="fan" size={30} color="black" />
-                            </TouchableOpacity>
-                            <TouchableOpacity style={styles.modalIc} onPress={() => selectIcon("IC6")}>
-                                <Entypo name="fingerprint" size={30} color="black" />
-                            </TouchableOpacity>
-                            {/* Add more icon options as needed */}
-                        </View>
-                    </View>
-                </Modal>
+            
+            
                 <View style={EditMotelStyle.containerBtn}>
                     <TouchableOpacity style={EditMotelStyle.button} onPress={handleExit}>
                         <Text style={EditMotelStyle.buttonText}> Thoát</Text>

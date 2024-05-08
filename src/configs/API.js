@@ -15,9 +15,9 @@ export const endpoints = {
     updateMotel:(idMotel) => `/motels/${idMotel}/`, //PATCH
     addPrice:(idMotel) => `/motels/${idMotel}/prices/`, //POST
     detailMotel:(idMotel) => `/motels/${idMotel}/`, //GET
-    deleteImgMotel:(idMotel) => `/motels/${idMotel}/images/`,  //DELETE
+    deleteImgMotel:(idMotel) => `/motels/images/${idMotel}/`,  //DELETE
     updatePrice:(idMotel) =>`/motels/${idMotel}/prices/`, //PATCH
-    deletePrice:(idMotel) => `/motels/${idMotel}/prices/`, //DELETE
+    deletePrice:(idPrice) => `/motels/prices/${idPrice}/`, //DELETE
     createPost:"/post/for_lease/", //POST
     getAllPostForOwner:"/post/for_lease/",  //GET
     likePost:(idPost) => `/post/${idPost}/like/`,  //POST

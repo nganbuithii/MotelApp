@@ -12,19 +12,18 @@ import * as ImagePicker from "expo-image-picker";
 import { useEffect, useState } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { authApi, endpoints } from "../../configs/API";
-import Toast from "react-native-toast-message";
 import InputEditMotel from "../common/InputEditMotel";
-import { Button } from "react-native-paper";
-import ButtonAuth from "../common/ButtonAuth";
+import showToast from "../common/ToastMessage";
+
 const EditMotel = ({ navigation, route }) => {
-    const defaultServices = [
-        { label: "Điện", value: "0", period: "Kwh" },
-        { label: "Nước", value: "0", period: "m3" },
-        { label: "Internet", value: "0", period: "Tháng" },
-    ];
-    const [editingService, setEditingService] = useState(null);// Để xem đang chỉnh sửa dịch vụ nào
-    const [newPrice, setNewPrice] = useState('');
-    const [editingPrice, setEditingPrice] = useState(null);
+    // const defaultServices = [
+    //     { label: "Điện", value: "0", period: "Kwh" },
+    //     { label: "Nước", value: "0", period: "m3" },
+    //     { label: "Internet", value: "0", period: "Tháng" },
+    // ];
+    // const [editingService, setEditingService] = useState(null);// Để xem đang chỉnh sửa dịch vụ nào
+    // const [newPrice, setNewPrice] = useState('');
+    // const [editingPrice, setEditingPrice] = useState(null);
 
 
 
@@ -100,14 +99,10 @@ const EditMotel = ({ navigation, route }) => {
             console.log(idMotel);
             console.log(" ẢNH CẦN XÓA:", idImage);
 
-            await authApi(token).delete(endpoints["deleteImgMotel"](idMotel), {
-                    data: { id:idImage }, // Truyền id qua dưới dạng dữ liệu JSON
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                });
+            await authApi(token).delete(endpoints["deleteImgMotel"](idImage));
             setRender(!render);
-            showToast1();
+            // showToast1();
+            showToast({ type: "success", text1: "Thành công", text2: "Xóa ảnh thành công" });
             console.log("Xóa ảnh thành công");
             //setRender(!render);
         } catch (ex) {
@@ -187,7 +182,7 @@ const EditMotel = ({ navigation, route }) => {
             // console.log("Mảng ảnh:", res.data.motel_images);
             // console.log("Mảng prices:", res.data.prices);
             setPrices(res.data.prices);
-            setImages(res.data.motel_images);
+            setImages(res.data.images);
         } catch (error) {
             console.error("Error fetching motel detail:", error);
             // Xử lý lỗi nếu có
@@ -201,24 +196,23 @@ const EditMotel = ({ navigation, route }) => {
         try {
             let token = await AsyncStorage.getItem("access-token");
             const formData = new FormData();
-            formData.append("id", "44")
+            formData.append("id", idMotel);
             console.log(token);
-            console.log("ID XÓA:", item.id);
             console.log("ID MOTEL:", idMotel);
-            console.log("FORRM:", formData);
-            const idMotel = item.idMotel; // Lấy idMotel từ item
             const priceId = item.id; // Lấy id của giá cần xóa
-            await authApi(token).delete(endpoints.deletePrice(idMotel), {
-                data: { id: priceId }, // Truyền id qua dưới dạng dữ liệu JSON
+            console.log("id giá xóa:", priceId);
+            await authApi(token).delete(endpoints.deletePrice(priceId), formData, {
                 headers: {
-                    'Content-Type': 'application/json',
+                    'Content-Type': 'multipart/form-data',
                 },
             });
+            
             console.log("Xóa thành công prices");
             console.log("xóa thành công prices");
 
             setRender(!render);
-            showToast1();
+            // showToast1();
+            showToast({ type: "success", text1: "Thành công", text2: "Xóa thành công" });
 
 
 
@@ -248,24 +242,24 @@ const EditMotel = ({ navigation, route }) => {
             ]
         );
     }
-    const showToast1 = () => {
-        Toast.show({
-            type: "success",
-            text1: "Thành công",
-            text2: "Cập nhật thông tin thành công.",
-            visibilityTime: 3000, // Thời gian tồn tại của toast (milliseconds)
-            autoHide: true, // Tự động ẩn toast sau khi hết thời gian tồn tại
-        });
-    };
-    const showToast2 = () => {
-        Toast.show({
-            type: "error",
-            text1: "Cảnh báo",
-            text2: "Không có thông tin mới để cập nhật.",
-            visibilityTime: 3000, // Thời gian tồn tại của toast (milliseconds)
-            autoHide: true, // Tự động ẩn toast sau khi hết thời gian tồn tại
-        });
-    };
+    // const showToast1 = () => {
+    //     Toast.show({
+    //         type: "success",
+    //         text1: "Thành công",
+    //         text2: "Cập nhật thông tin thành công.",
+    //         visibilityTime: 3000, // Thời gian tồn tại của toast (milliseconds)
+    //         autoHide: true, // Tự động ẩn toast sau khi hết thời gian tồn tại
+    //     });
+    // };
+    // const showToast2 = () => {
+    //     Toast.show({
+    //         type: "error",
+    //         text1: "Cảnh báo",
+    //         text2: "Không có thông tin mới để cập nhật.",
+    //         visibilityTime: 3000, // Thời gian tồn tại của toast (milliseconds)
+    //         autoHide: true, // Tự động ẩn toast sau khi hết thời gian tồn tại
+    //     });
+    // };
     const handleExit = () => {
         // console.log("Thoát");
         // console.log("dỮ LIỆU KHI THOÁT");
@@ -388,12 +382,12 @@ const EditMotel = ({ navigation, route }) => {
             console.log("Update thành công");
             console.log(response.data);
             // Hiển thị thông báo thành công
-            showToast1();
+            showToast({ type: "success", text1: "Thành công", text2: "Cập nhật thành công" });
             // Bật cờ render để render lại component
             setRender(!render);
         } catch (ex) {
             console.error(ex);
-            showToast2();
+            showToast({ type: "error", text1: "Lỗi", text2: "Lỗi cập nhật" });
         }
 
     }
@@ -417,6 +411,7 @@ const EditMotel = ({ navigation, route }) => {
                     {/* <Text>Thông tin phòng</Text> */}
 
                     <Text style={EditMotelStyle.labelService}> Thông tin phòng</Text>
+                    <Text> {idMotel}</Text>
                     <Text style={EditMotelStyle.label}>Xã/Phường</Text>
                     <View style={EditMotelStyle.inputContainer}>
                         <FontAwesome5 name="location-arrow" style={EditMotelStyle.icon} size={24} color="green" />
@@ -502,6 +497,7 @@ const EditMotel = ({ navigation, route }) => {
                         {prices.map((item, index) => (
                             <View key={index} style={EditMotelStyle.serviceIt}>
                                 <Text>{item.label}</Text>
+                                <Text>{item.name}</Text>
                                 <Text>
                                     {item.value} đ/{item.period}
                                 </Text>

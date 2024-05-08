@@ -193,12 +193,11 @@ const HomeIndex = ({ route }) => {
       if (currentPost.motel.id !== selectedHouse.id) {
         formData.append('motel', selectedHouse.id);
       }
-      if(currentPost.content === content && currentPost.motel.id === selectedHouse.id)
-        {
-          showToast({ type: "error", text1: "Cảnh báo", text2: "Chưa có thông tin mới " });
-          handleModalClose();
-          return;
-        }
+      if (currentPost.content === content && currentPost.motel.id === selectedHouse.id) {
+        showToast({ type: "error", text1: "Cảnh báo", text2: "Chưa có thông tin mới " });
+        handleModalClose();
+        return;
+      }
       // Nếu có sự thay đổi, gọi API cập nhật
       let res = await authApi(token).patch(endpoints["updatePost"](postId), formData, {
         headers: {
@@ -340,32 +339,34 @@ const HomeIndex = ({ route }) => {
 
             )}
 
-
-            <View style={{ flexDirection: "row" }}>
-              <Entypo name="location-pin" size={20} color="orange" />
-              <Text style={{ color: "gray" }}>
-                {post.motel.ward}, {post.motel.district}, {post.motel.city}
-              </Text>
-            </View>
-            <View>
-              <Text style={HomeStyles.desc}>{post.content}</Text>
-              {/* Ảnh bài đăng */}
-              <FlatList
-                data={post.motel.images}
-                renderItem={renderItem}
-                keyExtractor={(item) => item.id.toString()}
-                horizontal // Hiển thị ngang
-                pagingEnabled // Cuộn trang theo trang
-                showsHorizontalScrollIndicator={false} // Ẩn thanh trượt ngang
-                onViewableItemsChanged={onViewableItemsChanged}
-              />
-            </View>
-            {/* Hiển thị badge */}
-            <View style={HomeStyles.badgeContainer}>
-              <Text style={HomeStyles.badgeText}>
-                {currentIndex + 1}/{post.motel.images.length}
-              </Text>
-            </View>
+            <TouchableWithoutFeedback onPress={() => navigation.navigate("PostDetail")}>
+              <View>
+              <View style={{ flexDirection: "row" }}>
+                <Entypo name="location-pin" size={20} color="orange" />
+                <Text style={{ color: "gray" }}>
+                  {post.motel.ward}, {post.motel.district}, {post.motel.city}
+                </Text>
+              </View>
+              <View>
+                <Text style={HomeStyles.desc}>{post.content}</Text>
+                {/* Ảnh bài đăng */}
+                <FlatList
+                  data={post.motel.images}
+                  renderItem={renderItem}
+                  keyExtractor={(item) => item.id.toString()}
+                  horizontal // Hiển thị ngang
+                  pagingEnabled // Cuộn trang theo trang
+                  showsHorizontalScrollIndicator={false} // Ẩn thanh trượt ngang
+                  onViewableItemsChanged={onViewableItemsChanged}
+                />
+              </View>
+              {/* Hiển thị badge */}
+              <View style={HomeStyles.badgeContainer}>
+                <Text style={HomeStyles.badgeText}>
+                  {currentIndex + 1}/{post.motel.images.length}
+                </Text>
+              </View></View>
+            </TouchableWithoutFeedback>
             {/* icon */}
             <View style={styles.iconContainer}>
               <View style={MyStyles.flex}>
