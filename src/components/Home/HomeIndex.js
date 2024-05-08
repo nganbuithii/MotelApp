@@ -28,7 +28,7 @@ import { SimpleLineIcons } from '@expo/vector-icons';
 import Modal from 'react-native-modalbox';
 import { Button } from "react-native-paper";
 import Toast from "react-native-toast-message";
-
+import showToast from "../common/ToastMessage";
 const HomeIndex = ({ route }) => {
   const [postContent, setPostContent] = useState("");
   const [user, dispatch] = useContext(MyContext);
@@ -71,7 +71,7 @@ const HomeIndex = ({ route }) => {
   const fetchDataGetAllPost = async () => {
     try {
       let res = await API.get(endpoints["getAllPostForOwner"]);
-      console.log(res.data);
+      // console.log(res.data);
       setPosts(res.data.results);
     } catch (ex) {
       console.error(ex);
@@ -99,10 +99,10 @@ const HomeIndex = ({ route }) => {
   const handleLike = async (postId) => {
     try {
       const token = await AsyncStorage.getItem("access-token");
-      console.log(token);
-      console.log(postId);
+      // console.log(token);
+      // console.log(postId);
       await authApi(token).post(endpoints['likePost'](postId));
-      console.log("like bài thành công");
+      // console.log("like bài thành công");
       setRender(!render);
       // Nếu bài viết đã được like trước đó, xoá nó khỏi state likedState
       // Tạo một bản sao mới của likedState để cập nhật
@@ -174,14 +174,7 @@ const HomeIndex = ({ route }) => {
     setModalsEdit({});
 
   };
-  const showToast = () => {
-    Toast.show({type: 'success',text1: 'Thành công',text2: 'Bài viết được cập nhật.',visibilityTime: 5000, autoHide: true, 
-    });
-}
-  const showToastFail = () => {
-    Toast.show({type: 'error',text1: 'Lỗi',text2: 'Bạn chưa cập nhật thông tin mới.',visibilityTime: 5000, autoHide: true, 
-    });
-}
+
   const handleUpdatePost = async (postId) => {
     try {
       const token = await AsyncStorage.getItem("access-token");
@@ -202,7 +195,7 @@ const HomeIndex = ({ route }) => {
       }
       if(currentPost.content === content && currentPost.motel.id === selectedHouse.id)
         {
-          showToastFail();
+          showToast({ type: "error", text1: "Cảnh báo", text2: "Chưa có thông tin mới " });
           handleModalClose();
           return;
         }
@@ -214,8 +207,7 @@ const HomeIndex = ({ route }) => {
       });
 
       setRender(!render);
-      showToast();
-  
+      showToast({ type: "success", text1: "Thành công", text2: "Cập nhật thành công" });
       console.log("Cập nhật bài đăng:", postId);
       handleModalClose();
 
