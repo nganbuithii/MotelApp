@@ -43,6 +43,7 @@ const HomeIndex = ({ route }) => {
   const [content, setContent] = useState();
 
   const [motels, setMotels] = useState([]);
+  const [liked, setLiked] = useState(false);
 
   const selectHouse = (house) => {
     setSelectedHouse(house);
@@ -69,9 +70,19 @@ const HomeIndex = ({ route }) => {
 
   const fetchDataGetAllPost = async () => {
     try {
-      let res = await API.get(endpoints["getAllPostForOwner"]);
+      const token = await AsyncStorage.getItem("access-token");
+      let res = await authApi(token).get(endpoints["getAllPostForOwner"]);
       // console.log(res.data);
       setPosts(res.data.results);
+      console.log(res.data.results);
+      // Cập nhật likedState dựa trên dữ liệu bài đăng
+      const newLikedState = {};
+      res.data.results.forEach(post => {
+        if (post.liked) {
+          newLikedState[post.id] = true;
+        }
+      });
+      setLikedState(newLikedState);
     } catch (ex) {
       console.error(ex);
     }
@@ -80,21 +91,21 @@ const HomeIndex = ({ route }) => {
     fetchDataGetAllPost();
   }, [render]);
   // Khôi phục likedState từ AsyncStorage khi tải trang
-  useEffect(() => {
-    const restoreLikedState = async () => {
-      try {
-        const likeStateArr = await AsyncStorage.getItem("liked");
-        if (likeStateArr !== null) {
-          setLikedState(JSON.parse(likeStateArr));
-          console.log("Khôi phục trạng thái thành công");
-        }
-      } catch (error) {
-        console.error("Lỗi khôi phục trạng thái đã thích:", error);
-      }
-    };
+  // useEffect(() => {
+  //   const restoreLikedState = async () => {
+  //     try {
+  //       const likeStateArr = await AsyncStorage.getItem("liked");
+  //       if (likeStateArr !== null) {
+  //         setLikedState(JSON.parse(likeStateArr));
+  //         console.log("Khôi phục trạng thái thành công");
+  //       }
+  //     } catch (error) {
+  //       console.error("Lỗi khôi phục trạng thái đã thích:", error);
+  //     }
+  //   };
 
-    restoreLikedState();
-  }, []);
+  //   restoreLikedState();
+  // }, []);
   const handleLike = async (postId) => {
     try {
       const token = await AsyncStorage.getItem("access-token");
@@ -103,19 +114,10 @@ const HomeIndex = ({ route }) => {
       await authApi(token).post(endpoints['likePost'](postId));
       // console.log("like bài thành công");
       setRender(!render);
-      // Nếu bài viết đã được like trước đó, xoá nó khỏi state likedState
-      // Tạo một bản sao mới của likedState để cập nhật
+      // Cập nhật likedState sau khi thay đổi trạng thái like
       const newLikedState = { ...likedState };
-      // Nếu bài viết đã được like trước đó, xoá nó khỏi newLikedState
-      if (likedState[postId]) {
-        delete newLikedState[postId];
-      } else {
-        // Nếu bài viết chưa được like trước đó, thêm nó vào newLikedState
-        newLikedState[postId] = true;
-      }
+      newLikedState[postId] = !newLikedState[postId];
       setLikedState(newLikedState);
-      // Lưu likedState mới vào AsyncStorage
-      await AsyncStorage.setItem("liked", JSON.stringify(newLikedState));
     } catch (ex) {
       console.error(ex);
       console.log("Lỗi like bài");
@@ -124,6 +126,10 @@ const HomeIndex = ({ route }) => {
   const handleComment = (postId) => {
     console.log(postId);
     navigation.navigate("Comment", { postId: postId });
+    
+    navigation.addListener('focus', async () => {
+      setRender(!render);
+  });
   };
   const deletePost = async (postId) => {
     try {
@@ -371,7 +377,7 @@ const HomeIndex = ({ route }) => {
               <View style={MyStyles.flex}>
                 <Text>{post.like_count} </Text>
                 <TouchableWithoutFeedback onPress={() => handleLike(post.id)}>
-                  {likedState[post.id] ? <AntDesign name="heart" size={24} color="red" /> :
+                  {likedState[post.id] ? <AntDesign style={HomeStyles.iconPost} name="heart" size={24} color="red" /> :
                     <Feather style={HomeStyles.iconPost} name="heart" size={24} color="gray" />}
                 </TouchableWithoutFeedback>
                 <Text>{post.comment_count} </Text>

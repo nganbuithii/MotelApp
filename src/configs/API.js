@@ -26,7 +26,8 @@ export const endpoints = {
     updatePost:(idPost) => `/post/for_lease/${idPost}/`,  //PATCH
 
     detailOwner:(idOwner) => `/user/${idOwner}/` ,//get
-    follow:(idUser) => `/user/${idUser}/follow/`  // theo dõi - post
+    follow:(idUser) => `/user/${idUser}/follow/`,  // theo dõi - post
+    getComment:(idPost) => `/post/${idPost}/comments/`  // lấy tất cả comment
 };
 
 // Tạo một phiên bản axios với các cài đặt đã được cung cấp
