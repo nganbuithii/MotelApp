@@ -22,15 +22,18 @@ export const endpoints = {
     getAllPostForOwner:"/post/for_lease/",  //lấy tất cả bài đăng
     likePost:(idPost) => `/post/${idPost}/like/`,  //like bài
     commentPost:(idPost) => `/post/${idPost}/comments/`, //POST
+    editComment:(idComment) => `/post/comments/${idComment}/`,
     deletePost:(idPost) => `/post/${idPost}/`, //DELETE
     updatePost:(idPost) => `/post/for_lease/${idPost}/`,  //PATCH
-
     detailOwner:(idOwner) => `/user/${idOwner}/` ,//get
+    updateComment:(idComment) => `/post/comments/${idComment}/`,
     follow:(idUser) => `/user/${idUser}/follow/`,  // theo dõi - post
     getComment:(idPost) => `/post/${idPost}/comments/`,  // lấy tất cả comment
     getAllPostForRent:"/post/for_rent", //Lây tất cả post tìm nhà
-
     createPostForRent:"/post/for_rent/", // đăng bài bên người thuê
+    deleteComment:(idComment) => `/post/comments/${idComment}/`,
+    
+    
 };
 
 // Tạo một phiên bản axios với các cài đặt đã được cung cấp

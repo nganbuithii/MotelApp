@@ -1,15 +1,25 @@
-import React, { useEffect, useState } from 'react';
-import { View, Text, TextInput, FlatList, TouchableOpacity, Image, StyleSheet } from 'react-native';
+import React, { useContext, useEffect, useState } from 'react';
+import { View, Text, TextInput, FlatList, TouchableOpacity, Image, StyleSheet, Alert } from 'react-native';
 import { FontAwesome } from '@expo/vector-icons';
-import { COLOR } from '../common/color';
+import { COLOR, SHADOWS } from '../common/color';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import API, { authApi, endpoints } from '../../configs/API';
 import { ActivityIndicator } from 'react-native-paper';
+import MyContext from '../../configs/MyContext';
+import showToast from '../common/ToastMessage';
+import Modal from 'react-native-modalbox';
+
 
 const Comment = ({ route }) => {
     const [comments, setComments] = useState([]);
     const [content, setContent] = useState('');
     const [loading, setLoading] = useState(true);
+
+    const [user, dispatch] = useContext(MyContext);
+    const [showModal, setShowModal] = useState(false);
+    const [editingComment, setEditingComment] = useState('');
+    const [editingCommentId, setEditingCommentId] = useState(null);
+    const [render, setRender] = useState(false);
 
     const { postId } = route.params;
 
@@ -27,7 +37,7 @@ const Comment = ({ route }) => {
 
     useEffect(() => {
         getAllCommentByIdPost();
-    }, []);
+    }, [render]);
 
     const handleSend = async () => {
         try {
@@ -41,7 +51,8 @@ const Comment = ({ route }) => {
                 },
             });
             // Sau khi gửi bình luận thành công, cập nhật lại danh sách bình luận
-            getAllCommentByIdPost();
+            setRender(!render);
+            setContent("");
         } catch (ex) {
             console.error(ex);
             console.log("comment thất bại");
@@ -64,6 +75,62 @@ const Comment = ({ route }) => {
             return `${minutes} phút trước`;
         }
     };
+    const handleEdit = (id, commentContent) => {
+        setEditingCommentId(id); // Lưu id của comment
+        setEditingComment(commentContent);
+        setShowModal(true);
+    }
+    const handleUpdate = async () => {
+        try {
+            const token = await AsyncStorage.getItem("access-token");
+            const formData = new FormData();
+            formData.append("content", editingComment);
+            console.log(editingCommentId);
+            console.log(editingComment);
+            console.log(token);
+            let res = await authApi(token).patch(endpoints["updateComment"](editingCommentId), formData, {
+                headers: {
+                    'Content-Type': 'multipart/form-data',
+                },
+            });
+            console.log("cập nhật thành công");
+            setShowModal(false);
+            setRender(!render);
+        } catch (ex) {
+            console.error(ex);
+            showToast({ type: "error", text1: "Lỗi", text2: "Lỗi cập nhật bình luận" });
+        }
+    }
+
+    const handleDelete = async (idComment) => {
+        try {
+            const token = await AsyncStorage.getItem("access-token");
+            Alert.alert(
+                "Xác nhận",
+                "Bạn có chắc chắn muốn xóa bình luận này?",
+                [
+                    {
+                        text: "Hủy",
+                        style: "cancel"
+                    },
+                    {
+                        text: "Xóa",
+                        onPress: async () => {
+                            await authApi(token).delete(endpoints["deleteComment"](idComment));
+                            console.log("xóa thành công");
+                            showToast({ type: "success", text1: "Hoàn thành", text2: " Đã xóa bình luận" });
+                            getAllCommentByIdPost();
+                        },
+                        style: "destructive"
+                    }
+                ]
+            );
+            setRender(!render);
+        } catch (ex) {
+            console.error(ex);
+            showToast({ type: "error", text1: "Lỗi xóa bình luận", text2: ex });
+        }
+    }
 
     return (
         <View style={styles.container}>
@@ -80,7 +147,7 @@ const Comment = ({ route }) => {
                     ) : (
                         // Hiển thị danh sách bình luận
                         <FlatList
-                            style={{marginBottom:50}}
+                            style={{ marginBottom: 50 }}
                             data={comments}
                             showsVerticalScrollIndicator={false}
                             renderItem={({ item }) => (
@@ -90,24 +157,82 @@ const Comment = ({ route }) => {
                                         style={styles.avatar}
                                         source={{ uri: item.user.avatar }}
                                     />
+                                    {/* <Text>id: {item.id}</Text> */}
                                     <View>
-                                        <Text tyle={styles.comment}>{item.user.username}</Text>
-                                    {/* Nội dung và thời gian của bình luận */}
-                                    <View style={styles.commentContent}>
-                                        <Text style={styles.comment}>{item.content}</Text>
-                                        <Text style={styles.timeAgo}>{calculateTimeAgo(item.created_date)}</Text>
+                                        <Text style={{ fontWeight: "500", fontSize: 16 }}>{item.user.username}</Text>
+                                        {/* Nội dung và thời gian của bình luận */}
+                                        <View style={styles.commentContent}>
+                                            <Text style={styles.comment}>{item.content}</Text>
+                                            <Text style={styles.timeAgo}>{calculateTimeAgo(item.created_date)}</Text>
+                                        </View>
+                                        { /* Nếu user là người comment, hiển thị nút sửa và xóa */}
+                                        {item.user.id === user.id && (
+                                            <View style={styles.commentActionContainer}>
+                                                <TouchableOpacity style={styles.commentActionButton}
+                                                    onPress={() => handleEdit(item.id, item.content)} // Pass id và nội dung của comment vào hàm handleEdit
+                                                >
+                                                    <Text style={{ fontWeight: "500", color: COLOR.color_1 }}> Chỉnh sửa</Text>
+                                                </TouchableOpacity>
+
+                                                <TouchableOpacity style={styles.commentActionButton}
+                                                    onPress={() => handleDelete(item.id)}
+                                                >
+                                                    <Text style={{ fontWeight: "500", color: COLOR.color_1 }}>Xóa</Text>
+                                                </TouchableOpacity>
+                                            </View>
+                                        )}
+                                        { /* Nếu user không phải là người comment, hiển thị nút phản hồi */}
+                                        {item.user.id !== user.id && (
+                                            <View style={styles.commentActionContainer}>
+
+                                                <TouchableOpacity style={styles.commentActionButton}>
+                                                    <Text style={{ fontWeight: "500", color: COLOR.color_1 }}>Phản hồi</Text>
+                                                </TouchableOpacity>
+                                            </View>
+                                        )}
                                     </View>
-                                    </View>
-                                    
+
                                 </View>
                             )}
                             keyExtractor={(item, index) => index.toString()}
                             contentContainerStyle={styles.commentList}
-                            
+
                         />
+
                     )}
                 </View>
+
             )}
+            {/* Modal chỉnh sửa */}
+            <Modal
+                isOpen={showModal}
+                animationType="slide"
+                onRequestClose={() => setShowModal(false)}
+            >
+                <View style={styles.modalView}>
+                    <TextInput
+                        style={styles.inputEdit}
+                        placeholder="Nhập nội dung chỉnh sửa..."
+                        value={editingComment}
+                        onChangeText={text => setEditingComment(text)}
+                    />
+
+                    <TouchableOpacity
+                        style={[styles.button, styles.buttonClose, styles.closeButton]}
+                        onPress={() => setShowModal(false)}
+                    >
+                        <FontAwesome name="close" size={24} color="white" />
+                    </TouchableOpacity>
+                    <TouchableOpacity
+                        style={[styles.button, styles.buttonClose, styles.updateButton]}
+                        onPress={() => handleUpdate()}
+                    >
+                        <Text style={styles.textStyle}>Cập nhật</Text>
+
+                    </TouchableOpacity>
+                </View>
+
+            </Modal>
             {/* Ô input nhập bình luận */}
             <View style={styles.fixedInputContainer}>
                 <View style={styles.inputContainer}>
@@ -122,6 +247,7 @@ const Comment = ({ route }) => {
                     </TouchableOpacity>
                 </View>
             </View>
+
         </View>
     );
 };
@@ -151,7 +277,10 @@ const styles = StyleSheet.create({
         alignItems: 'center',
     },
     comment: {
-        fontSize: 16,
+        fontSize: 15,
+        // paddingHorizontal:30,
+        width: "85%",
+        color: COLOR.gray,
     },
     fixedInputContainer: {
         position: 'absolute',
@@ -191,6 +320,89 @@ const styles = StyleSheet.create({
         fontSize: 12,
         color: 'gray',
     },
+    commentActionContainer: {
+        flexDirection: 'row',
+        marginTop: 5,
+        marginLeft: 130
+    },
+    commentActionButton: {
+        marginRight: 10,
+        padding: 5,
+        borderRadius: 10,
+        paddingHorizontal: 10,
+        // backgroundColor: "#fff",
+    },
+    // Các style của component và modal ở đây
+    centeredView: {
+        flex: 1,
+        justifyContent: "center",
+        alignItems: "center",
+        marginTop: 22,
+        backgroundColor: "transparent"
+    },
+    modalView: {
+        margin: 20,
+        backgroundColor: "white",
+        borderRadius: 20,
+        padding: 35,
+        alignItems: "center",
+        shadowColor: "#000",
+        shadowOffset: {
+            width: 0,
+            height: 2
+        },
+        shadowOpacity: 0.25,
+        shadowRadius: 4,
+        elevation: 5
+    },
+    button: {
+        borderRadius: 20,
+        padding: 10,
+        elevation: 2,
+        marginBottom: 10,
+    },
+    buttonClose: {
+        backgroundColor: COLOR.color6,
+        width: '100%',
+        alignItems: 'center',
+        justifyContent: 'center',
+    },
+    closeButton: {
+        position: 'absolute',
+        top: 10,
+        right: 10,
+        width: 40,
+        height: 40,
+        borderRadius: 20,
+        backgroundColor: COLOR.color6,
+        alignItems: 'center',
+        justifyContent: 'center',
+    },
+    updateButton: {
+        backgroundColor: COLOR.PRIMARY,
+        width: '100%',
+        alignItems: 'center',
+        justifyContent: 'center',
+    },
+    textStyle: {
+        color: "white",
+        fontWeight: "bold",
+        textAlign: "center"
+    },
+    modalText: {
+        marginBottom: 15,
+        textAlign: "center",
+        backgroundColor: COLOR.color11,
+        padding: 40,
+    },
+    inputEdit: {
+        backgroundColor: COLOR.bg_color1,
+        padding: 30,
+        width: "100%",
+        marginBottom: 10,
+        borderRadius: 30,
+        marginTop: 30,
+    }
 });
 
 export default Comment;
