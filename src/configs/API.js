@@ -29,6 +29,8 @@ export const endpoints = {
     follow:(idUser) => `/user/${idUser}/follow/`,  // theo dõi - post
     getComment:(idPost) => `/post/${idPost}/comments/`,  // lấy tất cả comment
     getAllPostForRent:"/post/for_rent", //Lây tất cả post tìm nhà
+
+    createPostForRent:"/post/for_rent/", // đăng bài bên người thuê
 };
 
 // Tạo một phiên bản axios với các cài đặt đã được cung cấp

@@ -31,6 +31,7 @@ import { COLOR } from './src/components/common/color';
 import Payment from './src/components/Tenant/Payment';
 import HomeIndex from './src/components/Home/HomeIndex';
 import Comment from './src/components/Home/Comment';
+import CreatePostRent from './src/components/Tenant/CreatePostRent';
 //Điều hướng kiểu stack
 const Stack = createStackNavigator();
 
@@ -78,6 +79,8 @@ export default function App() {
 
           <Stack.Screen name="Payment" component={Payment}
             options={{ headerTitle: 'Thanh toán' }} />
+          <Stack.Screen name="CreatePostRent" component={CreatePostRent}
+            options={{ headerTitle: 'Tạo bài viết' }} />
           <Stack.Screen name="Comment" component={Comment}
             options={{ headerTitle: 'Bình luận' }} />
 
@@ -94,7 +97,7 @@ export default function App() {
             component={DetailOwner}
             options={{
               headerShown: true,// Tắt header cho màn hình Slider
-              headerTitle: 'Thông tin chủ trọ',
+              headerTitle: 'Thông tin chi tiết',
               headerTintColor: COLOR.PRIMARY,
             }}
           />

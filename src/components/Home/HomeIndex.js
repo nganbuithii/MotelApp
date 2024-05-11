@@ -258,6 +258,9 @@ const [tinChoThueActive, setTinChoThueActive] = useState(true);
     setTinTimNhaActive(false);
     setTinChoThueActive(true);
   }
+  const handleCreatePost =async () => {
+    user.user_role=="MOTEL_OWNER" ? navigation.navigate("CreatePost"): navigation.navigate("CreatePostRent");
+  }
   return (
     <View style={MyStyles.container}>
 
@@ -269,7 +272,7 @@ const [tinChoThueActive, setTinChoThueActive] = useState(true);
             source={{ uri: user.avatar }} // Thay đổi đường dẫn của ảnh mặc định
             style={HomeStyles.image}
           />
-          <TouchableOpacity onPress={() => navigation.navigate("CreatePost")}>
+          <TouchableOpacity onPress={handleCreatePost}>
             <View style={HomeStyles.postInputContainer}>
               <Text style={HomeStyles.postInputPlaceholder}>
                 Bạn muốn đăng bài?

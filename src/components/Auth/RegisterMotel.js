@@ -10,7 +10,6 @@ import { MaterialIcons } from "@expo/vector-icons";
 import { Entypo } from "@expo/vector-icons";
 import { Ionicons } from "@expo/vector-icons";
 import ButtonAuth from "../common/ButtonAuth";
-import DataXaPhuong from "../../assets/data/DataXaPhuong";
 import { AntDesign } from '@expo/vector-icons';
 import API, { authApi, endpoints } from "../../configs/API";
 import AsyncStorage from "@react-native-async-storage/async-storage";
