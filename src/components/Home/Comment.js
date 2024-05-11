@@ -80,7 +80,9 @@ const Comment = ({ route }) => {
                     ) : (
                         // Hiển thị danh sách bình luận
                         <FlatList
+                            style={{marginBottom:50}}
                             data={comments}
+                            showsVerticalScrollIndicator={false}
                             renderItem={({ item }) => (
                                 <View style={styles.commentContainer}>
                                     {/* Hiển thị avatar */}
@@ -88,15 +90,20 @@ const Comment = ({ route }) => {
                                         style={styles.avatar}
                                         source={{ uri: item.user.avatar }}
                                     />
+                                    <View>
+                                        <Text tyle={styles.comment}>{item.user.username}</Text>
                                     {/* Nội dung và thời gian của bình luận */}
                                     <View style={styles.commentContent}>
                                         <Text style={styles.comment}>{item.content}</Text>
                                         <Text style={styles.timeAgo}>{calculateTimeAgo(item.created_date)}</Text>
                                     </View>
+                                    </View>
+                                    
                                 </View>
                             )}
                             keyExtractor={(item, index) => index.toString()}
                             contentContainerStyle={styles.commentList}
+                            
                         />
                     )}
                 </View>
