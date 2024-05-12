@@ -1,4 +1,5 @@
 import axios from "axios";
+import { get } from "react-native/Libraries/TurboModule/TurboModuleRegistry";
 
 const HOST ="https://motel.pythonanywhere.com";
 
@@ -33,6 +34,8 @@ export const endpoints = {
     createPostForRent:"/post/for_rent/", // đăng bài bên người thuê
     deleteComment:(idComment) => `/post/comments/${idComment}/`,
     getMotelFilter:"/motels", // lọc trọ theo filter
+    getFollower:(idUser) => `/user/${idUser}/followers/`, // lẤY Ds người mình theo dõi  
+    getFollowing:(idUser) => `/user/${idUser}/following/`, // lẤY Ds người đang theo dõi   mk
     
     
 };

@@ -12,6 +12,7 @@ import API from "../../configs/API";
 import { endpoints, authApi } from "../../configs/API";
 import { ActivityIndicator } from "react-native-paper";
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { COLOR } from "../common/color";
 
 const Login = ({ navigation }) => {
     const [username, setUsername] = useState('');
@@ -28,10 +29,10 @@ const Login = ({ navigation }) => {
                 'Content-Type': 'application/x-www-form-urlencoded' // Change Content-Type
             };
             let data = {
-                username: username,
-                password: password,
-                // username:"ngan",
-                // password:"123456",
+                // username: username,
+                // password: password,
+                username:"ngan",
+                password:"123456",
                 // username:"M",
                 // password:"Meomeo@123",
                 client_id: "8OdjuOvhjzLFCigIbuw3mbDAlhWTirzeM7s1W1g2",
@@ -76,6 +77,8 @@ const Login = ({ navigation }) => {
             }
 
             console.log(userData); // Log thông tin người dùng
+            setUsername("");
+            setPassword("");
         } catch (error) {
             setLoading(false);
 
@@ -140,7 +143,7 @@ const Login = ({ navigation }) => {
 
                     <Text style={AuthStyles.txtLeft}>Quên mật khẩu?</Text>
 
-                    {loading ? (<ActivityIndicator />) : (
+                    {loading ? (<ActivityIndicator color={COLOR.PRIMARY}/>) : (
                         <ButtonAuth title="Đăng nhập" onPress={loginApp} />)}
 
 

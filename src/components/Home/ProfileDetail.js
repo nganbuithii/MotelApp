@@ -10,11 +10,15 @@ import API, { authApi, endpoints } from '../../configs/API';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Toast from 'react-native-toast-message';
 import MyStyles from '../../Styles/MyStyles';
+import showToast from '../common/ToastMessage';
+import Modal from 'react-native-modalbox';
+
+import { FlatList } from 'react-native-gesture-handler';
 
 
 const ProfileDetail = () => {
     const [user, dispatch] = useContext(MyContext);
-    
+
     const [upuser, setUpuser] = useState(user);
     const [dialog, setDialog] = useState(false);
     const [image, setImage] = useState(null);
@@ -24,13 +28,16 @@ const ProfileDetail = () => {
     const [email, setEmail] = useState(user.email);
     const [username, setUsername] = useState(user.username);
     const [phoneNumber, setPhoneNumber] = useState(user.phone);
-    const [isInfoChanged, setIsInfoChanged] = useState(false); // Thêm state để kiểm tra xem thông tin có thay đổi hay không
+    const [modalVisible, setModalVisible] = useState(false);
+    const [follower, setFollower] = useState([]);
+    const [following, setFollowing] = useState([]);
+    // const [isInfoChanged, setIsInfoChanged] = useState(false); // Thêm state để kiểm tra xem thông tin có thay đổi hay không
     const checkForCameraRollPermission = async () => {
         const { status } = await ImagePicker.getMediaLibraryPermissionsAsync();
         if (status !== "granted") {
-            alert(
-                "Please grant camera roll permissions inside your system's settings"
-            );
+            // alert(
+            //     "Please grant camera roll permissions inside your system's settings"
+            // );
         } else {
             console.log("Media Permissions are granted");
         }
@@ -53,15 +60,7 @@ const ProfileDetail = () => {
 
         }
     };
-    const showToast = () => {
-        Toast.show({
-            type: 'success',
-            text1: 'Thành công',
-            text2: 'Thông tin của bạn đã được cập nhật.',
-            visibilityTime: 5000, // Thời gian tồn tại của toast (milliseconds)
-            autoHide: true, // Tự động ẩn toast sau khi hết thời gian tồn tại
-        });
-    }
+
     const handleUpdate = async () => {
         const isInfoChanged = lastname !== user.last_name || username !== user.username || email !== user.email || phoneNumber !== user.phone || image !== null;
 
@@ -100,26 +99,75 @@ const ProfileDetail = () => {
             // Cập nhật thông tin người dùng toàn cục
             dispatch({ type: 'update_user', payload: res.data });
             // Hiển thị toast khi cập nhật thành công
-            showToast();
+            showToast({ type: "success", text1: "Thành công", text2: "Cập nhật thông tin thành công " });
+            // showToast();
         } catch (ex) {
             Alert.alert("Lỗi", "Lỗi cập nhật thông tin hồ sơ!")
             console.error(ex);
         }
     }
+    const getFollow = async () => {
+        try {
+            const token = await AsyncStorage.getItem("access-token");
+            let res = await authApi(token).get(endpoints["getFollower"](user.id));
+            console.log(res.data);
+            console.log(token);
+            setFollower(res.data);
+            setModalVisible(true);
+        } catch (ex) {
+            console.error(ex);
+        }
+    }
+    const unFollow = async (id) => {
+        try {
+            const token = await AsyncStorage.getItem("access-token");
+            await authApi(token).post(endpoints["follow"](id));
+            console.log("Hủy follow");
+            getFollowing();
+            dispatch({ type: 'update_user', payload: { ...user, following_count: user.following_count - 1 } }); // Cập nhật số người đang theo dõi
 
-    // // Sử dụng useEffect để theo dõi sự thay đổi của thông tin người dùng toàn cục
-    // useEffect(() => {
-    //     setIsInfoChanged(lastname !== '' || username !== '' || email !== '' || phoneNumber !== '');
-    // }, [lastname, username, email, phoneNumber]);
+        } catch (EX) {
+            console.error(EX);
+        }
+    }
+
+    const getFollowing = async () => {
+        try {
+            const token = await AsyncStorage.getItem("access-token");
+            let res = await authApi(token).get(endpoints["getFollowing"](user.id));
+            console.log("FOLLOWWING", res.data);
+            setFollowing(res.data);
+            setModalVisible(true);
+        } catch (ex) {
+            console.error(ex);
+        }
+    }
+    const renderItem = ({ item }) => (
+        <View style={styles.itemContainer}>
+            {following.length > 0 ? (
+                <>
+                    <Image
+                        source={{ uri: item.avatar }}
+                        style={styles.avatarMd}
+                    />
+                    <Text style={styles.usernameMd}>ID:{item.id}{item.username}</Text>
+                    <TouchableOpacity onPress={() => unFollow(item.id)} style={styles.unfollowButton}>
+                        <Text style={{ color: "#fff" }}>Hủy Follow</Text>
+                    </TouchableOpacity>
+                </>
+            ) : (
+                <Text style={styles.noFollowText}>Bạn chưa theo dõi ai</Text>
+
+            )}
+        </View>
+    );
 
     return (
         <View style={styles.containerDetail}>
-
             <Image
-                source={require('../../assets/images/5.jpg')} // Sử dụng ảnh mới nếu có, nếu không sử dụng avatar, nếu không có avatar sử dụng ảnh mặc định
+                source={image ? { uri: image } : avatar ? { uri: avatar } : require('../../assets/images/avt.png')} // Sử dụng ảnh mới nếu có, nếu không sử dụng avatar, nếu không có avatar sử dụng ảnh mặc định
                 style={styles.imgBg}
             />
-
             <View style={styles.containerAvt}>
                 <TouchableOpacity onPress={addImage} >
                     <Image
@@ -128,20 +176,39 @@ const ProfileDetail = () => {
                     />
                     <AntDesign name="camera" style={styles.iconCam} size={20} color={COLOR.PRIMARY} />
                 </TouchableOpacity>
-                <Text style={{textAlign:"center", color:"green", fontSize:20, fontWeight:"500"}}>{user.username}</Text>
+                <Text style={{ textAlign: "center", color: "green", fontSize: 20, fontWeight: "500" }}>{user.username}</Text>
             </View>
 
 
             <View style={MyStyles.flex}>
-                <View style={styles.badgeContainer}>
+                <TouchableOpacity style={styles.badgeContainer} onPress={getFollow}>
                     <Text style={styles.badgeText}>{user.follower_count}</Text>
                     <Text style={styles.badgeLabel}>Người theo dõi</Text>
-                </View>
-                <View style={styles.badgeContainer}>
+                </TouchableOpacity>
+                <TouchableOpacity style={styles.badgeContainer} onPress={getFollowing} >
                     <Text style={styles.badgeText}>{user.following_count}</Text>
                     <Text style={styles.badgeLabel}>Đang theo dõi</Text>
-                </View>
+                </TouchableOpacity>
             </View>
+            <Modal
+                style={[styles.modal, styles.centralModal]}
+                isOpen={modalVisible}
+                onClosed={() => setModalVisible(false)}
+                position={"center"}
+                backdropPressToClose={true}
+            >
+                <View style={styles.modalContent}>
+                    <TouchableOpacity onPress={() => setModalVisible(false)} style={styles.closeButton}>
+                        <AntDesign name="close" size={24} color="#fff" />
+                    </TouchableOpacity>
+                    <Text style={styles.modalTitle}>Danh sách người theo dõi</Text>
+                    <FlatList
+                        data={following}
+                        renderItem={renderItem}
+                        keyExtractor={item => item.id.toString()}
+                    />
+                </View>
+            </Modal>
 
 
 
@@ -194,7 +261,7 @@ const styles = StyleSheet.create({
         paddingHorizontal: 20,
         width: '100%',
         backgroundColor: "#fff",
-        position:"relative"
+        position: "relative"
     },
     avatar: {
         width: 120,
@@ -202,7 +269,7 @@ const styles = StyleSheet.create({
         marginBottom: 5,
         borderRadius: 100, // Đặt borderRadius thành nửa chiều rộng (200 / 2 = 100)
         borderWidth: 5,
-        borderColor:"#fff",
+        borderColor: "#fff",
         // position: 'relative',
         // aspectRatio: 1, // Đảm bảo tỷ lệ khung hình là 1:1
     },
@@ -221,22 +288,22 @@ const styles = StyleSheet.create({
         height: 40,
         borderColor: "gray",
         borderWidth: 0.3,
-        paddingVertical:10,
-        paddingHorizontal:10,
+        paddingVertical: 10,
+        paddingHorizontal: 10,
         borderRadius: 5,
         width: '100%',
-        fontSize:16,
-        color:"gray",
-        
+        fontSize: 16,
+        color: "gray",
+
     },
     iconCam: {
         position: 'absolute',
         bottom: 10,
         right: 10,
         color: "black",
-        backgroundColor:"#fff",
-        borderRadius:50,
-        padding:3
+        backgroundColor: "#fff",
+        borderRadius: 50,
+        padding: 3
     },
     badgeContainer: {
         backgroundColor: COLOR.offWhite, // Màu nền của badge
@@ -268,14 +335,76 @@ const styles = StyleSheet.create({
         width: "100%",
         height: 100,
         opacity: 0.3,
-        // position:"relative"
     },
-    containerAvt:{
-    // position:"absolute",
-    // top:30
-    top:-60,
-    flexDirection:"column"
+    containerAvt: {
+        top: -60,
+        flexDirection: "column"
 
+    },
+    itemContainer: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'space-between', // Để các phần tử nằm ngang và đều nhau
+        marginBottom: 20, // Thay đổi khoảng cách giữa các mục nếu cần
+        paddingHorizontal: 20, // Thay đổi khoảng cách từ mép trái đến phần tử đầu tiên nếu cần
+        paddingVertical: 10, // Thay đổi khoảng cách dọc của mỗi mục nếu cần
+        backgroundColor: COLOR.bg_color1,
+        borderRadius: 30,
+        ...SHADOWS.medium
+    },
+
+    modal: {
+        justifyContent: 'center',
+        alignItems: 'center'
+    },
+    centralModal: {
+        width: '80%',
+        height: '80%',
+        backgroundColor: 'white',
+        borderRadius: 10,
+        padding: 20
+    },
+    modalContent: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center'
+    },
+    modalTitle: {
+        fontSize: 18,
+        fontWeight: 'bold',
+        marginBottom: 10,
+        marginTop: 30,
+    },
+    closeButton: {
+        position: 'absolute',
+        top: -40,
+        right: -50,
+        padding: 10,
+        backgroundColor: COLOR.PRIMARY,
+        borderRadius: 50,
+    },
+    noFollowText: {
+        color: "black",
+        fontWeight: "500",
+
+    },
+    avatarMd: {
+        width: 80,
+        height: 80,
+        borderRadius: 50,
+        marginLeft: "auto",
+        marginRight: 25,
+    },
+    usernameMd: {
+        fontSize: 20,
+        fontWeight: "bold",
+        // marginRight: 50,
+    },
+    unfollowButton: {
+        padding: 7,
+        backgroundColor: COLOR.PRIMARY,
+        borderRadius: 10,
+        marginLeft: 20,
     }
 });
 

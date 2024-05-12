@@ -76,6 +76,12 @@ const DetailOwner = ({ route }) => {
             console.log("follow họ thành công");
             setRender(!render);
             setIsFollowing(!isFollowing);
+            if(follow ==false){
+                dispatch({ type: 'update_user', payload: { ...user, following_count: user.following_count +1 } }); // Cập nhật số người đang theo dõi
+            }else{
+                dispatch({ type: 'update_user', payload: { ...user, following_count: user.following_count -1 } }); // Cập nhật số người đang theo dõi
+            }
+            
         } catch (ex) {
             console.error(ex);
         }
