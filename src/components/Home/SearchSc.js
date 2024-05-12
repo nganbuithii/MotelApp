@@ -1,6 +1,7 @@
 import React, { useContext, useState, useEffect } from "react";
 import {
-  View, Text, TextInput, TouchableOpacity, StyleSheet, ScrollView, Image, ActivityIndicator,  } from "react-native";
+  View, Text, TextInput, TouchableOpacity, StyleSheet, ScrollView, Image, ActivityIndicator,
+} from "react-native";
 import { COLOR, SHADOWS } from "../common/color";
 import RNPickerSelect from "react-native-picker-select";
 import { FontAwesome, FontAwesome5, MaterialIcons, Octicons } from "@expo/vector-icons";
@@ -142,7 +143,7 @@ const SearchSc = () => {
       console.log("ok");
       console.log(res.data);
       setData(res.data.results);
-      
+
     } catch (ex) {
       console.error(ex);
     }
@@ -161,6 +162,7 @@ const SearchSc = () => {
     <View style={SearchStyle.itemContainer}>
       <Image source={require('../../assets/images/1.jpg')} style={SearchStyle.image} />
       <View style={SearchStyle.infoContainer}>
+        <Text>{item.id}</Text>
         <Text style={SearchStyle.title}><Octicons name="location" size={15} color={COLOR.PRIMARY} />ㅤ{item.city}</Text>
         <Text><Octicons name="location" size={15} color={COLOR.PRIMARY} />ㅤ{item.district}</Text>
         <Text><Octicons name="location" size={15} color={COLOR.PRIMARY} />ㅤ{item.other_address}</Text>
@@ -175,13 +177,17 @@ const SearchSc = () => {
   );
   return (
     <View style={SearchStyle.container}>
+      <Image
+        source={require("../../assets/images/green.jpg")}
+        style={SearchStyle.backgroundImage}
+      />
 
       <View style={HomeStyles.tab} >
         <MaterialCommunityIcons name="filter-menu" size={24} color={COLOR.PRIMARY} style={HomeStyles.bellIcon} />
         <Text style={HomeStyles.textHead}>Lọc tìm kiếm </Text>
 
       </View>
-      <TouchableOpacity  style={SearchStyle.xoaLoc} onPress={handleClearFilter}>
+      <TouchableOpacity style={SearchStyle.xoaLoc} onPress={handleClearFilter}>
         <MaterialIcons name="filter-alt-off" size={24} color="black" />
         <Text> Xóa lọc</Text>
       </TouchableOpacity>
@@ -192,7 +198,7 @@ const SearchSc = () => {
             value={city}
             onValueChange={(value) => {
               setCity(value);
-              handleCityChange(value); 
+              handleCityChange(value);
             }}
             placeholder={{ label: 'Chọn tỉnh/thành phố', value: null }}
             items={cities.map(city => ({ label: city.full_name, value: city.full_name }))}
@@ -277,14 +283,15 @@ const SearchSc = () => {
         </View>
 
         {searchStarted ? (
-  <View>
-    {data.length > 0 ? (
-      data.map(item => renderItem({ item, key: item.id })) // Thêm key cho mỗi phần tử
-    ) : (
-      <Text style={SearchStyle.noResultText} key="no-result">Không tìm thấy kết quả phù hợp.</Text>
-    )}
-  </View>
-) : null}
+          <View>
+            {data.length > 0 ? (
+             data.map((item, index) => renderItem({item}))
+
+            ) : (
+              <Text style={SearchStyle.noResultText} key="no-result">Không tìm thấy kết quả phù hợp.</Text>
+            )}
+          </View>
+        ) : null}
 
 
       </ScrollView>

@@ -19,7 +19,7 @@ import showToast from "../common/ToastMessage";
 import { FontAwesome } from '@expo/vector-icons';
 import RentPostsList from "./RentPostList";
 
-const HomeIndex = ({ route }) => {
+const HomeIndex = ({ route }) => {  
   const [postContent, setPostContent] = useState("");
   const [user, dispatch] = useContext(MyContext);
   const navigation = useNavigation();
@@ -29,6 +29,9 @@ const HomeIndex = ({ route }) => {
   const [showOptions, setShowOptions] = useState({});
   const [selectedHouse, setSelectedHouse] = useState(null);
   const [loading, setLoading] = useState(false);
+
+  const [fetchPage, setFetchPage] = useState(false);
+  
 
   // const [showHouseList, setShowHouseList] = useState(true);
   const [modalsEdit, setModalsEdit] = useState({});
@@ -108,12 +111,19 @@ const HomeIndex = ({ route }) => {
       // console.log(token);
       // console.log(postId);
       await authApi(token).post(endpoints['likePost'](postId));
-      // console.log("like bài thành công");
-      setRender(!render);
+      console.log("like bài thành công");
+      // setRender(!render);
       // Cập nhật likedState sau khi thay đổi trạng thái like
-      const newLikedState = { ...likedState };
-      newLikedState[postId] = !newLikedState[postId];
-      setLikedState(newLikedState);
+       // Cập nhật trạng thái liked cho bài đăng đã được thích trong state likedState
+    setLikedState(prevLikedState => ({ ...prevLikedState, [postId]: true }));
+    
+    // Cập nhật bài đăng được thích trong state posts
+    setPosts(prevPosts => prevPosts.map(post => {
+      if (post.id === postId) {
+        return { ...post, liked: true };
+      }
+      return post;
+    }));
     } catch (ex) {
       console.error(ex);
       console.log("Lỗi like bài");
@@ -281,12 +291,13 @@ const HomeIndex = ({ route }) => {
       if (newData && newData.length > 0) {
         setPosts(prevPosts => [...prevPosts, ...newData]);
       }
+      setFetchPage(true);
     } catch (ex) {
       console.error(ex);
     }
   }
   const handleScroll = (event) => {
-    console.log("Hàm đc gọi");
+    // console.log("Hàm đc gọi");
     const { layoutMeasurement, contentOffset, contentSize } = event.nativeEvent;
     // console.log(layoutMeasurement);
     // console.log(contentOffset);
@@ -297,6 +308,10 @@ const HomeIndex = ({ route }) => {
       fetchNextPagePost();
     }
   };
+  const handleDetail = (idMotel) => {
+    console.log(idMotel);
+    navigation.navigate("PostDetail", {idMotel: idMotel})
+  }
   return (
     <View style={MyStyles.container}>
 
@@ -324,7 +339,7 @@ const HomeIndex = ({ route }) => {
           
 
         </View>
-        <TouchableOpacity onPress={fetchNextPagePost}><Text>khfwkehf</Text></TouchableOpacity>
+        {/* <TouchableOpacity onPress={fetchNextPagePost}><Text>khfwkehf</Text></TouchableOpacity> */}
         <View style={styles.buttonContainer}>
           <TouchableOpacity style={[styles.buttonLoc, tinChoThueActive ? styles.activeButton : null]} onPress={handleTinChoThue}>
             <Text style={[styles.buttonText, tinChoThueActive ? styles.activeButtonText : null]}>Tin bài cho thuê<FontAwesome name="home" size={15} color="#fff" /></Text>
@@ -386,34 +401,27 @@ const HomeIndex = ({ route }) => {
                     value={content}
                     placeholder="Nội dung mới"
                   />
-                  <Text style={{ color: "#fff" }}>Chọn nhà trọ khác</Text>
+                   <Text style={{ color: "#fff" }}>Chọn nhà trọ khác</Text>
                   <View style={styles.container}>
-                    {displayRentPosts ? (
-                      // Dành cho bài đăng thuê
-                      post.motel && (
-                        <TouchableOpacity
-                          key={post.motel.id.toString()}
-                          onPress={() => selectHouse(post.motel)}
-                        >
-                          <Text style={styles.houseItem}>
-                            {post.motel.title}: {post.motel.ward}, {post.motel.district}, {post.motel.city}
-                            {selectedHouse && selectedHouse.id === post.motel.id && (
-                              <MaterialCommunityIcons
-                                name="check"
-                                size={24}
-                                color="green"
-                                style={{ position: "absolute", right: 10 }}
-                              />
-                            )}
-                          </Text>
-                        </TouchableOpacity>
-                      )
-                    ) : (
-                      // Dành cho bài đăng tìm nhà
-                      <Text style={styles.houseItem}>
-                        {post.ward}, {post.district}, {post.city}
-                      </Text>
-                    )}
+                    {motels.map((item) => (
+                      <TouchableOpacity
+                        key={item.id.toString()}
+                        onPress={() => selectHouse(item)}
+                      >
+                        <Text style={styles.houseItem}>
+                          {item.title}: {item.ward}, {item.district}, {item.city}
+                          {selectedHouse && selectedHouse.id === item.id && (
+                            <MaterialCommunityIcons
+                              name="check"
+                              size={24}
+                              color="green"
+                              style={{ position: "absolute", right: 10 }}
+                            />
+                          )}
+                        </Text>
+                      </TouchableOpacity>
+                    ))}
+
                   </View>
 
                   <View style={{ flexDirection: "row" }}>
@@ -428,7 +436,7 @@ const HomeIndex = ({ route }) => {
               </Modal>
             )}
 
-            <TouchableWithoutFeedback onPress={() => navigation.navigate("PostDetail")}>
+            <TouchableWithoutFeedback onPress={()=>handleDetail(post.motel.id)}>
               <View>
                 <View style={{ flexDirection: "row" }}>
                   <Entypo name="location-pin" size={20} color="orange" />

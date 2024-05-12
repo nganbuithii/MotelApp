@@ -213,20 +213,20 @@ const PlusOwner = () => {
                                 <View style={{ flexDirection: "row" }}>
                                     <View style={styles.tag}>
                                         <MaterialIcons name="attach-money" style={styles.iconTag} size={20} color="green" />
-                                        <Text style={{ fontSize: 12 }}>{item.price}</Text>
+                                        <Text style={{ fontSize: 12 }}>{item.price} VNĐ</Text>
                                     </View>
                                     <View style={styles.tag}>
                                         <FontAwesome6 name="house-chimney-window" style={styles.iconTag} size={20} color="green" />
-                                        <Text style={{ fontSize: 12 }}>{item.area}</Text>
+                                        <Text style={{ fontSize: 12 }}>{item.area} m2</Text>
                                     </View>
                                     <View style={styles.tag}>
                                         <FontAwesome name="users" style={styles.iconTag} size={20} color="green" />
-                                        <Text>{item.max_people}</Text>
+                                        <Text>{item.max_people} Người</Text>
                                     </View>
                                 </View>
                                 <View style={{ flexDirection: "row", marginBottom: 10 }}>
                                     <FontAwesome6 style={styles.iconTag} name="location-dot" size={20} color="green" />
-                                    <Text style={{ fontSize: 12 }}>{item.other_address}</Text>
+                                    <Text style={{ fontSize: 12 }}>{item.ward}- {item.district}- {item.city}</Text>
                                 </View>
                             </View>
                             <FlatList
@@ -316,7 +316,10 @@ const styles = StyleSheet.create({
         borderRadius: 20,
         ...SHADOWS.medium,
         flexDirection: "row",
-        marginTop: 10
+        marginTop: 10,
+        paddingBottom:15,
+        paddingHorizontal:20,
+
     },
     containerMotel: {
         width: "98%",
@@ -337,21 +340,16 @@ const styles = StyleSheet.create({
     },
     tag: {
         flexDirection: "row",
-        // borderColor:"green",
-        // borderWidth:1,
-        // width: 180,
-        padding: 3,
+        padding: 5,
         borderRadius: 10,
-        // backgroundColor:COLOR.offWhite,
+        backgroundColor:COLOR.color11,
         marginTop: 3,
         marginLeft: 5,
         borderRadius: 20,
-        // ...SHADOWS.medium,
-        marginBottom: 5,
+        marginBottom: 20,
         borderColor: COLOR.offWhite,
-        borderWidth: 1,
+        paddingRight:10,
 
-        // ...SHADOWS.sma
     }
     , iconTag: {
         paddingHorizontal: 10
