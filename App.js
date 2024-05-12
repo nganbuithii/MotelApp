@@ -31,6 +31,7 @@ import Payment from './src/components/Tenant/Payment';
 import HomeIndex from './src/components/Home/HomeIndex';
 import Comment from './src/components/Home/Comment';
 import CreatePostRent from './src/components/Tenant/CreatePostRent';
+
 //Điều hướng kiểu stack
 const Stack = createStackNavigator();
 
@@ -121,30 +122,27 @@ export default function App() {
               component={Home} 
               options={{ headerShown: false }}/> */}
 
-          {user === null ?
-            <>
-              <Stack.Screen
-                name="Login"
-                component={Login}
-                options={{ headerShown: false }} // Tắt header cho màn hình Login
-              />
-            </> :
-            <>
-              <Stack.Screen
-                name="Home"
-                component={Home}
-                options={{
-                  headerLeft: null, // Tắt icon back
-                  headerShown: false,
-                  headerTitle: "NACA",
-                }} />
-              <Stack.Screen
-                name="RegisterMotel"
-                component={RegisterMotel}
-                options={{ headerShown: false }} // Tắt header cho màn hình Slider
-              />
-            </>
-          }
+
+          <Stack.Screen
+            name="Login"
+            component={Login}
+            options={{ headerShown: false }} // Tắt header cho màn hình Login
+          />
+
+
+          <Stack.Screen
+            name="Home"
+            component={Home}
+            options={{
+              headerLeft: null, // Tắt icon back
+              headerShown: false,
+              headerTitle: "NACA",
+            }} />
+          <Stack.Screen
+            name="RegisterMotel"
+            component={RegisterMotel}
+            options={{ headerShown: false }} // Tắt header cho màn hình Slider
+          />
 
           <Stack.Screen
             name="Register"
