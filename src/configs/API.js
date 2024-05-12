@@ -32,6 +32,7 @@ export const endpoints = {
     getAllPostForRent:"/post/for_rent", //Lây tất cả post tìm nhà
     createPostForRent:"/post/for_rent/", // đăng bài bên người thuê
     deleteComment:(idComment) => `/post/comments/${idComment}/`,
+    getMotelFilter:"/motels", // lọc trọ theo filter
     
     
 };

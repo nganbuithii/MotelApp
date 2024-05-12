@@ -13,7 +13,6 @@ import Home from './src/components/Home/Home';
 import MyUserReducer from './reducer/MyUserReducer';
 import MyContext from './src/configs/MyContext';
 import ProfileDetail from './src/components/Home/ProfileDetail';
-import SearchFilter from './src/components/Home/SearchFilter';
 import RegisterMotel from './src/components/Auth/RegisterMotel';
 import UploadImgHouse from './src/components/Auth/UploadImgHouse';
 import PostDetail from './src/components/Home/PostDetail';
@@ -59,8 +58,7 @@ export default function App() {
             options={{ headerTitle: 'Tài khoản của bạn' }} />
           <Stack.Screen name="HomeIndex" component={HomeIndex}
             options={{ headerShown: false }} />
-          <Stack.Screen name="SearchFilter" component={SearchFilter}
-            options={{ headerTitle: 'Lọc kết quả tìm kiếm' }} />
+
           <Stack.Screen name="NotificationsSc" component={NotificationsSc}
             options={{ headerTitle: 'Thông báo' }} />
           <Stack.Screen name="PlusOwner" component={PlusOwner}

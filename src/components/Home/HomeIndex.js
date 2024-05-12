@@ -268,10 +268,11 @@ const HomeIndex = ({ route }) => {
       setLoading(true); // Đánh dấu loading khi bắt đầu fetch dữ liệu
       const nextPage = page + 1;
       setPage(nextPage);
+      console.log("PAGE:", nextPage);
       console.log("fetchNextPagePost được gọi khi cuộn đến cuối view");
       const token = await AsyncStorage.getItem("access-token");
       let res = await authApi(token).get(endpoints["getAllPostForOwner"], {
-        params: { page: page}
+        params: { page: nextPage}
       });
       const newData = res.data.results;
       console.log("Data mới được fetch",res.data.results);
@@ -285,13 +286,14 @@ const HomeIndex = ({ route }) => {
     }
   }
   const handleScroll = (event) => {
-    // console.log("Hàm đc gọi");
+    console.log("Hàm đc gọi");
     const { layoutMeasurement, contentOffset, contentSize } = event.nativeEvent;
     // console.log(layoutMeasurement);
     // console.log(contentOffset);
     // console.log("CONTENT SIZE",contentSize);
     // Kiểm tra nếu nội dung đã cuộn đến cuối và không đang loading thì fetch dữ liệu mới
     if (layoutMeasurement.height + contentOffset.y >= contentSize.height-1000 && !loading) {
+      console.log("ok");
       fetchNextPagePost();
     }
   };
@@ -332,8 +334,8 @@ const HomeIndex = ({ route }) => {
             <Text style={[styles.buttonText, tinTimNhaActive ? styles.activeButtonText : null]}>Tin tìm nhà<FontAwesome5 name="search" size={15} color="#fff" /></Text>
           </TouchableOpacity>
         </View>
-        {posts.map((post) => (
-          <View key={post.id} style={styles.myPost}>
+        {posts.map((post, index) => (
+          <View key={index} style={styles.myPost}>
             <Text>id: {post.id}</Text>
 
             <View style={styles.postContainer}>
