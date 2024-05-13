@@ -159,7 +159,7 @@ const SearchSc = () => {
     setData([]);
   };
   const renderItem = ({ item }) => (
-    <View style={SearchStyle.itemContainer}>
+    <View style={SearchStyle.itemContainer} key={item.id}>
       <Image source={require('../../assets/images/1.jpg')} style={SearchStyle.image} />
       <View style={SearchStyle.infoContainer}>
         <Text>{item.id}</Text>

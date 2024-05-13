@@ -29,6 +29,7 @@ const ProfileDetail = () => {
     const [username, setUsername] = useState(user.username);
     const [phoneNumber, setPhoneNumber] = useState(user.phone);
     const [modalVisible, setModalVisible] = useState(false);
+    const [modalVisible1, setModalVisible1] = useState(false);
     const [follower, setFollower] = useState([]);
     const [following, setFollowing] = useState([]);
     // const [isInfoChanged, setIsInfoChanged] = useState(false); // Thêm state để kiểm tra xem thông tin có thay đổi hay không
@@ -113,7 +114,7 @@ const ProfileDetail = () => {
             console.log(res.data);
             console.log(token);
             setFollower(res.data);
-            setModalVisible(true);
+            setModalVisible1(true);
         } catch (ex) {
             console.error(ex);
         }
@@ -161,6 +162,25 @@ const ProfileDetail = () => {
             )}
         </View>
     );
+    const renderItem1 = ({ item }) => (
+        <View style={styles.itemContainer}>
+            {follower.length > 0 ? (
+                <>
+                    <Image
+                        source={{ uri: item.avatar }}
+                        style={styles.avatarMd}
+                    />
+                    <Text style={styles.usernameMd}>ID:{item.id}{item.username}</Text>
+                    {/* <TouchableOpacity onPress={() => unFollow(item.id)} style={styles.unfollowButton}>
+                        <Text style={{ color: "#fff" }}>Hủy Follow</Text>
+                    </TouchableOpacity> */}
+                </>
+            ) : (
+                <Text style={styles.noFollowText}>Bạn chưa theo dõi ai</Text>
+
+            )}
+        </View>
+    );
 
     return (
         <View style={styles.containerDetail}>
@@ -201,10 +221,29 @@ const ProfileDetail = () => {
                     <TouchableOpacity onPress={() => setModalVisible(false)} style={styles.closeButton}>
                         <AntDesign name="close" size={24} color="#fff" />
                     </TouchableOpacity>
-                    <Text style={styles.modalTitle}>Danh sách người theo dõi</Text>
+                    <Text style={styles.modalTitle}>Danh sách người đang theo dõi</Text>
                     <FlatList
                         data={following}
                         renderItem={renderItem}
+                        keyExtractor={item => item.id.toString()}
+                    />
+                </View>
+            </Modal>
+            <Modal
+                style={[styles.modal, styles.centralModal]}
+                isOpen={modalVisible1}
+                onClosed={() => setModalVisible(false)}
+                position={"center"}
+                backdropPressToClose={true}
+            >
+                <View style={styles.modalContent}>
+                    <TouchableOpacity onPress={() => setModalVisible(false)} style={styles.closeButton}>
+                        <AntDesign name="close" size={24} color="#fff" />
+                    </TouchableOpacity>
+                    <Text style={styles.modalTitle}>Danh sách người theo dõi</Text>
+                    <FlatList
+                        data={follower}
+                        renderItem={renderItem1}
                         keyExtractor={item => item.id.toString()}
                     />
                 </View>
