@@ -13,6 +13,7 @@ import { Feather } from '@expo/vector-icons';
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { authApi, endpoints } from "../../configs/API";
 import showToast from "../common/ToastMessage";
+import * as ImagePicker from "expo-image-picker";
 
 const CreatePostRent = ({ navigation }) => {
     const [cities, setCities] = useState([]); // State để lưu trữ danh sách các tỉnh/thành phố
@@ -21,12 +22,48 @@ const CreatePostRent = ({ navigation }) => {
 
     const [user, dispatch] = useContext(MyContext);
     const [loading, setLoading] = useState(false);
-    const [desc, setDesc] = useState(null);
     const [ward, setWard] = useState(null);
     const [district, setDistrict] = useState(null);
     const [city, setCity] = useState(null);
     const [other, setOther] = useState(null);
     const [content, setContent] = useState();
+    const [image, setImage] = useState(null);
+
+    const [contentError, setContentError] = useState("");
+    const [imgErr, setImgErr] = useState("");
+    const [wardErr, setWardErr] = useState("");
+    const [cityErr, setCityErr] = useState("");
+    const [districtErr, setDistrictErr] = useState("");
+    const [otherErr, setOtherErr] = useState("");
+
+
+    const checkForCameraRollPermission = async () => {
+        const { status } = await ImagePicker.getMediaLibraryPermissionsAsync();
+        if (status !== "granted") {
+            console.log("Please grant camera roll permissions inside your system's settings");
+            // alert(
+
+            // );
+        } else {
+            console.log("Media Permissions are granted");
+        }
+    };
+
+    useEffect(() => {
+        checkForCameraRollPermission();
+    }, []);
+    const addImage = async () => {
+        let image = await ImagePicker.launchImageLibraryAsync({
+            mediaTypes: ImagePicker.MediaTypeOptions.Images,
+            allowsEditing: true,
+            aspect: [4, 3],
+            quality: 1,
+        });
+        console.log(JSON.stringify(image));
+        if (!image.canceled) {
+            setImage(image.assets[0].uri);
+        }
+    };
 
 
     // Hàm để lấy danh sách quận/huyện dựa trên tỉnh/thành phố được chọn
@@ -107,20 +144,43 @@ const CreatePostRent = ({ navigation }) => {
     };
     const handleSubmit = async () => {
         try {
+            if (!content) { setContentError("Vui lòng nhập mô tả"); } else { setContentError(""); }
+            if (!image) { setImgErr("Vui lòng chọn hình ảnh"); } else { setImgErr(""); }
+            if (!ward) { setWardErr("Vui lòng chọn xã phường"); } else { setWardErr(""); }
+            if (!city) { setCityErr("Vui lòng chọn thành phố"); } else { setCityErr(""); }
+            if (!district) { setDistrictErr("Vui lòng chọn quận huyện"); } else { setDistrictErr(""); }
+            if (!other) { setOtherErr("Vui lòng chọn quận huyện"); } else { setOtherErr(""); }
+            if (content && ward && district && city && other && image) {
             let token = await AsyncStorage.getItem("access-token");
+            console.log(token);
             const formData = new FormData();
-            let res = await authApi(token).post(endpoints["createPostForRent"], formData, {
-                headers: {
-                    'Content-Type': 'multipart/form-data',
-                },
-            });
-            console.log("Đăng bài thành công");
-            
-            navigation.navigate("HomeIndex",{myPost: res.data})
+            formData.append("content", content);
+            formData.append("ward", getWardNameById(ward));
+            formData.append("city", getCityNameById(city));
+            formData.append("district", getDistrictNameById(district));
+            formData.append("other_address", other);
+            const uriParts = image.split('.');
+            const fileType = uriParts[uriParts.length - 1];
+            const img = {
+                uri: image,
+                name: `image.${fileType}`,
+                type: `image/${fileType}`,
+            }
+
+            formData.append('image', img);
+           
+                let res = await authApi(token).post(endpoints["createPostForRent"], formData, {
+                    headers: {
+                        'Content-Type': 'multipart/form-data',
+                    },
+                });
+                console.log("Đăng bài thành công");
+
+                navigation.navigate("HomeIndex", { myPost: res.data })
+            }
+
         } catch (ex) {
             console.error(ex);
-            showToast({ type: "error", text1: "Lỗi Đăng bài", text2: "Hãy thử lại sau " });
-
         }
     };
 
@@ -142,21 +202,35 @@ const CreatePostRent = ({ navigation }) => {
                 <View>
 
                     <Text style={styles.sectionTitle}>Mô tả</Text>
+                    {!!contentError && <Text style={styles.errorText}><Ionicons name="warning" size={12} color="red" />{contentError}</Text>}
                     <View style={styles.inputContainer}>
                         <TextInput placeholder="Hãy viết nội dung cho bài viết của bạn?" style={styles.input} multiline={true} value={content} onChangeText={(text) => setContent(text)}
-                            onFocus={() => setContentError("")} />
+                        />
                     </View>
-                    <TouchableOpacity style={styles.uploadButton}>
+                    {!!imgErr && <Text style={styles.errorText}><Ionicons name="warning" size={12} color="red" />{imgErr}</Text>}
+                    <TouchableOpacity style={styles.uploadButton} onPress={addImage}>
                         <Ionicons name="camera" size={24} color="lightgreen" />
                         <Text style={styles.uploadText}>Thêm hình ảnh</Text>
                     </TouchableOpacity>
+                    {image && (
+                        <View style={styles.imageContainer}>
+                            <Image
+                                source={{ uri: image }}
+                                style={styles.selectedImage}
+                            />
+                            <TouchableOpacity style={styles.deleteImageButton} onPress={() => setImage("")}>
+                                <Ionicons name="close-circle-outline" size={24} color="red" />
+                            </TouchableOpacity>
+                        </View>
+                    )}
+
                     <Text style={styles.sectionTitle}>Vị trí muốn tìm trọ</Text>
                     <TouchableOpacity style={styles.uploadButton}>
                         <Feather name="map-pin" size={24} color="lightgreen" />
                         <Text style={styles.uploadText}>Thêm vị trí</Text>
                     </TouchableOpacity>
                 </View>
-
+                {!!wardErr && <Text style={styles.errorText}><Ionicons name="warning" size={12} color="red" />{wardErr}</Text>}
                 <View style={styles.selectContainer}>
                     {/* <Text>Chọn tỉnh/thành phố:</Text> */}
                     <RNPickerSelect
@@ -169,7 +243,7 @@ const CreatePostRent = ({ navigation }) => {
                         items={cities.map(city => ({ label: city.full_name, value: city.id }))}
                     />
                 </View>
-
+                {!!districtErr && <Text style={styles.errorText}><Ionicons name="warning" size={12} color="red" />{districtErr}</Text>}
                 <View style={styles.selectContainer}>
                     <RNPickerSelect
                         value={district}
@@ -181,7 +255,7 @@ const CreatePostRent = ({ navigation }) => {
                         items={districts.map(district => ({ label: district.full_name, value: district.id }))}
                     />
                 </View>
-
+                {!!cityErr && <Text style={styles.errorText}><Ionicons name="warning" size={12} color="red" />{cityErr}</Text>}
                 <View style={styles.selectContainer}>
                     <RNPickerSelect
                         value={ward}
@@ -190,6 +264,7 @@ const CreatePostRent = ({ navigation }) => {
                         items={wards.map(ward => ({ label: ward.full_name, value: ward.id }))}
                     />
                 </View>
+                {!!otherErr && <Text style={styles.errorText}><Ionicons name="warning" size={12} color="red" />{otherErr}</Text>}
                 <View style={styles.inputContainer}>
 
                     <TextInput
@@ -211,8 +286,11 @@ const CreatePostRent = ({ navigation }) => {
 };
 
 const styles = StyleSheet.create({
-
-
+    errorText: {
+        color: "red",
+        fontWeight: "500",
+        textAlign: "center"
+    },
     container: {
         flex: 1,
         backgroundColor: "#fff",
@@ -294,13 +372,28 @@ const styles = StyleSheet.create({
         borderWidth: 1,
         borderColor: '#ccc',
         ...SHADOWS.medium,
-        marginTop:10,
+        marginTop: 10,
     },
 
     uploadText: {
         marginLeft: 10,
         fontSize: 16,
         color: "lightgreen",
+    },
+    selectedImage: {
+        width: 200,
+        height: 200,
+        borderRadius: 10,
+        marginTop: 10,
+        marginLeft: 60
+    },
+    deleteImageButton: {
+        position: 'absolute',
+        top: 5,
+        right: 50,
+        backgroundColor: "#fff",
+        borderRadius: 20,
+        padding: 5,
     },
 
 

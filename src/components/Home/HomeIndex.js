@@ -19,7 +19,7 @@ import showToast from "../common/ToastMessage";
 import { FontAwesome } from '@expo/vector-icons';
 import RentPostsList from "./RentPostList";
 
-const HomeIndex = ({ route }) => {  
+const HomeIndex = ({ route }) => {
   const [postContent, setPostContent] = useState("");
   const [user, dispatch] = useContext(MyContext);
   const navigation = useNavigation();
@@ -31,7 +31,7 @@ const HomeIndex = ({ route }) => {
   const [loading, setLoading] = useState(false);
 
   const [fetchPage, setFetchPage] = useState(false);
-  
+
 
   // const [showHouseList, setShowHouseList] = useState(true);
   const [modalsEdit, setModalsEdit] = useState({});
@@ -114,16 +114,16 @@ const HomeIndex = ({ route }) => {
       console.log("like bài thành công");
       // setRender(!render);
       // Cập nhật likedState sau khi thay đổi trạng thái like
-       // Cập nhật trạng thái liked cho bài đăng đã được thích trong state likedState
-    setLikedState(prevLikedState => ({ ...prevLikedState, [postId]: true }));
-    
-    // Cập nhật bài đăng được thích trong state posts
-    setPosts(prevPosts => prevPosts.map(post => {
-      if (post.id === postId) {
-        return { ...post, liked: true };
-      }
-      return post;
-    }));
+      // Cập nhật trạng thái liked cho bài đăng đã được thích trong state likedState
+      setLikedState(prevLikedState => ({ ...prevLikedState, [postId]: true }));
+
+      // Cập nhật bài đăng được thích trong state posts
+      setPosts(prevPosts => prevPosts.map(post => {
+        if (post.id === postId) {
+          return { ...post, liked: true };
+        }
+        return post;
+      }));
     } catch (ex) {
       console.error(ex);
       console.log("Lỗi like bài");
@@ -282,11 +282,11 @@ const HomeIndex = ({ route }) => {
       console.log("fetchNextPagePost được gọi khi cuộn đến cuối view");
       const token = await AsyncStorage.getItem("access-token");
       let res = await authApi(token).get(endpoints["getAllPostForOwner"], {
-        params: { page: nextPage}
+        params: { page: nextPage }
       });
       const newData = res.data.results;
-      console.log("Data mới được fetch",res.data.results);
-      console.log("NEW",newData);
+      console.log("Data mới được fetch", res.data.results);
+      console.log("NEW", newData);
       // Kiểm tra nếu newData không rỗng thì cập nhật danh sách bài đăng
       if (newData && newData.length > 0) {
         setPosts(prevPosts => [...prevPosts, ...newData]);
@@ -303,26 +303,33 @@ const HomeIndex = ({ route }) => {
     // console.log(contentOffset);
     // console.log("CONTENT SIZE",contentSize);
     // Kiểm tra nếu nội dung đã cuộn đến cuối và không đang loading thì fetch dữ liệu mới
-    if (layoutMeasurement.height + contentOffset.y >= contentSize.height-1000 && !loading) {
+    if (layoutMeasurement.height + contentOffset.y >= contentSize.height - 1000 && !loading) {
       console.log("ok");
       fetchNextPagePost();
     }
   };
   const handleDetail = (idMotel) => {
     console.log(idMotel);
-    navigation.navigate("PostDetail", {idMotel: idMotel})
+    navigation.navigate("PostDetail", { idMotel: idMotel })
   }
+  const handleShare = (id) => {
+    // Tạo URL ảo dựa trên thông tin của bài viết
+    const URL = `https://motel.pythonanywhere.com/posts/${id}`;
+
+    // Hiển thị URL ảo cho người dùng
+    Alert.alert('Chia sẻ link ', URL);
+};
   return (
     <View style={MyStyles.container}>
 
       {/* Bài viết */}
       <ScrollView style={styles.scrollContainer}
-      
-      onScroll={handleScroll}
-      scrollEventThrottle={16} // Tần số gọi hàm khi cuộn (16ms = 60fps)
+
+        onScroll={handleScroll}
+        scrollEventThrottle={16} // Tần số gọi hàm khi cuộn (16ms = 60fps)
       >
         {/* Thanh đăng bài nằm ngang */}
-      
+
         <View style={HomeStyles.postBar}>
           <Image
             source={{ uri: user.avatar }} // Thay đổi đường dẫn của ảnh mặc định
@@ -336,7 +343,7 @@ const HomeIndex = ({ route }) => {
               <AntDesign name="pluscircleo" size={24} color="black" />
             </View>
           </TouchableOpacity>
-          
+
 
         </View>
         {/* <TouchableOpacity onPress={fetchNextPagePost}><Text>khfwkehf</Text></TouchableOpacity> */}
@@ -401,7 +408,7 @@ const HomeIndex = ({ route }) => {
                     value={content}
                     placeholder="Nội dung mới"
                   />
-                   <Text style={{ color: "#fff" }}>Chọn nhà trọ khác</Text>
+                  <Text style={{ color: "#fff" }}>Chọn nhà trọ khác</Text>
                   <View style={styles.container}>
                     {motels.map((item) => (
                       <TouchableOpacity
@@ -436,7 +443,7 @@ const HomeIndex = ({ route }) => {
               </Modal>
             )}
 
-            <TouchableWithoutFeedback onPress={()=>handleDetail(post.motel.id)}>
+            <TouchableWithoutFeedback onPress={() => handleDetail(post.motel.id)}>
               <View>
                 <View style={{ flexDirection: "row" }}>
                   <Entypo name="location-pin" size={20} color="orange" />
@@ -452,22 +459,33 @@ const HomeIndex = ({ route }) => {
                 <View>
                   <Text style={HomeStyles.desc}>{post.content}</Text>
                   {/* Ảnh bài đăng */}
-                  <FlatList
-                    data={post.motel ? post.motel.images : []}
-                    renderItem={renderItem}
-                    keyExtractor={(item) => item.id.toString()}
-                    horizontal // Hiển thị ngang
-                    pagingEnabled // Cuộn trang theo trang
-                    showsHorizontalScrollIndicator={false} // Ẩn thanh trượt ngang
-                    onViewableItemsChanged={onViewableItemsChanged}
-                  />
+                  {post.motel ? (
+                    <FlatList
+                      data={post.motel.images}
+                      renderItem={renderItem}
+                      keyExtractor={(item, index) => index.toString()} // Sử dụng index của mảng làm key
+                      horizontal // Hiển thị ngang
+                      pagingEnabled // Cuộn trang theo trang
+                      showsHorizontalScrollIndicator={false} // Ẩn thanh trượt ngang
+                      onViewableItemsChanged={onViewableItemsChanged}
+                    />
+                  ) : (
+                    <Image
+                      source={{ uri: post.image }} // Sử dụng uri từ post.image như là nguồn hình ảnh
+                      style={styles.image} // Thêm style cho hình ảnh nếu cần
+                    />
+                  )}
+
                 </View>
                 {/* Hiển thị badge */}
-                <View style={HomeStyles.badgeContainer}>
-                  <Text style={HomeStyles.badgeText}>
-                    {currentIndex + 1}/{post.motel ? post.motel.images.length : 0}
-                  </Text>
-                </View>
+                {post.motel && (
+                  <View style={HomeStyles.badgeContainer}>
+                    <Text style={HomeStyles.badgeText}>
+                      {currentIndex + 1}/{post.motel.images.length}
+                    </Text>
+                  </View>
+                )}
+
               </View>
             </TouchableWithoutFeedback>
             {/* icon */}
@@ -487,9 +505,13 @@ const HomeIndex = ({ route }) => {
                     size={24}
                     color="black"
                   /></TouchableWithoutFeedback>
-                <Feather name="send" size={24} color="black" />
+                  <TouchableOpacity onPress={()=>handleShare(post.id)}>
+
+                    <Feather name="send" size={24} color="black" />
+                  </TouchableOpacity>
+                
               </View>
-              <Feather name="bookmark" size={24} color="black" />
+              {/* <Feather name="bookmark" size={24} color="black" /> */}
             </View>
           </View>
         ))}

@@ -81,9 +81,9 @@ const Comment = ({ route }) => {
             formData.append("content", content);
             console.log(formData);
             // Kiểm tra xem có phải là phản hồi bình luận không
-        if (replyForComment.id !== null) {
-            formData.append("reply_for", replyForComment.id);
-        }
+            if (replyForComment.id !== null) {
+                formData.append("reply_for", replyForComment.id);
+            }
             await authApi(token).post(endpoints['commentPost'](postId), formData, {
                 headers: {
                     'Content-Type': 'multipart/form-data',
@@ -185,8 +185,8 @@ const Comment = ({ route }) => {
                             source={require('../../assets/images/nocmt.png')}
                         />
                     ) : (
-                        <ScrollView style={{marginBottom:50}}
-                        showsVerticalScrollIndicator={false}
+                        <ScrollView style={{ marginBottom: 50 }}
+                            showsVerticalScrollIndicator={false}
                         >
                             <View style={styles.container}>
                                 {comments.map((item, index) => (
@@ -280,13 +280,13 @@ const Comment = ({ route }) => {
             {/* Ô input nhập bình luận */}
             <View style={styles.fixedInputContainer}>
                 <View style={styles.inputContainer}>
-                   <TextInput
-    style={styles.input}
-    placeholder="Nhập bình luận của bạn..."
-    value={content}
-    onChangeText={text => setContent(text)}
-    ref={inputRef}
-/>
+                    <TextInput
+                        style={styles.input}
+                        placeholder="Nhập bình luận của bạn..."
+                        value={content}
+                        onChangeText={text => setContent(text)}
+                        ref={inputRef}
+                    />
                     <TouchableOpacity style={styles.sendButton} onPress={handleSend}>
                         <FontAwesome name="send" size={24} color="#FFF" />
                     </TouchableOpacity>
@@ -428,7 +428,7 @@ const styles = StyleSheet.create({
     modalText: {
         marginBottom: 15,
         textAlign: "center",
-        backgroundColor:COLOR.bg_color1,
+        backgroundColor: COLOR.bg_color1,
         padding: 40,
     },
     inputEdit: {
@@ -455,14 +455,14 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         // marginTop: 5,
         // justifyContent:"flex-end",
-        marginLeft:"auto"
+        marginLeft: "auto"
     },
     commentActionButton: {
         marginLeft: "auto",
-        paddingLeft:20,
+        paddingLeft: 20,
     },
     actionButtonText: {
-        color:COLOR.PRIMARY,
+        color: COLOR.PRIMARY,
         fontWeight: 'bold',
     },
 });
