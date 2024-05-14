@@ -88,6 +88,8 @@ const HomeIndex = ({ route }) => {
   };
   useEffect(() => {
     fetchDataGetAllPost();
+    // getAllPostForRent();
+
   }, [render]);
   // Khôi phục likedState từ AsyncStorage khi tải trang
   // useEffect(() => {
@@ -134,7 +136,12 @@ const HomeIndex = ({ route }) => {
     navigation.navigate("Comment", { postId: postId });
 
     navigation.addListener('focus', async () => {
-      setRender(!render);
+      if (tinTimNhaActive == true) {
+        getAllPostForRent();
+      } else if (tinChoThueActive == true) {
+        setRender(!render);
+      }
+
     });
   };
   const deletePost = async (postId) => {
@@ -142,7 +149,11 @@ const HomeIndex = ({ route }) => {
       const token = await AsyncStorage.getItem("access-token");
       await authApi(token).delete(endpoints["deletePost"](postId));
       console.log("Xóa bài thành công");
-      setRender(!render);
+      if (tinTimNhaActive == true) {
+        getAllPostForRent();
+      } else if (tinChoThueActive == true) {
+        setRender(!render);
+      }
     } catch (ex) {
       console.error(ex);
       console.log("Lỗi xóa bài");
@@ -170,14 +181,19 @@ const HomeIndex = ({ route }) => {
   }
   const handleEdit = async (postId, post) => {
     // Lưu thông tin về bài đăng được chọn vào state modalsEdit
-    setModalsEdit({ ...modalsEdit, [postId]: post });
-    setShowOptions({ ...showOptions, [postId]: false });
-    let motels = await getMotel();
+    if (tinTimNhaActive == true) {
+      navigation.navigate("Editpost", {postId:postId, post:post});
+    } else {
 
-    // Cập nhật nội dung bài đăng và nhà trọ trước đó
-    setContent(post.content);
-    setSelectedHouse(post.motel);
 
+      setModalsEdit({ ...modalsEdit, [postId]: post });
+      setShowOptions({ ...showOptions, [postId]: false });
+      let motels = await getMotel();
+
+      // Cập nhật nội dung bài đăng và nhà trọ trước đó
+      setContent(post.content);
+      setSelectedHouse(post.motel);
+    }
   };
 
   const handleModalClose = () => {
@@ -216,9 +232,10 @@ const HomeIndex = ({ route }) => {
         },
       });
 
-      setRender(!render);
+
       showToast({ type: "success", text1: "Thành công", text2: "Cập nhật thành công" });
       console.log("Cập nhật bài đăng:", postId);
+
       handleModalClose();
 
     } catch (error) {
@@ -318,7 +335,7 @@ const HomeIndex = ({ route }) => {
 
     // Hiển thị URL ảo cho người dùng
     Alert.alert('Chia sẻ link ', URL);
-};
+  };
   return (
     <View style={MyStyles.container}>
 
@@ -394,6 +411,7 @@ const HomeIndex = ({ route }) => {
             )}
 
             {/* Ẩn hiện Modal chỉnh sửa */}
+
             {modalsEdit[post.id] && (
               <Modal
                 isOpen={true}
@@ -505,11 +523,11 @@ const HomeIndex = ({ route }) => {
                     size={24}
                     color="black"
                   /></TouchableWithoutFeedback>
-                  <TouchableOpacity onPress={()=>handleShare(post.id)}>
+                <TouchableOpacity onPress={() => handleShare(post.id)}>
 
-                    <Feather name="send" size={24} color="black" />
-                  </TouchableOpacity>
-                
+                  <Feather name="send" size={24} color="black" />
+                </TouchableOpacity>
+
               </View>
               {/* <Feather name="bookmark" size={24} color="black" /> */}
             </View>

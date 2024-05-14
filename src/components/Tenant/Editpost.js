@@ -16,19 +16,21 @@ import showToast from "../common/ToastMessage";
 import * as ImagePicker from "expo-image-picker";
 import PostStyle from "./PostStyle";
 
-const CreatePostRent = ({ navigation }) => {
+const Editpost = ({ navigation, route }) => {
+    const { postId, post } = route.params;
+    // const [rpost, setRPost] = useState(post);
     const [cities, setCities] = useState([]); // State để lưu trữ danh sách các tỉnh/thành phố
     const [districts, setDistricts] = useState([]); // State để lưu trữ danh sách các quận/huyện
     const [wards, setWards] = useState([]);
 
     const [user, dispatch] = useContext(MyContext);
     const [loading, setLoading] = useState(false);
-    const [ward, setWard] = useState(null);
-    const [district, setDistrict] = useState(null);
-    const [city, setCity] = useState(null);
-    const [other, setOther] = useState(null);
-    const [content, setContent] = useState();
-    const [image, setImage] = useState(null);
+    const [ward, setWard] = useState();
+    const [district, setDistrict] = useState();
+    const [city, setCity] = useState();
+    const [other, setOther] = useState(post.other_address);
+    const [content, setContent] = useState(post.content);
+    const [image, setImage] = useState(post.image);
 
     const [contentError, setContentError] = useState("");
     const [imgErr, setImgErr] = useState("");
@@ -36,6 +38,22 @@ const CreatePostRent = ({ navigation }) => {
     const [cityErr, setCityErr] = useState("");
     const [districtErr, setDistrictErr] = useState("");
     const [otherErr, setOtherErr] = useState("");
+
+
+    useEffect(() => {
+        const cityId = cityIdMapping[post.city];
+        const districtId = districtIdMapping[post.district];
+        const wardId = wardIdMapping[post.ward];
+        setCity(cityId);
+        setWard(wardId);
+        setDistrict(districtId);
+        setOther(post.other_address);
+        setContent(post.content);
+        setImage(post.image);
+        console.log(city);
+        console.log(ward);
+    }, [city, ward, district]); // Thêm city, ward, district vào mảng dependency
+    
 
 
     const checkForCameraRollPermission = async () => {
@@ -52,6 +70,7 @@ const CreatePostRent = ({ navigation }) => {
 
     useEffect(() => {
         checkForCameraRollPermission();
+
     }, []);
     const addImage = async () => {
         let image = await ImagePicker.launchImageLibraryAsync({
@@ -108,6 +127,7 @@ const CreatePostRent = ({ navigation }) => {
                 if (response.data.error === 0) {
                     setCities(response.data.data); // Cập nhật state với danh sách tỉnh/thành phố
                 }
+                // console.log(response.data.data);
             } catch (error) {
                 console.error('Error fetching cities:', error);
             }
@@ -118,6 +138,18 @@ const CreatePostRent = ({ navigation }) => {
     const cityMapping = {};
     cities.forEach(city => {
         cityMapping[city.id] = city.full_name;
+    });
+    const cityIdMapping = {};
+    cities.forEach(city => {
+        cityIdMapping[city.full_name] = city.id;
+    });
+    const districtIdMapping = {};
+    districts.forEach(district => {
+        districtIdMapping[district.full_name] = district.id;
+    });
+    const wardIdMapping = {};
+    wards.forEach(ward => {
+        wardIdMapping[ward.full_name] = ward.id;
     });
 
     const districtMapping = {};
@@ -152,30 +184,36 @@ const CreatePostRent = ({ navigation }) => {
             if (!district) { setDistrictErr("Vui lòng chọn quận huyện"); } else { setDistrictErr(""); }
             if (!other) { setOtherErr("Vui lòng chọn quận huyện"); } else { setOtherErr(""); }
             if (content && ward && district && city && other && image) {
-            let token = await AsyncStorage.getItem("access-token");
-            console.log(token);
-            const formData = new FormData();
-            formData.append("content", content);
-            formData.append("ward", getWardNameById(ward));
-            formData.append("city", getCityNameById(city));
-            formData.append("district", getDistrictNameById(district));
-            formData.append("other_address", other);
-            const uriParts = image.split('.');
-            const fileType = uriParts[uriParts.length - 1];
-            const img = {
-                uri: image,
-                name: `image.${fileType}`,
-                type: `image/${fileType}`,
-            }
+                let token = await AsyncStorage.getItem("access-token");
+                console.log(token);
+                // console.log("POST", post);
+                const formData = new FormData();
+                if (content != post.content) { formData.append("content", content); }
+                if (ward != wardIdMapping[post.ward]) { formData.append("ward", getWardNameById(ward)); }
+                if (city != cityIdMapping[post.city]) { formData.append("city", getCityNameById(city)); }
+                if (district != districtIdMapping[post.district]) { formData.append("district", getDistrictNameById(district)); }
+                if (other != post.other_address) { formData.append("other_address", other); }
 
-            formData.append('image', img);
-           
-                let res = await authApi(token).post(endpoints["createPostForRent"], formData, {
+
+
+                const uriParts = image.split('.');
+                const fileType = uriParts[uriParts.length - 1];
+                const img = {
+                    uri: image,
+                    name: `image.${fileType}`,
+                    type: `image/${fileType}`,
+                }
+                if (image != post.image) {
+                    formData.append('image', img);
+                }
+                console.log("id post",postId);
+
+                let res = await authApi(token).patch(endpoints["updatePostRent"](postId), formData, {
                     headers: {
                         'Content-Type': 'multipart/form-data',
                     },
                 });
-                console.log("Đăng bài thành công");
+                console.log("Cập nhật thành công");
 
                 navigation.navigate("HomeIndex", { myPost: res.data })
             }
@@ -184,7 +222,14 @@ const CreatePostRent = ({ navigation }) => {
             console.error(ex);
         }
     };
+    const test = () => {
+        console.log("Post data:", post);
 
+        console.log("City:", city);
+        console.log("District:", district);
+        console.log("Ward:", ward);
+
+    }
     return (
         <View style={PostStyle.container}>
             <Image
@@ -198,7 +243,9 @@ const CreatePostRent = ({ navigation }) => {
                         style={PostStyle.avatar} />
                     <Text style={PostStyle.username}>{user.username}</Text>
                 </View>
-
+                <TouchableOpacity onPress={test}>
+                    <Text> Helo</Text>
+                </TouchableOpacity>
 
                 <View>
 
@@ -278,7 +325,7 @@ const CreatePostRent = ({ navigation }) => {
 
                 <View style={PostStyle.buttonContainer}>
                     {loading ? (<ActivityIndicator />) : (
-                        <ButtonAuth title="Đăng bài" onPress={handleSubmit} />)}
+                        <ButtonAuth title="Cập nhật bài viết" onPress={handleSubmit} />)}
                 </View>
             </ScrollView>
 
@@ -286,4 +333,11 @@ const CreatePostRent = ({ navigation }) => {
     );
 };
 
-export default CreatePostRent;
+const styles = StyleSheet.create({
+
+
+
+});
+
+
+export default Editpost;

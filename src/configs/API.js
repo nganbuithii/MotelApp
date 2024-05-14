@@ -28,14 +28,15 @@ export const endpoints = {
     updatePost:(idPost) => `/post/for_lease/${idPost}/`,  //PATCH
     detailOwner:(idOwner) => `/user/${idOwner}/` ,//get
     updateComment:(idComment) => `/post/comments/${idComment}/`,
+    createPostForRent:"/post/for_rent/", // đăng bài bên người thuê
     follow:(idUser) => `/user/${idUser}/follow/`,  // theo dõi - post
     getComment:(idPost) => `/post/${idPost}/comments/`,  // lấy tất cả comment
-    getAllPostForRent:"/post/for_rent", //Lây tất cả post tìm nhà
-    createPostForRent:"/post/for_rent/", // đăng bài bên người thuê
+    getAllPostForRent:"/post/for_rent", //Lây tất cả post tìm nhà    
     deleteComment:(idComment) => `/post/comments/${idComment}/`,
     getMotelFilter:"/motels", // lọc trọ theo filter
     getFollower:(idUser) => `/user/${idUser}/followers/`, // lẤY Ds người mình theo dõi  
     getFollowing:(idUser) => `/user/${idUser}/following/`, // lẤY Ds người đang theo dõi   mk
+    updatePostRent:(idPost) => `/post/for_rent/${idPost}/`,
     
     
 };

@@ -31,6 +31,7 @@ import Payment from './src/components/Tenant/Payment';
 import HomeIndex from './src/components/Home/HomeIndex';
 import Comment from './src/components/Home/Comment';
 import CreatePostRent from './src/components/Tenant/CreatePostRent';
+import Editpost from './src/components/Tenant/Editpost';
 
 //Điều hướng kiểu stack
 const Stack = createStackNavigator();
@@ -65,6 +66,9 @@ export default function App() {
           <Stack.Screen name="PlusOwner" component={PlusOwner}
             // options={{ headerTitle: 'Nhà trọ của tôi' }}
             options={{ headerShown: false }} />
+          <Stack.Screen name="Editpost" component={Editpost}
+            options={{ headerTitle: 'Chỉnh sửa bài viết' }}
+          />
           <Stack.Screen name="ChatDetail" component={ChatDetail}
             options={{ headerShown: false }} />
           <Stack.Screen name="EditMotel" component={EditMotel}
