@@ -17,7 +17,7 @@ import MyContext from '../../configs/MyContext';
 import axios from 'axios';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 
-const RegisterMotel = ({ navigation }) => {
+const RegisterMotel = ({ navigation, route }) => {
     const [cities, setCities] = useState([]); // State để lưu trữ danh sách các tỉnh/thành phố
     const [districts, setDistricts] = useState([]); // State để lưu trữ danh sách các quận/huyện
     const [wards, setWards] = useState([]);
@@ -33,6 +33,13 @@ const RegisterMotel = ({ navigation }) => {
     const [area, setArea] = useState(null);
     const [other, setOther] = useState(null);
     const [cabinet, setCabinet] = useState(null);
+    // const { latitude, longitude, locationName } = route.params;
+    const lon = route.params?.lon;
+    const lat = route.params?.lat;
+    const nameLoc = route.params?.nameLoc;
+
+    // const {latt, setLatt} = useState();
+
 
     const [error, setError] = useState({
         price: '',
@@ -42,7 +49,7 @@ const RegisterMotel = ({ navigation }) => {
         district: '',
         city: '',
         area: '',
-        cabinet:''
+        cabinet: ''
     });
 
     // Hàm để lấy danh sách quận/huyện dựa trên tỉnh/thành phố được chọn
@@ -124,36 +131,19 @@ const RegisterMotel = ({ navigation }) => {
     const handleSubmit = async () => {
         try {
             const newErrors = {};
-            if (!price) {
-                newErrors.price = "Vui lòng nhập giá phòng";
-            } else if (price && price <= 0) {
-                newErrors.price = "Vui lòng nhập giá lớn hơn 0";
-            }
-            if (!people) {
-                newErrors.people = "Vui lòng nhập số lượng người ở";
-            } else if (people && people <= 0) {
-                newErrors.people = "Vui lòng nhập số lượng lớn hơn 0";
-            }
-            if (!area) {
-                newErrors.area = "Vui lòng nhập diện tích nhà";
-            } else if (area && area < 100) {
-                newErrors.area = "Vui lòng nhập diện tích lớn hơn 100 m2";
-            }
-            if (!desc) {
-                newErrors.desc = "Vui lòng nhập mô tả";
-            }
-            if (!ward) {
-                newErrors.ward = "Vui lòng nhập xã/phường";
-            }
-            if (!district) {
-                newErrors.district = "Vui lòng nhập quận/huyện";
-            }
-            if (!city) {
-                newErrors.city = "Vui lòng nhập tỉnh/thành phố";
-            }
-            if(!cabinet){
-                newErrors.cabinet="Vui lòng nhập thông tin nội thất"
-            }
+            if (!price) { newErrors.price = "Vui lòng nhập giá phòng"; }
+            else if (price && price <= 0) { newErrors.price = "Vui lòng nhập giá lớn hơn 0"; }
+            if (!people) { newErrors.people = "Vui lòng nhập số lượng người ở"; }
+            else if (people && people <= 0) { newErrors.people = "Vui lòng nhập số lượng lớn hơn 0"; }
+            if (!area) { newErrors.area = "Vui lòng nhập diện tích nhà"; }
+            else if (area && area < 100) { newErrors.area = "Vui lòng nhập diện tích lớn hơn 100 m2"; }
+            if (!desc) { newErrors.ward = "Vui lòng nhập xã/phường"; }
+            if (!district) { newErrors.district = "Vui lòng nhập quận/huyện"; }
+            if (!city) { newErrors.city = "Vui lòng nhập tỉnh/thành phố"; }
+            if (!cabinet) { newErrors.cabinet = "Vui lòng nhập thông tin nội thất" }
+            // if(lat){setLatt(lat);
+            // }
+            // if(lon){setLonn(lon);};
 
 
             try {
@@ -168,8 +158,8 @@ const RegisterMotel = ({ navigation }) => {
                 formData.append('city', getCityNameById(city));
                 formData.append('area', area);
                 formData.append('other_address', other);
-                formData.append('lat', "1");
-                formData.append('lon', "1");
+                formData.append('lat', lat);
+                formData.append('lon', lon);
                 formData.append('furniture', cabinet);
                 console.log("form data:", formData);
                 // console.log(token);
@@ -216,6 +206,24 @@ const RegisterMotel = ({ navigation }) => {
             console.error("Lỗi trong quá trình xử lý form:", ex);
         }
     };
+    // const test = () => {
+    //     console.log(lon);
+    //     console.log(lat);
+    //     console.log(nameLoc);
+    // }
+    const nextMap = () => {
+
+        navigation.navigate("MapSearch");
+        if (nameLoc) {
+            navigation.addListener('focus', async () => {
+                setOther(nameLoc);
+            });
+        } else {
+            console.log("no")
+        }
+
+
+    };
 
     return (
         <View style={styles.container}>
@@ -232,6 +240,9 @@ const RegisterMotel = ({ navigation }) => {
                 />
                 <Text style={styles.txtHead}>Đăng ký nhà trọ của bạn</Text>
             </View>
+            {/* <TouchableOpacity onPress={test}>
+                <Text> He4k4</Text>
+            </TouchableOpacity> */}
             <ScrollView contentContainerStyle={styles.scrollView}>
                 {error.price && <Text style={styles.errorMsg}><AntDesign name="exclamation" size={13} color="red" />{error.price}</Text>}
                 <View style={styles.inputContainer}>
@@ -263,7 +274,7 @@ const RegisterMotel = ({ navigation }) => {
 
                 {error.cabinet && <Text style={styles.errorMsg}><AntDesign name="exclamation" size={13} color="red" />{error.cabinet}</Text>}
                 <View style={styles.inputContainer}>
-                <MaterialCommunityIcons style={styles.icon} name="file-cabinet" size={24} color="black" />
+                    <MaterialCommunityIcons style={styles.icon} name="file-cabinet" size={24} color="black" />
                     <TextInput style={styles.input} value={cabinet} onChangeText={setCabinet} placeholder="Nội thất " />
                 </View>
 
@@ -331,8 +342,9 @@ const RegisterMotel = ({ navigation }) => {
                         placeholder="Địa chỉ khác (Nếu có)"
                     />
                 </View>
-                <TouchableOpacity style={{padding:30, backgroundColor:"pink"}} onPress={()=> navigation.navigate("MapSearch")}>
-                    <Text> Map</Text>
+                <TouchableOpacity style={{ padding: 10, borderRadius: 20, backgroundColor: COLOR.PRIMARY, flexDirection: "row" }} onPress={nextMap} >
+                    <Entypo name="map" size={24} color="#fff" />
+                    <Text style={{ color: "#fff", marginLeft: 20 }}> Tìm kiếm nhanh hơn trên bản đồ</Text>
                 </TouchableOpacity>
 
                 <View style={styles.buttonContainer}>

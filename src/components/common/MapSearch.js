@@ -64,6 +64,7 @@ const MapSearch = ({ navigation, route }) => {
 
     const handleQuery = async (t) => {
         setsearchQuery(t);
+        setShowConfirmButton(!(t === "" || searching));
         if (t == "") {
             return;
         }
@@ -88,9 +89,24 @@ const MapSearch = ({ navigation, route }) => {
             },
         ],
     };
-    const handleConfirmLocation = () => {
-        navigation.navigate("RegisterMotel");
+    const handleConfirmLocation = async () => {
+        try {
+            const response = await fetch(
+                `https://dev.virtualearth.net/REST/v1/Locations?query=${searchQuery}&key=${API_key}`
+            );
+            const data = await response.json();
+            const firstLocation = data.resourceSets[0].resources[0];
+            const locationName = firstLocation.name; // Lấy tên vị trí
+            navigation.navigate("RegisterMotel", { lat:latitude, lon:longitude, nameLoc:locationName });
+        } catch (error) {
+            console.error("Error searching location:", error);
+            Alert.alert(
+                "Error",
+                "An error occurred while searching for the location. Please try again later."
+            );
+        }
     };
+    
     return (
         <View style={styles.container}>
             <Searchbar
@@ -102,7 +118,7 @@ const MapSearch = ({ navigation, route }) => {
                 onBlur={handleUnFocus}
                 ref={textInputRef}
                 placeholderTextColor="black"
-                style={{ marginTop: 30, backgroundColor: COLOR.color12 }}
+                style={{ marginTop: 10, backgroundColor: COLOR.color12 }}
                 iconColor="#fff"
             />
 
