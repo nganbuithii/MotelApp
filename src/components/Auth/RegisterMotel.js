@@ -331,6 +331,9 @@ const RegisterMotel = ({ navigation }) => {
                         placeholder="Địa chỉ khác (Nếu có)"
                     />
                 </View>
+                <TouchableOpacity style={{padding:30, backgroundColor:"pink"}} onPress={()=> navigation.navigate("MapSearch")}>
+                    <Text> Map</Text>
+                </TouchableOpacity>
 
                 <View style={styles.buttonContainer}>
                     {loading ? (<ActivityIndicator />) : (

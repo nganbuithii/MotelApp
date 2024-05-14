@@ -32,6 +32,7 @@ import HomeIndex from './src/components/Home/HomeIndex';
 import Comment from './src/components/Home/Comment';
 import CreatePostRent from './src/components/Tenant/CreatePostRent';
 import Editpost from './src/components/Tenant/Editpost';
+import MapSearch from './src/components/common/MapSearch';
 
 //Điều hướng kiểu stack
 const Stack = createStackNavigator();
@@ -63,6 +64,8 @@ export default function App() {
 
           <Stack.Screen name="NotificationsSc" component={NotificationsSc}
             options={{ headerTitle: 'Thông báo' }} />
+          <Stack.Screen name="MapSearch" component={MapSearch}
+            options={{ headerShown: false }} />
           <Stack.Screen name="PlusOwner" component={PlusOwner}
             // options={{ headerTitle: 'Nhà trọ của tôi' }}
             options={{ headerShown: false }} />
