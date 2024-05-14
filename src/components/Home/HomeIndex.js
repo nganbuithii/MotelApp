@@ -182,7 +182,7 @@ const HomeIndex = ({ route }) => {
   const handleEdit = async (postId, post) => {
     // Lưu thông tin về bài đăng được chọn vào state modalsEdit
     if (tinTimNhaActive == true) {
-      navigation.navigate("Editpost", {postId:postId, post:post});
+      navigation.navigate("Editpost", { postId: postId, post: post });
     } else {
 
 
@@ -336,6 +336,34 @@ const HomeIndex = ({ route }) => {
     // Hiển thị URL ảo cho người dùng
     Alert.alert('Chia sẻ link ', URL);
   };
+  const handleFollow = async (idUser) => {
+    try {
+      const token = await AsyncStorage.getItem("access-token");
+      console.log(token);
+      console.log("í user", idUser);
+      let res = await authApi(token).post(endpoints["follow"](idUser));
+      // setOwnerFollowed(true);
+      console.log("follow họ thành công");
+      if (tinTimNhaActive == true) {
+        getAllPostForRent();
+      } else if (tinChoThueActive == true) {
+        setRender(!render);
+      }
+
+      // setIsFollowing(!isFollowing);
+      // if(follow ==false){
+      //     dispatch({ type: 'update_user', payload: { ...user, following_count: user.following_count +1 } }); // Cập nhật số người đang theo dõi
+      // }else{
+      //     dispatch({ type: 'update_user', payload: { ...user, following_count: user.following_count -1 } }); // Cập nhật số người đang theo dõi
+      // }
+
+    } catch (ex) {
+      console.error(ex);
+    }
+  }
+  const detailNext = () => {
+
+  }
   return (
     <View style={MyStyles.container}>
 
@@ -380,19 +408,35 @@ const HomeIndex = ({ route }) => {
             <View style={styles.postContainer}>
               <View style={styles.userInfoContainer}>
                 <TouchableOpacity
-                  onPress={() => navigation.navigate("DetailOwner", { ownerId: post.user.id })}
+                  onPress={() => {
+                    navigation.navigate("DetailOwner", { ownerId: post.user.id });
+                    navigation.addListener('focus', async () => {
+                      if (tinTimNhaActive == true) {
+                        getAllPostForRent();
+                      } else if (tinChoThueActive == true) {
+                        setRender(!render);
+                      }
+                    });
+                  }}
                 >
                   <Image
                     source={{ uri: post.user.avatar }}
                     style={styles.userAvatar}
                   />
                 </TouchableOpacity>
+
                 <Text style={styles.userName}>{post.user.username}</Text>
               </View>
-              <TouchableOpacity style={styles.btnFollow}>
-                <Text style={{ color: "#fff" }}> Theo dõi</Text>
-                <Entypo name="plus" size={12} color="#fff" />
+              <TouchableOpacity
+                style={styles.btnFollow}
+                onPress={() => handleFollow(post.user.id)}>
+                {post.user.followed ? <Text style={{ color: "#fff" }}>Đang theo dõi</Text> :
+                  <Text style={{ color: "#fff" }}>Theo dõi</Text>
+                }
+                {/* <Text style={{ color: "#fff" }}>{ownerFollowed ? "Đang theo dõi" : "Theo dõi"}</Text> */}
+                <Entypo name={post.user.followed ? "minus" : "plus"} size={10} color="#fff" />
               </TouchableOpacity>
+
               {post.user.id === user.id && (
                 <TouchableWithoutFeedback onPress={() => setShowOptions({ ...showOptions, [post.id]: !showOptions[post.id] })}>
                   <SimpleLineIcons name="options-vertical" size={20} color="black" />
@@ -552,7 +596,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
   },
   userInfoContainer: {
-    width: "70%",
+    width: "65%",
     flexDirection: "row",
     alignItems: "center",
   },
@@ -570,9 +614,10 @@ const styles = StyleSheet.create({
   btnFollow: {
     backgroundColor: COLOR.input_default,
     padding: 5,
-    paddingVertical: 5,
+    paddingVertical: 8,
     borderRadius: 25,
     flexDirection: "row",
+
     // marginLeft: "auto",
   },
   // ảnh bài đăng
