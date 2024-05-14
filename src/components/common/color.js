@@ -4,7 +4,7 @@ const COLOR = {
     secondary: "#16D26B",
     finally:"#09742B",
     color_1:"#3CB371",
-    // color2:"#00FA9A",
+    color2:"#00FA9A",
     color3:"#98FB98",
     color4:"#00FF7F",
     color5:"#4DDF57",
