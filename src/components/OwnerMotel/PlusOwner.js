@@ -14,6 +14,7 @@ import { authApi } from "../../configs/API";
 import { endpoints } from "../../configs/API";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import Toast from 'react-native-toast-message';
+import PlusOwnerStyle from "../../Styles/PlusOwnerStyle";
 
 
 const PlusOwner = () => {
@@ -90,7 +91,7 @@ const PlusOwner = () => {
         // Gọi hàm fetchMotels khi component được render và sau mỗi phút
         const interval = setInterval(() => {
             fetchMotels();
-        }, 60000); // 60000 milliseconds = 1 phút
+        }, 30000); // 60000 milliseconds = 1 phút
     
         // Xóa interval khi component bị unmount để tránh memory leak
         return () => clearInterval(interval);
@@ -187,17 +188,17 @@ const PlusOwner = () => {
     };
 
     return (
-        <View style={styles.container}>
+        <View style={PlusOwnerStyle.container}>
 
             <View style={HomeStyles.tab}>
                 <FontAwesome name="heart" size={24} color={COLOR.PRIMARY} style={HomeStyles.bellIcon} />
                 {/* <Ionicons name="arrow-back-outline" size={24} color={COLOR.PRIMARY} style={HomeStyles.bellIcon} /> */}
-                <Text style={styles.textHead}>Nhà trọ của tôi</Text>
+                <Text style={PlusOwnerStyle.textHead}>Nhà trọ của tôi</Text>
             </View>
             <TouchableWithoutFeedback onPress={handleAddRoomPress}>
-                <View style={styles.buttonAdd}>
+                <View style={PlusOwnerStyle.buttonAdd}>
                     <Feather name="plus" style={{ marginTop: 8 }} size={24} color="#fff" />
-                    <Text style={styles.textAdd}>Thêm mới</Text>
+                    <Text style={PlusOwnerStyle.textAdd}>Thêm mới</Text>
                 </View>
             </TouchableWithoutFeedback>
             {isLoading ? ( // Kiểm tra nếu đang tải dữ liệu
@@ -206,26 +207,26 @@ const PlusOwner = () => {
                 <ScrollView style={{ flex: 1 }} showsVerticalScrollIndicator={false}>
                     {storedMotels.map((item, index) => (
 
-                        <View key={index} style={styles.containerMotel}>
+                        <View key={index} style={PlusOwnerStyle.containerMotel}>
                             <Text>Id: {item.id}</Text>
                             <Text style={{ textAlign: "center", marginBottom: 5 }}>{item.name}</Text>
                             <View >
                                 <View style={{ flexDirection: "row" }}>
-                                    <View style={styles.tag}>
-                                        <MaterialIcons name="attach-money" style={styles.iconTag} size={20} color="green" />
+                                    <View style={PlusOwnerStyle.tag}>
+                                        <MaterialIcons name="attach-money" style={PlusOwnerStyle.iconTag} size={20} color="green" />
                                         <Text style={{ fontSize: 12 }}>{item.price} VNĐ</Text>
                                     </View>
-                                    <View style={styles.tag}>
-                                        <FontAwesome6 name="house-chimney-window" style={styles.iconTag} size={20} color="green" />
+                                    <View style={PlusOwnerStyle.tag}>
+                                        <FontAwesome6 name="house-chimney-window" style={PlusOwnerStyle.iconTag} size={20} color="green" />
                                         <Text style={{ fontSize: 12 }}>{item.area} m2</Text>
                                     </View>
-                                    <View style={styles.tag}>
-                                        <FontAwesome name="users" style={styles.iconTag} size={20} color="green" />
+                                    <View style={PlusOwnerStyle.tag}>
+                                        <FontAwesome name="users" style={PlusOwnerStyle.iconTag} size={20} color="green" />
                                         <Text>{item.max_people} Người</Text>
                                     </View>
                                 </View>
                                 <View style={{ flexDirection: "row", marginBottom: 10 }}>
-                                    <FontAwesome6 style={styles.iconTag} name="location-dot" size={20} color="green" />
+                                    <FontAwesome6 style={PlusOwnerStyle.iconTag} name="location-dot" size={20} color="green" />
                                     <Text style={{ fontSize: 12 }}>{item.ward}- {item.district}- {item.city}</Text>
                                 </View>
                             </View>
@@ -234,7 +235,7 @@ const PlusOwner = () => {
                                 renderItem={({ item }) => (
                                     <Image
                                         source={{ uri: item.url }}
-                                        style={[styles.imgMotel, { width: Dimensions.get('window').width }]}
+                                        style={[PlusOwnerStyle.imgMotel, { width: Dimensions.get('window').width }]}
                                         onLoad={() => handleImageChange(index)}
                                     />
                                 )}
@@ -243,22 +244,22 @@ const PlusOwner = () => {
                                 showsHorizontalScrollIndicator={false} // Tắt thanh trượt ngang
                             />
 
-                            <View style={styles.buttonContainer}>
+                            <View style={PlusOwnerStyle.buttonContainer}>
                                 {item.approved ? (
-                                    <TouchableOpacity onPress={() => handleEdit(item)} style={[styles.button, styles.editButton]}>
+                                    <TouchableOpacity onPress={() => handleEdit(item)} style={[PlusOwnerStyle.button, PlusOwnerStyle.editButton]}>
                                         <FontAwesome name="edit" size={13} color="black" />
-                                        <Text style={styles.buttonText}>Chỉnh sửa</Text>
+                                        <Text style={PlusOwnerStyle.buttonText}>Chỉnh sửa</Text>
                                     </TouchableOpacity>
                                 ) : (
-                                    <TouchableOpacity style={[styles.button, styles.editButton]}>
+                                    <TouchableOpacity style={[PlusOwnerStyle.button, PlusOwnerStyle.editButton]}>
                                         <FontAwesome name="hourglass-half" size={13} color="black" />
-                                        <Text style={styles.buttonText}>Đang chờ duyệt</Text>
+                                        <Text style={PlusOwnerStyle.buttonText}>Đang chờ duyệt</Text>
                                     </TouchableOpacity>
                                 )}
 
-                                <TouchableOpacity onPress={() => handleDelete(item.id)} style={[styles.button, styles.deleteButton]}>
+                                <TouchableOpacity onPress={() => handleDelete(item.id)} style={[PlusOwnerStyle.button, PlusOwnerStyle.deleteButton]}>
                                     <FontAwesome name="trash" size={13} color="black" />
-                                    <Text style={styles.buttonText}>Xóa</Text>
+                                    <Text style={PlusOwnerStyle.buttonText}>Xóa</Text>
                                 </TouchableOpacity>
 
 
@@ -272,129 +273,7 @@ const PlusOwner = () => {
 }
 
 const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        justifyContent: 'flex-start',
-        alignItems: 'center',
-    },
-    navContainer: {
-        width: "100%",
-    },
-    nav: {
-        width: "100%",
-        alignContent: "center"
-    },
-    tab: {
-        flexDirection: "row",
-        alignItems: "center",
-        justifyContent: "center",
-        width: "100%",
-        backgroundColor: COLOR.color11,
-        paddingVertical: 15,
-        paddingLeft: 10,
-        paddingTop: 20,
-        ...SHADOWS.medium,
-    },
-    textHead: {
-        fontSize: 18,
-        color: COLOR.PRIMARY,
-        fontWeight: "500",
-        textAlign: "center",
-        marginTop: 10,
-        marginLeft: 10
-    },
-    textAdd: {
-        color: "#fff",
-        fontWeight: "500",
-        textAlign: "center",
-        marginTop: 10,
-        marginLeft: 10
-    },
-    buttonAdd: {
-        backgroundColor: COLOR.color12,
-        padding: 8,
-        borderRadius: 20,
-        ...SHADOWS.medium,
-        flexDirection: "row",
-        marginTop: 10,
-        paddingBottom:15,
-        paddingHorizontal:20,
-
-    },
-    containerMotel: {
-        width: "98%",
-        ...SHADOWS.medium,
-        // borderRadius:30,
-        backgroundColor: COLOR.offWhite,
-        padding: 10,
-        // borderTopLeftRadius: 40,
-        // borderTopRightRadius: 30,
-
-        marginTop: 10,
-        borderRadius: 30,
-        marginBottom: 10
-    },
-    imgMotel: {
-        width: "55%",
-        height: 200,
-    },
-    tag: {
-        flexDirection: "row",
-        padding: 5,
-        borderRadius: 10,
-        backgroundColor:COLOR.color11,
-        marginTop: 3,
-        marginLeft: 5,
-        borderRadius: 20,
-        marginBottom: 20,
-        borderColor: COLOR.offWhite,
-        paddingRight:10,
-
-    }
-    , iconTag: {
-        paddingHorizontal: 10
-    },
-    buttonContainer: {
-        flexDirection: "row",
-        justifyContent: "flex-end",
-        marginTop: 10,
-    },
-    button: {
-        flexDirection: "row",
-        alignItems: "center",
-        paddingHorizontal: 10,
-        paddingVertical: 5,
-        borderRadius: 5,
-        marginVertical: 10,
-        marginHorizontal: 5,
-
-    },
-    buttonText: {
-        marginLeft: 5,
-        fontSize: 12
-    },
-    editButton: {
-        backgroundColor: "#FFD700",
-    },
-    deleteButton: {
-        backgroundColor: "#FF6347",
-    },
-    badgeContainer: {
-        position: 'absolute',
-        top: 100,
-        right: 10, // Hoặc left: 10 nếu bạn muốn đặt badge ở góc trái
-        // backgroundColor:COLOR.color6,
-        borderRadius: 10,
-        paddingHorizontal: 5,
-        paddingVertical: 2,
-    },
-    badgeText: {
-        color: COLOR.PRIMARY,
-        fontSize: 12,
-    },
-    imageContainer: {
-        position: "relative"
-    }
+    
 });
 
 export default PlusOwner;

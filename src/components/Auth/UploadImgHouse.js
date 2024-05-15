@@ -32,13 +32,24 @@ const UploadImgHouse = ({ navigation, route }) => {
             console.log("Error selecting images: ", error);
         }
     };
-
-    const renderImageItem = ({ item }) => (
-        <Image
-            source={{ uri: item.uri }}
-            style={styles.image}
-        />
+    const handleRemoveImage = (indexToRemove) => {
+        const newImages = images.filter((_, index) => index !== indexToRemove);
+        setImages(newImages);
+    };
+    
+    const renderImageItem = ({ item, index }) => (
+        <View style={{position:"relative"}}>
+            <TouchableOpacity onPress={() => handleRemoveImage(index)} style={styles.removeButton}>
+                <AntDesign name="close" size={15} color="red" />
+            </TouchableOpacity>
+            <Image
+                source={{ uri: item.uri }}
+                style={styles.image}
+            />
+            
+        </View>
     );
+    
     // Khi ấn submit
     const handleComplete = async () => {
         try {
@@ -237,6 +248,14 @@ const styles = StyleSheet.create({
         borderRadius: 10,
         width: "30%",
         ...SHADOWS.medium
+    },
+    removeButton:{
+        padding:5,
+        backgroundColor:"#fff",
+        width:30,
+        top:10,
+        zIndex:9000,
+        right:0
     }
 });
 

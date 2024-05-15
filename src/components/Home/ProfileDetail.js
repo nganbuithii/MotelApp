@@ -12,6 +12,7 @@ import Toast from 'react-native-toast-message';
 import MyStyles from '../../Styles/MyStyles';
 import showToast from '../common/ToastMessage';
 import Modal from 'react-native-modalbox';
+import InputField from '../common/InputField';
 
 import { FlatList } from 'react-native-gesture-handler';
 
@@ -151,7 +152,7 @@ const ProfileDetail = () => {
                         source={{ uri: item.avatar }}
                         style={styles.avatarMd}
                     />
-                    <Text style={styles.usernameMd}>ID:{item.id}{item.username}</Text>
+                    <Text style={styles.usernameMd}>{item.username}</Text>
                     <TouchableOpacity onPress={() => unFollow(item.id)} style={styles.unfollowButton}>
                         <Text style={{ color: "#fff" }}>Hủy Follow</Text>
                     </TouchableOpacity>
@@ -170,7 +171,7 @@ const ProfileDetail = () => {
                         source={{ uri: item.avatar }}
                         style={styles.avatarMd}
                     />
-                    <Text style={styles.usernameMd}>ID:{item.id}{item.username}</Text>
+                    <Text style={styles.usernameMd}>{item.username}</Text>
                     {/* <TouchableOpacity onPress={() => unFollow(item.id)} style={styles.unfollowButton}>
                         <Text style={{ color: "#fff" }}>Hủy Follow</Text>
                     </TouchableOpacity> */}
@@ -196,11 +197,11 @@ const ProfileDetail = () => {
                     />
                     <AntDesign name="camera" style={styles.iconCam} size={20} color={COLOR.PRIMARY} />
                 </TouchableOpacity>
-                <Text style={{ textAlign: "center", color: "green", fontSize: 20, fontWeight: "500" }}>{user.username}</Text>
+                <Text style={{ textAlign: "center", color: "green", fontSize: 20, fontWeight: "500", backgroundColor:"pink" }}>{user.username}</Text>
             </View>
 
 
-            <View style={MyStyles.flex}>
+            <View style={[MyStyles.flex, {}]}>
                 <TouchableOpacity style={styles.badgeContainer} onPress={getFollow}>
                     <Text style={styles.badgeText}>{user.follower_count}</Text>
                     <Text style={styles.badgeLabel}>Người theo dõi</Text>
@@ -237,7 +238,7 @@ const ProfileDetail = () => {
                 backdropPressToClose={true}
             >
                 <View style={styles.modalContent}>
-                    <TouchableOpacity onPress={() => setModalVisible(false)} style={styles.closeButton}>
+                    <TouchableOpacity onPress={() => setModalVisible1(false)} style={styles.closeButton}>
                         <AntDesign name="close" size={24} color="#fff" />
                     </TouchableOpacity>
                     <Text style={styles.modalTitle}>Danh sách người theo dõi</Text>
@@ -249,42 +250,24 @@ const ProfileDetail = () => {
                 </View>
             </Modal>
 
-
-
-
             <View style={styles.inputContainer}>
-                <Text style={styles.label}>Tên</Text>
-                <TextInput
-
-                    style={styles.inputDetail}
-                    value={lastname}
-                    onChangeText={(text) => setLastName(text)}
-                />
+                <InputField label="Tên" value={lastname}
+                    onChangeText={(text) => setLastName(text)}/>
             </View>
             <View style={styles.inputContainer}>
-                <Text style={styles.label}>Username</Text>
-                <TextInput
-
-                    style={styles.inputDetail}
-                    value={username}
-                    onChangeText={(text) => setUsername(text)}
-                />
+                <InputField label="Username" 
+                value={username}
+                onChangeText={(text) => setUsername(text)}/>
             </View>
             <View style={styles.inputContainer}>
-                <Text style={styles.label}>Email</Text>
-                <TextInput
-                    style={styles.inputDetail}
-                    value={email}
-                    onChangeText={(text) => setEmail(text)}
-                />
+            <InputField label="Email" 
+                value={email}
+                onChangeText={(text) => setEmail(text)}/>
             </View>
             <View style={styles.inputContainer}>
-                <Text style={styles.label}>Số điện thoại</Text>
-                <TextInput
-                    style={styles.inputDetail}
-                    value={phoneNumber}
-                    onChangeText={(text) => setPhoneNumber(text)}
-                />
+            <InputField label="Số điện thoại" 
+                value={phoneNumber}
+                onChangeText={(text) => setPhoneNumber(text)}/>
             </View>
             {loading ? (<ActivityIndicator />) : (
                 <ButtonAuth onPress={handleUpdate} title="Lưu thay đổi" />)}
@@ -313,9 +296,11 @@ const styles = StyleSheet.create({
         // aspectRatio: 1, // Đảm bảo tỷ lệ khung hình là 1:1
     },
     inputContainer: {
-        marginBottom: 10,
+        
+        // marginBottom: 10,
         width: '100%',
-        ...SHADOWS.medium
+        ...SHADOWS.medium,
+        marginTop:15
     },
     label: {
         marginBottom: 5,
@@ -397,11 +382,11 @@ const styles = StyleSheet.create({
         alignItems: 'center'
     },
     centralModal: {
-        width: '80%',
+        width: '90%',
         height: '80%',
         backgroundColor: 'white',
         borderRadius: 10,
-        padding: 20
+        
     },
     modalContent: {
         flex: 1,
@@ -416,8 +401,8 @@ const styles = StyleSheet.create({
     },
     closeButton: {
         position: 'absolute',
-        top: -40,
-        right: -50,
+        top: -30,
+        right: -20,
         padding: 10,
         backgroundColor: COLOR.PRIMARY,
         borderRadius: 50,
@@ -428,8 +413,8 @@ const styles = StyleSheet.create({
 
     },
     avatarMd: {
-        width: 80,
-        height: 80,
+        width: 50,
+        height: 50,
         borderRadius: 50,
         marginLeft: "auto",
         marginRight: 25,
@@ -437,6 +422,7 @@ const styles = StyleSheet.create({
     usernameMd: {
         fontSize: 20,
         fontWeight: "bold",
+        width:"35%"
         // marginRight: 50,
     },
     unfollowButton: {

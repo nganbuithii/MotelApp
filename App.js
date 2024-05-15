@@ -33,7 +33,7 @@ import Comment from './src/components/Home/Comment';
 import CreatePostRent from './src/components/Tenant/CreatePostRent';
 import Editpost from './src/components/Tenant/Editpost';
 import MapSearch from './src/components/common/MapSearch';
-
+import SearchSc from './src/components/Home/SearchSc';
 //Điều hướng kiểu stack
 const Stack = createStackNavigator();
 

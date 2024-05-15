@@ -28,7 +28,7 @@ export default StyleSheet.create({
         color: COLOR.secondary,
     },
     input: {
-        width: "85%",
+        width: "75%",
         color:"gray"
     },
     label: {

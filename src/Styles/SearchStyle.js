@@ -7,6 +7,9 @@ export default StyleSheet.create({
         flex: 1,
         backgroundColor: COLOR.bg_color1,
     },
+    input:{
+        marginRight:100
+    },
 
     inputContainer: {
         flexDirection: "row",

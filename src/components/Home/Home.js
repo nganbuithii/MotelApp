@@ -9,6 +9,7 @@ import SearchSc from './SearchSc';
 import ProfileSc from './ProfileSc';
 import NotificationsSc from './NotificationsSc';
 import MyContext from '../../configs/MyContext';
+import SearchStack from './SearchStack';
 import PlusOwner from '../OwnerMotel/PlusOwner';
 
 
@@ -34,7 +35,7 @@ const Home = () => {
 
     const renderScene = BottomNavigation.SceneMap({
         home: HomeIndex,
-        search: SearchSc,
+        search: SearchStack, 
         chat: ChatSc,
         notification: NotificationsSc,
         profile: ProfileSc,

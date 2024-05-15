@@ -16,16 +16,6 @@ import InputEditMotel from "../common/InputEditMotel";
 import showToast from "../common/ToastMessage";
 
 const EditMotel = ({ navigation, route }) => {
-    // const defaultServices = [
-    //     { label: "Điện", value: "0", period: "Kwh" },
-    //     { label: "Nước", value: "0", period: "m3" },
-    //     { label: "Internet", value: "0", period: "Tháng" },
-    // ];
-    // const [editingService, setEditingService] = useState(null);// Để xem đang chỉnh sửa dịch vụ nào
-    // const [newPrice, setNewPrice] = useState('');
-    // const [editingPrice, setEditingPrice] = useState(null);
-
-
 
     const { idMotel } = route.params;
     const [price, setPrice] = useState("");
@@ -40,54 +30,37 @@ const EditMotel = ({ navigation, route }) => {
     const [images, setImages] = useState([]);
     const [prices, setPrices] = useState([]);
     const [render, setRender] = useState(false);
-    // const addNewPrice = async ({ label, value, period }) => {
-    //     const token = await AsyncStorage.getItem("access-token");
-    //     // console.log(token);
-    //     // console.log(idMotel);
-    //     const formData = new FormData();
-    //     formData.append("label", label);
-    //     formData.append("value", value);
-    //     formData.append("period", period);
+    const [cities, setCities] = useState([]); // State để lưu trữ danh sách các tỉnh/thành phố
+    const [districts, setDistricts] = useState([]); // State để lưu trữ danh sách các quận/huyện
+    const [wards, setWards] = useState([]);
+    // const lon = route.params?.lon;
+    // const lat = route.params?.lat;
+    // const nameLoc = route.params?.nameLoc;
+    const [initialState, setInitialState] = useState({
+        ward: "",
+        district: "",
+        city: "",
+        other: "",
+        price: "",
+        area: "",
+        maxpeople: "",
+        desc: ""
+    });
 
-    //     let res = await authApi(token).post(endpoints['addPrice'](idMotel), formData, {
-    //         headers: {
-    //             'Content-Type': 'multipart/form-data',
-    //         },
-    //     });
-    //     console.log(res.data);
-    //     console.log("Thanh công add price");
-
-    // }
-
-    // const savePrice = async () => {
-    //     const token = await AsyncStorage.getItem("access-token");
-    //     const { idMotel } = route.params;
-    //     if (editingService) {
-    //         const { label, period } = editingService;
-    //         const formData = new FormData();
-    //         formData.append("label", label);
-    //         formData.append("value", newPrice);
-    //         formData.append("period", period);
-    //         console.log("FORRM DATA:", formData);
-    //         try {
-    //             // const res = await authApi(token).post(endpoints['addPrice'](idMotel), formData, {
-    //             //     headers: {
-    //             //         'Content-Type': 'multipart/form-data',
-    //             //     },
-    //             // });
-    //             // console.log(res.data);
-    //             console.log("Thêm giá tiền dịch vụ thành công");
-    //         } catch (error) {
-    //             console.error("Lỗi khi thêm giá tiền dịch vụ:", error);
-    //         }
-    //     }
-    // }
+    useEffect(() => {
+        console.log("Route params:", route.params);
+        if (route.params?.nameLoc) {
+            console.log("Here", route.params.nameLoc);
+            setOther(route.params.nameLoc);
+        }
+    }, [route.params?.nameLoc]);
     const exitModal = () => {
         setEditingService("");
     }
     const canDeleteImage = (index) => {
         return images.length > 3;
     };
+
     const fetchApiDeleteImg = async (idImage) => {
         try {
             const token = await AsyncStorage.getItem("access-token");
@@ -183,6 +156,16 @@ const EditMotel = ({ navigation, route }) => {
             // console.log("Mảng prices:", res.data.prices);
             setPrices(res.data.prices);
             setImages(res.data.images);
+            setInitialState({
+                ward: res.data.ward,
+                district: res.data.district,
+                city: res.data.city,
+                other: res.data.other_address,
+                price: String(res.data.price),
+                area: String(res.data.area),
+                maxpeople: String(res.data.max_people),
+                desc: res.data.description
+            });
         } catch (error) {
             console.error("Error fetching motel detail:", error);
             // Xử lý lỗi nếu có
@@ -206,7 +189,7 @@ const EditMotel = ({ navigation, route }) => {
                     'Content-Type': 'multipart/form-data',
                 },
             });
-            
+
             console.log("Xóa thành công prices");
             console.log("xóa thành công prices");
 
@@ -242,28 +225,8 @@ const EditMotel = ({ navigation, route }) => {
             ]
         );
     }
-    // const showToast1 = () => {
-    //     Toast.show({
-    //         type: "success",
-    //         text1: "Thành công",
-    //         text2: "Cập nhật thông tin thành công.",
-    //         visibilityTime: 3000, // Thời gian tồn tại của toast (milliseconds)
-    //         autoHide: true, // Tự động ẩn toast sau khi hết thời gian tồn tại
-    //     });
-    // };
-    // const showToast2 = () => {
-    //     Toast.show({
-    //         type: "error",
-    //         text1: "Cảnh báo",
-    //         text2: "Không có thông tin mới để cập nhật.",
-    //         visibilityTime: 3000, // Thời gian tồn tại của toast (milliseconds)
-    //         autoHide: true, // Tự động ẩn toast sau khi hết thời gian tồn tại
-    //     });
-    // };
+
     const handleExit = () => {
-        // console.log("Thoát");
-        // console.log("dỮ LIỆU KHI THOÁT");
-        // console.log(motel.images);
         console.log("id", idMotel);
         //console.log(motel.images)
         Alert.alert(
@@ -365,14 +328,31 @@ const EditMotel = ({ navigation, route }) => {
         try {
             const token = await AsyncStorage.getItem("access-token");
             const formData = new FormData();
-            formData.append("ward", ward);
-            formData.append("district", district);
-            formData.append("city", city);
-            formData.append("other_address", other);
-            formData.append("price", price);
-            formData.append("area", area);
-            formData.append("max_people", maxpeople);
-            formData.append("description", desc);
+            console.log("ID MOTEL", idMotel)
+
+            // So sánh giá trị hiện tại với giá trị ban đầu
+            if (ward !== initialState.ward) { formData.append("ward", ward); }
+            if (district !== initialState.district) { formData.append("district", district); }
+            if (city !== initialState.city) { formData.append("city", city); }
+            if (other !== initialState.other) { formData.append("other_address", other); }
+            if (price !== initialState.price) { formData.append("price", price); }
+            if (area !== initialState.area) { formData.append("area", area); }
+            if (maxpeople !== initialState.maxpeople) { formData.append("max_people", maxpeople); }
+            if (desc !== initialState.desc) { formData.append("description", desc); }
+            if(ward == initialState.ward && district == initialState.district &&
+                city==initialState.city && other ==initialState.other && maxpeople ==initialState.maxpeople
+                && desc == initialState.desc
+            ){
+                Alert.alert(
+                    "Thông báo",
+                    "Không có thông tin mới để cập nhật.",
+                    [
+                        { text: "OK", onPress: () => console.log("OK Pressed") }
+                    ],
+                    { cancelable: false }
+                );
+                return;
+            }
             const response = await authApi(token).patch(endpoints["updateMotel"](idMotel), formData, {
                 headers: {
                     'Content-Type': 'multipart/form-data',
@@ -386,12 +366,16 @@ const EditMotel = ({ navigation, route }) => {
             // Bật cờ render để render lại component
             setRender(!render);
         } catch (ex) {
-            console.error(ex);
+            // console.error(ex);
             showToast({ type: "error", text1: "Lỗi", text2: "Lỗi cập nhật" });
         }
 
     }
+    const nextMap = () => {
 
+        navigation.navigate('MapSearch', { previousScreen: 'EditMotel' });
+
+    }
     return (
         <View style={EditMotelStyle.container}>
             <View style={HomeStyles.tab}>
@@ -432,11 +416,11 @@ const EditMotel = ({ navigation, route }) => {
                         <FontAwesome6 name="location-dot" style={EditMotelStyle.icon} size={24} color="green"
                         />
                         <InputEditMotel onChangeText={(text) => setOther(text)} value={other} placeholder="Địa chỉ khác" />
+                        {/* <TouchableOpacity onPress={nextMap}>
+                            <FontAwesome5 name="map-marked-alt" style={EditMotelStyle.icon} size={24} color="green" />
+                        </TouchableOpacity> */}
+                    </View>
 
-                    </View>
-                    <View style={EditMotelStyle.inputContainer}>
-                        <FontAwesome5 name="map-marked-alt" style={EditMotelStyle.icon} size={24} color="green" />
-                    </View>
                     <Text style={EditMotelStyle.label}> Tiền phòng</Text>
                     <View style={EditMotelStyle.inputContainer}>
                         <FontAwesome

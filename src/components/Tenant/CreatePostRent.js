@@ -5,7 +5,7 @@ import {
 } from "react-native";
 import { COLOR, SHADOWS } from "../common/color";
 import RNPickerSelect from "react-native-picker-select";
-import { Ionicons } from "@expo/vector-icons";
+import { Entypo, Ionicons } from "@expo/vector-icons";
 import ButtonAuth from "../common/ButtonAuth";
 import MyContext from '../../configs/MyContext';
 import axios from 'axios';
@@ -15,8 +15,9 @@ import { authApi, endpoints } from "../../configs/API";
 import showToast from "../common/ToastMessage";
 import * as ImagePicker from "expo-image-picker";
 import PostStyle from "./PostStyle";
+import SearchStyle from "../../Styles/SearchStyle";
 
-const CreatePostRent = ({ navigation }) => {
+const CreatePostRent = ({ navigation, route }) => {
     const [cities, setCities] = useState([]); // State để lưu trữ danh sách các tỉnh/thành phố
     const [districts, setDistricts] = useState([]); // State để lưu trữ danh sách các quận/huyện
     const [wards, setWards] = useState([]);
@@ -37,7 +38,16 @@ const CreatePostRent = ({ navigation }) => {
     const [districtErr, setDistrictErr] = useState("");
     const [otherErr, setOtherErr] = useState("");
 
-
+    const lon = route.params?.lon;
+    const lat = route.params?.lat;
+    const nameLoc = route.params?.nameLoc;
+    useEffect(() => {
+        console.log("Route params:", route.params);
+        if (route.params?.nameLoc) {
+            console.log("Here", route.params.nameLoc);
+            setOther(route.params.nameLoc);
+        }
+    }, [route.params?.nameLoc]);
     const checkForCameraRollPermission = async () => {
         const { status } = await ImagePicker.getMediaLibraryPermissionsAsync();
         if (status !== "granted") {
@@ -152,24 +162,24 @@ const CreatePostRent = ({ navigation }) => {
             if (!district) { setDistrictErr("Vui lòng chọn quận huyện"); } else { setDistrictErr(""); }
             if (!other) { setOtherErr("Vui lòng chọn quận huyện"); } else { setOtherErr(""); }
             if (content && ward && district && city && other && image) {
-            let token = await AsyncStorage.getItem("access-token");
-            console.log(token);
-            const formData = new FormData();
-            formData.append("content", content);
-            formData.append("ward", getWardNameById(ward));
-            formData.append("city", getCityNameById(city));
-            formData.append("district", getDistrictNameById(district));
-            formData.append("other_address", other);
-            const uriParts = image.split('.');
-            const fileType = uriParts[uriParts.length - 1];
-            const img = {
-                uri: image,
-                name: `image.${fileType}`,
-                type: `image/${fileType}`,
-            }
+                let token = await AsyncStorage.getItem("access-token");
+                console.log(token);
+                const formData = new FormData();
+                formData.append("content", content);
+                formData.append("ward", getWardNameById(ward));
+                formData.append("city", getCityNameById(city));
+                formData.append("district", getDistrictNameById(district));
+                formData.append("other_address", other);
+                const uriParts = image.split('.');
+                const fileType = uriParts[uriParts.length - 1];
+                const img = {
+                    uri: image,
+                    name: `image.${fileType}`,
+                    type: `image/${fileType}`,
+                }
 
-            formData.append('image', img);
-           
+                formData.append('image', img);
+
                 let res = await authApi(token).post(endpoints["createPostForRent"], formData, {
                     headers: {
                         'Content-Type': 'multipart/form-data',
@@ -184,7 +194,9 @@ const CreatePostRent = ({ navigation }) => {
             console.error(ex);
         }
     };
-
+    const nextMap = () => {
+        navigation.navigate("MapSearch", { previousScreen: 'CreatePostRent' });;
+    }
     return (
         <View style={PostStyle.container}>
             <Image
@@ -226,10 +238,10 @@ const CreatePostRent = ({ navigation }) => {
                     )}
 
                     <Text style={PostStyle.sectionTitle}>Vị trí muốn tìm trọ</Text>
-                    <TouchableOpacity style={PostStyle.uploadButton}>
+                    {/* <TouchableOpacity style={PostStyle.uploadButton}>
                         <Feather name="map-pin" size={24} color="lightgreen" />
                         <Text style={PostStyle.uploadText}>Thêm vị trí</Text>
-                    </TouchableOpacity>
+                    </TouchableOpacity> */}
                 </View>
                 {!!wardErr && <Text style={PostStyle.errorText}><Ionicons name="warning" size={12} color="red" />{wardErr}</Text>}
                 <View style={PostStyle.selectContainer}>
@@ -266,14 +278,24 @@ const CreatePostRent = ({ navigation }) => {
                     />
                 </View>
                 {!!otherErr && <Text style={PostStyle.errorText}><Ionicons name="warning" size={12} color="red" />{otherErr}</Text>}
-                <View style={PostStyle.inputContainer}>
 
+                <View style={SearchStyle.inputContainer}>
+                    <Ionicons
+                        style={SearchStyle.icon}
+                        name="location-sharp"
+                        size={24}
+                        color="black"
+                    />
                     <TextInput
-                        style={PostStyle.input}
+                        style={SearchStyle.input}
                         value={other}
                         onChangeText={setOther}
-                        placeholder="Địa chỉ khác (Nếu có)"
+                        placeholder="Địa chỉ khác"
                     />
+                    <TouchableOpacity style={{ marginLeft: "auto" }} onPress={nextMap} >
+                        <Entypo style={{ backgroundColor: COLOR.PRIMARY, padding: 10, borderRadius: 10, }} name="map" size={24} color="#fff" />
+                    </TouchableOpacity>
+
                 </View>
 
                 <View style={PostStyle.buttonContainer}>

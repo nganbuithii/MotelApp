@@ -14,8 +14,13 @@ import HomeStyles from "../../Styles/HomeStyles";
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { authApi, endpoints } from "../../configs/API";
+import { Entypo } from '@expo/vector-icons';
+import { useNavigation } from '@react-navigation/native';
 
-const SearchSc = () => {
+
+const SearchSc = ({ route }) => {
+
+  const navigation = useNavigation();
   const [cities, setCities] = useState([]); // State để lưu trữ danh sách các tỉnh/thành phố
   const [districts, setDistricts] = useState([]); // State để lưu trữ danh sách các quận/huyện
   const [wards, setWards] = useState([]);
@@ -28,6 +33,19 @@ const SearchSc = () => {
   const [priceFilter, setPriceFilter] = useState();
   const [areaFilter, setAreaFilter] = useState();
   const [searchStarted, setSearchStarted] = useState(false);
+
+  const lon = route.params?.lon;
+  const lat = route.params?.lat;
+  const nameLoc = route.params?.nameLoc;
+  useEffect(() => {
+    console.log("Route params:", route.params);
+    if (route.params?.nameLoc) {
+        console.log("Here", route.params.nameLoc);
+        setOther(route.params.nameLoc);
+    }
+}, [route.params?.nameLoc]);
+
+
 
 
   const [data, setData] = useState([]);
@@ -73,6 +91,7 @@ const SearchSc = () => {
         if (response.data.error === 0) {
           setCities(response.data.data); // Cập nhật state với danh sách tỉnh/thành phố
         }
+
       } catch (error) {
         console.error('Error fetching cities:', error);
       }
@@ -175,6 +194,11 @@ const SearchSc = () => {
       </View>
     </View>
   );
+  const nextMap = () => {
+    navigation.navigate('MapSearch', { previousScreen: 'SearchSc' });
+
+  }
+
   return (
     <View style={SearchStyle.container}>
       <Image
@@ -187,6 +211,7 @@ const SearchSc = () => {
         <Text style={HomeStyles.textHead}>Lọc tìm kiếm </Text>
 
       </View>
+      
       <TouchableOpacity style={SearchStyle.xoaLoc} onPress={handleClearFilter}>
         <MaterialIcons name="filter-alt-off" size={24} color="black" />
         <Text> Xóa lọc</Text>
@@ -237,6 +262,10 @@ const SearchSc = () => {
             onChangeText={setOther}
             placeholder="Địa chỉ khác"
           />
+          <TouchableOpacity style={{ marginLeft: "auto" }} onPress={nextMap} >
+            <Entypo style={{ backgroundColor: COLOR.PRIMARY, padding: 10, borderRadius: 10, }} name="map" size={24} color="#fff" />
+          </TouchableOpacity>
+
         </View>
         <View style={SearchStyle.selectContainer}>
           <RNPickerSelect
@@ -285,7 +314,7 @@ const SearchSc = () => {
         {searchStarted ? (
           <View>
             {data.length > 0 ? (
-             data.map((item, index) => renderItem({item}))
+              data.map((item, index) => renderItem({ item }))
 
             ) : (
               <Text style={SearchStyle.noResultText} key="no-result">Không tìm thấy kết quả phù hợp.</Text>

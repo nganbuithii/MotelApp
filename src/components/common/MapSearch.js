@@ -10,6 +10,7 @@ const windowWidth = Dimensions.get("window").width;
 import { AntDesign } from '@expo/vector-icons';
 import { Searchbar } from 'react-native-paper';
 import { COLOR } from "./color";
+import SearchSc from "../Home/SearchSc";
 
 const MapSearch = ({ navigation, route }) => {
     const [animation] = useState(new Animated.Value(400));
@@ -97,7 +98,26 @@ const MapSearch = ({ navigation, route }) => {
             const data = await response.json();
             const firstLocation = data.resourceSets[0].resources[0];
             const locationName = firstLocation.name; // Lấy tên vị trí
-            navigation.navigate("RegisterMotel", { lat:latitude, lon:longitude, nameLoc:locationName });
+            console.log(latitude);
+            console.log(locationName);
+            console.log(longitude);
+            const previousScreen = route.params?.previousScreen;
+
+            // Tùy thuộc vào màn hình trước đó, thực hiện điều hướng tương ứng
+            switch (previousScreen) {
+                case 'SearchSc':
+                    navigation.navigate('SearchSc', { lat: latitude, lon: longitude, nameLoc: locationName });
+                    break;
+                case 'RegisterMotel':
+                    navigation.navigate('RegisterMotel', { lat: latitude, lon: longitude, nameLoc: locationName });
+                    break;
+                case 'CreatePostRent':
+                    navigation.navigate('CreatePostRent', { lat: latitude, lon: longitude, nameLoc: locationName });
+                    break;
+                default:
+                    navigation.goBack(); // Trường hợp mặc định, quay lại màn hình trước
+                    break;
+            }
         } catch (error) {
             console.error("Error searching location:", error);
             Alert.alert(

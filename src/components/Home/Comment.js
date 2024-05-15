@@ -231,7 +231,7 @@ const Comment = ({ route }) => {
                                                         <View style={styles.replyDetails}>
                                                             <Text style={{ fontWeight: "500", fontSize: 16 }}>{reply.user.username}</Text>
                                                             <Text>{reply.content}</Text>
-                                                            <Text>{calculateTimeAgo(reply.created_date)}</Text>
+                                                            <Text style={{color:"gray", fontSize:12}}>{calculateTimeAgo(reply.created_date)}</Text>
                                                         </View>
                                                     </View>
                                                 ))}

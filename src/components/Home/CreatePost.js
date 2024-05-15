@@ -9,7 +9,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { authApi, endpoints } from "../../configs/API";
 import { Ionicons } from '@expo/vector-icons';
 
-const CreatePost = ({navigation}) => {
+const CreatePost = ({ navigation }) => {
     const [motels, setMotels] = useState([]);
     const [user, dispatch] = useContext(MyContext);
 
@@ -40,36 +40,30 @@ const CreatePost = ({navigation}) => {
 
     const handleSubmit = async () => {
         try {
-            if (!content) {
-                setContentError("Vui lòng nhập mô tả");
-            } else {
-                setContentError("");
-            }
-            if (!selectedHouse) {
-                setHouseError("Vui lòng chọn nhà trọ");
-            } else {
-                setHouseError("");
-            }
+            if (!content) { setContentError("Vui lòng nhập mô tả"); }
+            else { setContentError(""); }
+            if (!selectedHouse) { setHouseError("Vui lòng chọn nhà trọ"); }
+            else { setHouseError(""); }
             // Kiểm tra xem tất cả các trường đều đã hợp lệ
-        if ( content && selectedHouse) {
-            const token = await AsyncStorage.getItem("access-token");
-            const formData = new FormData();
-            // formData.append("title", title);
-            formData.append("content", content);
-            formData.append("motel", selectedHouse.id);
-            console.log("ID", selectedHouse.id);
-            console.log("form", formData);
-            console.log(token);
-            let res = await authApi(token).post(endpoints['createPost'], formData, {
-                headers: {
-                    'Content-Type': 'multipart/form-data',
-                },
-            });
-            console.log("Đăng bài thành công");
-            console.log("res daata post:", res.data);
-            navigation.navigate("HomeIndex",{myPost: res.data})
-            
-        }
+            if (content && selectedHouse) {
+                const token = await AsyncStorage.getItem("access-token");
+                const formData = new FormData();
+                // formData.append("title", title);
+                formData.append("content", content);
+                formData.append("motel", selectedHouse.id);
+                console.log("ID", selectedHouse.id);
+                console.log("form", formData);
+                console.log(token);
+                let res = await authApi(token).post(endpoints['createPost'], formData, {
+                    headers: {
+                        'Content-Type': 'multipart/form-data',
+                    },
+                });
+                console.log("Đăng bài thành công");
+                console.log("res daata post:", res.data);
+                navigation.navigate("HomeIndex", { myPost: res.data })
+
+            }
         } catch (ex) {
             console.error(ex);
         }
@@ -80,8 +74,8 @@ const CreatePost = ({navigation}) => {
             <View style={styles.container}>
                 <View style={styles.userInfo}>
                     <Image
-        source={{uri:user.avatar}} // Thay đổi đường dẫn của ảnh mặc định
-        style={styles.avatar} />
+                        source={{ uri: user.avatar }} // Thay đổi đường dẫn của ảnh mặc định
+                        style={styles.avatar} />
                     <Text style={styles.username}>{user.username}</Text>
                 </View>
                 <View style={styles.containerBody}>
@@ -170,8 +164,8 @@ const styles = StyleSheet.create({
         height: 70,
         borderRadius: 40,
         marginRight: 10,
-        borderWidth:2,
-        borderColor:COLOR.PRIMARY
+        borderWidth: 2,
+        borderColor: COLOR.PRIMARY
     },
     username: {
         fontSize: 16,
