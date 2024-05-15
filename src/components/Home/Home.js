@@ -2,7 +2,7 @@ import * as React from 'react';
 import { View } from 'react-native';
 import { BottomNavigation, Text } from 'react-native-paper';
 import { COLOR } from '../common/color';
-import { HomeIcon, SearchIcon, ChatIcon, NotificationIcon, ProfileIcon, PlusIcon } from '../common/Icon'
+import { HomeIcon, SearchIcon, ChatIcon, NotificationIcon, ProfileIcon, PlusIcon, HeartIcon } from '../common/Icon'
 import HomeIndex from './HomeIndex';
 import ChatSc from './ChatSc';
 import SearchSc from './SearchSc';
@@ -12,6 +12,13 @@ import MyContext from '../../configs/MyContext';
 import SearchStack from './SearchStack';
 import PlusOwner from '../OwnerMotel/PlusOwner';
 
+const MusicRoute = () => <Text>Music</Text>;
+
+const AlbumsRoute = () => <Text>Albums</Text>;
+
+const RecentsRoute = () => <Text>Recents</Text>;
+
+const NotificationsRoute = () => <Text>Notifications</Text>;
 
 const Home = () => {
     const [index, setIndex] = React.useState(0);
@@ -22,12 +29,13 @@ const Home = () => {
         { key: 'chat', focusedIcon: ChatIcon, unfocusedIcon: ChatIcon },
         { key: 'notification', focusedIcon: NotificationIcon, unfocusedIcon: NotificationIcon },
         { key: 'profile', focusedIcon: ProfileIcon, unfocusedIcon: ProfileIcon },
+
     ]);
 
     const [routesOwner] = React.useState([
         { key: 'home', focusedIcon: HomeIcon, unfocusedIcon: HomeIcon },
         { key: 'chat', focusedIcon: ChatIcon, unfocusedIcon: ChatIcon },
-        { key: 'plus', focusedIcon: PlusIcon, unfocusedIcon: PlusIcon },
+        { key: 'plus', focusedIcon: HeartIcon, unfocusedIcon: HeartIcon },
         { key: 'notification', focusedIcon: NotificationIcon, unfocusedIcon: NotificationIcon },
         { key: 'profile', focusedIcon: ProfileIcon, unfocusedIcon: ProfileIcon },
     ]);
@@ -35,11 +43,11 @@ const Home = () => {
 
     const renderScene = BottomNavigation.SceneMap({
         home: HomeIndex,
-        search: SearchStack, 
+        search: SearchStack,
         chat: ChatSc,
         notification: NotificationsSc,
         profile: ProfileSc,
-        plus:PlusOwner
+        plus: PlusOwner
     });
 
     return (
@@ -48,9 +56,10 @@ const Home = () => {
                 navigationState={{ index, routes }}
                 onIndexChange={setIndex}
                 renderScene={renderScene}
-                barStyle={{ backgroundColor: COLOR.color12, height: '7%' }}
-                activeColor={COLOR.finally}
-                inactiveColor="#fff" // Màu trắng cho icon không active
+                barStyle={{ backgroundColor: COLOR.color11, height: '7.5%' }}
+                activeColor={COLOR.PRIMARY}
+                inactiveColor="#7CDFA9"// Màu trắng cho icon không active
+            
             />
 
         </View>

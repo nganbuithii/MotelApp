@@ -1,9 +1,10 @@
 import { View, Text, StyleSheet, TextInput, FlatList, TouchableOpacity, Image, ScrollView, Alert, ActivityIndicator, Modal, } from "react-native";
 import HomeStyles from "../../Styles/HomeStyles";
-import { Entypo, MaterialIcons } from "@expo/vector-icons";
-import { COLOR } from "../common/color";
+import { Entypo, Foundation, MaterialIcons } from "@expo/vector-icons";
+import { COLOR, SHADOWS } from "../common/color";
 import { AntDesign } from "@expo/vector-icons";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
+
 import { FontAwesome } from "@expo/vector-icons";
 import { FontAwesome6 } from "@expo/vector-icons";
 import { FontAwesome5 } from "@expo/vector-icons";
@@ -339,10 +340,10 @@ const EditMotel = ({ navigation, route }) => {
             if (area !== initialState.area) { formData.append("area", area); }
             if (maxpeople !== initialState.maxpeople) { formData.append("max_people", maxpeople); }
             if (desc !== initialState.desc) { formData.append("description", desc); }
-            if(ward == initialState.ward && district == initialState.district &&
-                city==initialState.city && other ==initialState.other && maxpeople ==initialState.maxpeople
+            if (ward == initialState.ward && district == initialState.district &&
+                city == initialState.city && other == initialState.other && maxpeople == initialState.maxpeople
                 && desc == initialState.desc
-            ){
+            ) {
                 Alert.alert(
                     "Thông báo",
                     "Không có thông tin mới để cập nhật.",
@@ -397,72 +398,57 @@ const EditMotel = ({ navigation, route }) => {
                     <Text style={EditMotelStyle.labelService}> Thông tin phòng</Text>
                     {/* <Text> {idMotel}</Text> */}
                     <Text style={EditMotelStyle.label}>Xã/Phường</Text>
-                    <View style={EditMotelStyle.inputContainer}>
-                        <FontAwesome5 name="location-arrow" style={EditMotelStyle.icon} size={24} color="green" />
-                        <InputEditMotel value={ward} placeholder="Xã/Phường" onChangeText={(text) => setWard(text)} />
+
+                    <View style={styles.inputContainer}>
+                        <MaterialIcons style={styles.icon} name="edit-location" size={24} color="black" />
+                        <TextInput style={styles.input} value={ward} onChangeText={setWard}
+                            placeholder="Xã/phường" />
                     </View>
                     <Text style={EditMotelStyle.label}> Quận/Huyện</Text>
-                    <View style={EditMotelStyle.inputContainer}>
-                        <FontAwesome5 name="location-arrow" style={EditMotelStyle.icon} size={24} color="green" />
-                        <InputEditMotel placeholder="Quận/Huyện" value={district} onChangeText={(text) => setDistrict(text)} />
+                    <View style={styles.inputContainer}>
+                        <MaterialIcons style={styles.icon} name="edit-location" size={24} color="black" />
+                        <TextInput style={styles.input} value={district} onChangeText={setDistrict}
+                            placeholder="Quận/ Huyện" />
                     </View>
                     <Text style={EditMotelStyle.label}>Tỉnh/Thành phố</Text>
-                    <View style={EditMotelStyle.inputContainer}>
-                        <FontAwesome5 name="location-arrow" style={EditMotelStyle.icon} size={24} color="green" />
-                        <InputEditMotel value={city} placeholder="Tỉnh/Thành phố" onChangeText={(text) => setCity(text)} />
+                    <View style={styles.inputContainer}>
+                        <MaterialIcons style={styles.icon} name="edit-location" size={24} color="black" />
+                        <TextInput style={styles.input} value={city} onChangeText={setCity}
+                            placeholder="Tỉnh/ Thành phố" />
                     </View>
                     <Text style={EditMotelStyle.label}> Địa chỉ khác</Text>
-                    <View style={EditMotelStyle.inputContainer}>
-                        <FontAwesome6 name="location-dot" style={EditMotelStyle.icon} size={24} color="green"
-                        />
-                        <InputEditMotel onChangeText={(text) => setOther(text)} value={other} placeholder="Địa chỉ khác" />
-                        {/* <TouchableOpacity onPress={nextMap}>
-                            <FontAwesome5 name="map-marked-alt" style={EditMotelStyle.icon} size={24} color="green" />
-                        </TouchableOpacity> */}
+                    <View style={styles.inputContainer}>
+                        <MaterialIcons style={styles.icon} name="edit-location" size={24} color="black" />
+                        <TextInput style={styles.input} value={ward} onChangeText={setWard}
+                            placeholder="Địa chỉ khác" />
                     </View>
 
                     <Text style={EditMotelStyle.label}> Tiền phòng</Text>
-                    <View style={EditMotelStyle.inputContainer}>
-                        <FontAwesome
-                            name="money"
-                            style={EditMotelStyle.icon}
-                            size={24}
-                            color="green"
-                        />
-                        <InputEditMotel onChangeText={(text) => setPrice(text)} value={price} placeholder="Giá phòng" />
-
+                    <View style={styles.inputContainer}>
+                    <Foundation style={styles.icon} name="dollar" size={24} color="black" />
+                       
+                        <TextInput style={styles.input} value={price} onChangeText={setPrice}
+                            placeholder="Tiền phòng" />
                     </View>
                     <Text style={EditMotelStyle.label}> Diện tích</Text>
-                    <View style={EditMotelStyle.inputContainer}>
-                        <FontAwesome6 name="house" style={EditMotelStyle.icon} size={24} color="green" />
-                        <TextInput
-                            onChangeText={(text) => setArea(text)}
-                            value={area}
-                            style={EditMotelStyle.input}
-                            placeholder="Diện tích"
-                        />
+                    <View style={styles.inputContainer}>
+                    <AntDesign style={styles.icon} name="areachart" size={24} color="black" />
+                        <TextInput style={styles.input} value={area} onChangeText={setArea}
+                            placeholder="Diện tích" />
                     </View>
                     <Text style={EditMotelStyle.label}> Mô tả</Text>
 
-                    <View style={EditMotelStyle.inputContainer}>
-                        <Entypo
-                            name="pencil"
-                            style={EditMotelStyle.icon}
-                            size={24}
-                            color="green"
-                        />
-                        <InputEditMotel onChangeText={(text) => setDesc(text)} value={desc} placeholder="Mô tả" />
+                    <View style={styles.inputContainer}>
+                    <MaterialIcons style={styles.icon} name="mode-edit-outline" size={24} color="black" />
+                        <TextInput style={styles.input} value={desc} onChangeText={setDesc}
+                            placeholder="Mô tả" />
                     </View>
                     <Text style={EditMotelStyle.label}> Số người</Text>
 
-                    <View style={EditMotelStyle.inputContainer}>
-                        <FontAwesome5
-                            name="users"
-                            style={EditMotelStyle.icon}
-                            size={24}
-                            color="green"
-                        />
-                        <InputEditMotel onChangeText={(text) => setMaxpeople(text)} value={maxpeople} placeholder="Số người" />
+                    <View style={styles.inputContainer}>
+                    <MaterialIcons style={styles.icon} name="supervised-user-circle" size={24} color="black" />
+                        <TextInput style={styles.input} value={maxpeople} onChangeText={setMaxpeople}
+                            placeholder="Số người ở" />
                     </View>
                 </View>
 
@@ -536,5 +522,25 @@ const EditMotel = ({ navigation, route }) => {
         </View>
     );
 };
-
+const styles = StyleSheet.create({
+    inputContainer: {
+        flexDirection: "row",
+        alignItems: "center",
+        borderBottomWidth: 2,
+        borderBottomColor: COLOR.bg_color1,
+        borderRadius: 20,
+        padding: 10,
+        marginVertical: 5,
+        backgroundColor: "#fff",
+        ...SHADOWS.small,
+        width:"90%",
+        marginLeft:20,
+        alignContent:"center",
+        // justifyContent:"center"
+    },
+    icon: {
+        width: 45,
+        color: COLOR.PRIMARY,
+    },
+})
 export default EditMotel;

@@ -13,11 +13,13 @@ import API, { authApi, endpoints } from "../../configs/API";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { SimpleLineIcons } from '@expo/vector-icons';
 import Modal from 'react-native-modalbox';
+import { FontAwesome6 } from '@expo/vector-icons';
 import { Button } from "react-native-paper";
 import HomeStyles from "../../Styles/HomeStyles";
 import showToast from "../common/ToastMessage";
 import { FontAwesome } from '@expo/vector-icons';
 import RentPostsList from "./RentPostList";
+import PostCreateStyle from "../../Styles/PostCreateStyle";
 
 const HomeIndex = ({ route }) => {
   const [postContent, setPostContent] = useState("");
@@ -40,6 +42,7 @@ const HomeIndex = ({ route }) => {
   const [tinTimNhaActive, setTinTimNhaActive] = useState(false);
   const [tinChoThueActive, setTinChoThueActive] = useState(true);
   const [page, setPage] = useState(1); // Trang hiện tại
+  const [dataMotel, setDataMotel] = useState([]);
 
   const [motels, setMotels] = useState([]);
   // const [liked, setLiked] = useState(false);
@@ -55,7 +58,7 @@ const HomeIndex = ({ route }) => {
   const renderItem = ({ item }) => (
     <Image
       source={{ uri: item.url }}
-      style={[styles.image, { width: Dimensions.get("window").width }]}
+      style={[styles.image, { width: Dimensions.get("window").width - 40 }]}
     />
   );
 
@@ -350,20 +353,34 @@ const HomeIndex = ({ route }) => {
         setRender(!render);
       }
 
-      // setIsFollowing(!isFollowing);
-      // if(follow ==false){
-      //     dispatch({ type: 'update_user', payload: { ...user, following_count: user.following_count +1 } }); // Cập nhật số người đang theo dõi
-      // }else{
-      //     dispatch({ type: 'update_user', payload: { ...user, following_count: user.following_count -1 } }); // Cập nhật số người đang theo dõi
-      // }
-
     } catch (ex) {
       console.error(ex);
     }
   }
-  const detailNext = () => {
-
+  const getAllMotel = async () => {
+    try {
+      const token = await AsyncStorage.getItem("access-token");
+      let res = await authApi(token).get(endpoints["getMotelFilter"]);
+      console.log("DATAAAAAAAA NHÀ TRỌ ALL:", res.data);
+      setDataMotel(res.data.results);
+    } catch (ex) {
+      console.error(ex);
+    }
   }
+  const DetailMotelById =async (id) => {
+    try{
+      const token =await AsyncStorage.getItem("access-token");
+      const res = await authApi(token).get(endpoints["detailMotel"](id));
+      console.log(res.data);
+    }catch(ex){
+      console.error(ex);
+    }
+  }
+  useEffect(() => {
+    getAllMotel();
+    console.log("DATAAAAA3J23IO23:", dataMotel);
+  }, [])
+
   return (
     <View style={MyStyles.container}>
 
@@ -374,7 +391,6 @@ const HomeIndex = ({ route }) => {
         scrollEventThrottle={16} // Tần số gọi hàm khi cuộn (16ms = 60fps)
       >
         {/* Thanh đăng bài nằm ngang */}
-
         <View style={HomeStyles.postBar}>
           <Image
             source={{ uri: user.avatar }} // Thay đổi đường dẫn của ảnh mặc định
@@ -388,26 +404,73 @@ const HomeIndex = ({ route }) => {
               <AntDesign name="pluscircleo" size={24} color="black" />
             </View>
           </TouchableOpacity>
+        </View>
 
+        <View style={{
+          backgroundColor: COLOR.offWhite, paddingVertical: 10,
+        }}>
+          <Text style={[PostCreateStyle.sectionTitle, { color: COLOR.PRIMARY }]}>Khám phá phòng trọ</Text>
+          <FlatList
+            data={dataMotel}
+            keyExtractor={(item, index) => index.toString()}
+            horizontal
+            renderItem={({ item }) => (
+              <View style={styles.KhamPha}>
+                <Image
+                  source={{ uri: user.avatar }}
+                  style={{ width: 120, height: 150, borderRadius: 10, }}
+                />
+                <Text>{item.id}</Text>
+                <View style={{ flexDirection: "row", marginTop: 5 }}>
+                  <Entypo name="pencil" size={15} color="orange" style={HomeStyles.iconPost} />
+                  <Text style={HomeStyles.textKP}>{item.description}</Text>
+                </View>
 
+                <View style={{ flexDirection: "row" }}>
+                  <FontAwesome6 name="location-dot" size={15} color="orange" style={HomeStyles.iconPost} />
+                  <Text style={HomeStyles.textKP}>{item.city}</Text>
+                </View>
+                <View style={{ flexDirection: "row" }}>
+                  <Feather name="dollar-sign" size={15} color="orange" style={HomeStyles.iconPost} />
+                  <Text style={HomeStyles.textKP}>{item.price} VNĐ</Text>
+                </View>
+                <Text style={HomeStyles.textDetail}>xem chi tiết </Text>
+
+              </View>
+            )}
+          />
         </View>
         {/* <TouchableOpacity onPress={fetchNextPagePost}><Text>khfwkehf</Text></TouchableOpacity> */}
         <View style={styles.buttonContainer}>
           <TouchableOpacity style={[styles.buttonLoc, tinChoThueActive ? styles.activeButton : null]} onPress={handleTinChoThue}>
-            <Text style={[styles.buttonText, tinChoThueActive ? styles.activeButtonText : null]}>Tin bài cho thuê<FontAwesome name="home" size={15} color="#fff" /></Text>
+            <Text style={[styles.buttonText, tinChoThueActive ? styles.activeButtonText : null]}>Tin bài cho thuê</Text>
+            <FontAwesome name="home" size={15} color="#fff" />
           </TouchableOpacity>
 
-          <TouchableOpacity style={[styles.buttonLoc, tinTimNhaActive ? styles.activeButton : null]} onPress={handleTinTimNha}>
-            <Text style={[styles.buttonText, tinTimNhaActive ? styles.activeButtonText : null]}>Tin tìm nhà<FontAwesome5 name="search" size={15} color="#fff" /></Text>
+          <TouchableOpacity style={[styles.buttonLoc, tinTimNhaActive ? styles.activeButton : null,]} onPress={handleTinTimNha}>
+            <Text style={[styles.buttonText, tinTimNhaActive ? styles.activeButtonText : null]}>Tin tìm nhà</Text>
+            <FontAwesome5 name="search" size={15} color="#fff" />
           </TouchableOpacity>
         </View>
+        <View style={styles.textContainer}>
+        {tinChoThueActive && <Text style={[PostCreateStyle.sectionTitle, { color: COLOR.PRIMARY }]}>Bảng tin bài đăng cho thuê nhà</Text>}
+        {tinTimNhaActive && <Text style={[PostCreateStyle.sectionTitle, { color: COLOR.PRIMARY }]}>Bảng tin tìm nhà</Text>}
+      </View>
         {posts.map((post, index) => (
           <View key={index} style={styles.myPost}>
-            <Text>id: {post.id}</Text>
+            {/* <Text>id: {post.id}</Text> */}
+            {post.user.id === user.id && (
+              <TouchableWithoutFeedback onPress={() => setShowOptions({ ...showOptions, [post.id]: !showOptions[post.id] })}>
+                <Entypo name="dots-three-horizontal" style={styles.iconDetail} size={24} color="black" />
+              </TouchableWithoutFeedback>
+            )}
 
             <View style={styles.postContainer}>
+
               <View style={styles.userInfoContainer}>
+
                 <TouchableOpacity
+                  style={styles.avatarContainer}
                   onPress={() => {
                     navigation.navigate("DetailOwner", { ownerId: post.user.id });
                     navigation.addListener('focus', async () => {
@@ -430,19 +493,15 @@ const HomeIndex = ({ route }) => {
               <TouchableOpacity
                 style={styles.btnFollow}
                 onPress={() => handleFollow(post.user.id)}>
-                {post.user.followed ? <Text style={{ color: "#fff" }}>Đang theo dõi</Text> :
-                  <Text style={{ color: "#fff" }}>Theo dõi</Text>
+                {post.user.followed ? <Text style={{ color: COLOR.PRIMARY, fontSize: 12 }}>Đang theo dõi</Text> :
+                  <Text style={{ color: COLOR.PRIMARY, fontSize: 12 }}>Theo dõi</Text>
                 }
-                {/* <Text style={{ color: "#fff" }}>{ownerFollowed ? "Đang theo dõi" : "Theo dõi"}</Text> */}
-                <Entypo name={post.user.followed ? "minus" : "plus"} size={10} color="#fff" />
+                <Entypo name={post.user.followed ? "minus" : "plus"} size={10} color="lightgreen" />
               </TouchableOpacity>
 
-              {post.user.id === user.id && (
-                <TouchableWithoutFeedback onPress={() => setShowOptions({ ...showOptions, [post.id]: !showOptions[post.id] })}>
-                  <SimpleLineIcons name="options-vertical" size={20} color="black" />
-                </TouchableWithoutFeedback>
-              )}
+
             </View>
+
             {showOptions[post.id] && (
               <View style={HomeStyles.modalContainer}>
                 <TouchableOpacity onPress={() => handleEdit(post.id, post)}>
@@ -507,17 +566,15 @@ const HomeIndex = ({ route }) => {
 
             <TouchableWithoutFeedback onPress={() => handleDetail(post.motel.id)}>
               <View>
-                <View style={{ flexDirection: "row" }}>
+                <View style={{ flexDirection: "row", width: "100%", paddingHorizontal: 10 }}>
                   <Entypo name="location-pin" size={20} color="orange" />
-                  <Text style={{ color: "gray" }}>
-                    <View>
-                      <Text style={{ color: "gray" }}>
-                        {post.motel ? `${post.motel.ward}, ${post.motel.district}, ${post.motel.city}` : `${post.ward}, ${post.district}, ${post.city}`}
-                      </Text>
-                    </View>
-
-                  </Text>
+                  <View style={{ flex: 1 }}>
+                    <Text style={{ color: "gray" }}>
+                      {post.motel ? `${post.motel.ward}, ${post.motel.district}, ${post.motel.city}` : `${post.ward}, ${post.district}, ${post.city}`}
+                    </Text>
+                  </View>
                 </View>
+
                 <View>
                   <Text style={HomeStyles.desc}>{post.content}</Text>
                   {/* Ảnh bài đăng */}
@@ -553,12 +610,12 @@ const HomeIndex = ({ route }) => {
             {/* icon */}
             <View style={styles.iconContainer}>
               <View style={MyStyles.flex}>
-                <Text>{post.like_count} </Text>
+                <Text style={{ fontWeight: "bold" }}>{post.like_count} </Text>
                 <TouchableWithoutFeedback onPress={() => handleLike(post.id)}>
                   {likedState[post.id] ? <AntDesign style={HomeStyles.iconPost} name="heart" size={24} color="red" /> :
-                    <Feather style={HomeStyles.iconPost} name="heart" size={24} color="gray" />}
+                    <Feather style={HomeStyles.iconPost} name="heart" size={24} color="black" />}
                 </TouchableWithoutFeedback>
-                <Text>{post.comment_count} </Text>
+                <Text style={{ fontWeight: "bold" }}>{post.comment_count} </Text>
 
                 <TouchableWithoutFeedback onPress={() => handleComment(post.id)}>
                   <Feather
@@ -594,56 +651,85 @@ const styles = StyleSheet.create({
     alignItems: "center",
     marginVertical: 10,
     paddingHorizontal: 10,
+    position: "relative",
+
   },
   userInfoContainer: {
-    width: "65%",
+    // width: "60%",
     flexDirection: "row",
     alignItems: "center",
+    marginBottom: 6,
+    marginTop: 20,
+  },
+  avatarContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
   },
   userAvatar: {
-    width: 40,
-    height: 40,
-    borderRadius: 20, // Đặt borderRadius thành một giá trị bằng nửa của chiều rộng hoặc chiều cao
-    marginRight: 10,
-    borderWidth: 2, // Độ dày của viền
-    borderColor: COLOR.color3, // Màu sắc của viền
+    width: 50,
+    height: 50,
+    borderRadius: 30,
+    marginRight: 8,
   },
   userName: {
-    fontWeight: "bold",
+    fontSize: 16,
+    fontWeight: 'bold',
   },
   btnFollow: {
-    backgroundColor: COLOR.input_default,
-    padding: 5,
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: "#fff", // Thay màu nền bằng màu bạn muốn
     paddingVertical: 8,
-    borderRadius: 25,
-    flexDirection: "row",
+    paddingHorizontal: 12,
+    borderRadius: 10,
+    ...SHADOWS.small,
+    position: "absolute",
+    left: 142,
+    top: -1
 
-    // marginLeft: "auto",
+  },
+  btnText: {
+    color: COLOR.PRIMARY,
+    marginRight: 4,
+  },
+  iconDetail: {
+    position: 'absolute',
+    top: 0,
+    right: 25, // Đặt left thành 0 để biểu tượng được đặt ở góc trái
+    padding: 10,
   },
   // ảnh bài đăng
   image: {
-    height: 300,
+    height: 260,
     resizeMode: "cover",
     position: "relative",
+    marginBottom: 10,
+    // borderColor:"#fff",
+    // borderWidth:3
+
   },
   iconContainer: {
     flexDirection: "row",
-    justifyContent: "space-between", // Sắp xếp các icon theo hai phía
-    paddingHorizontal: 15, // Khoảng cách giữa icon và mép
-    borderTopWidth: 1, // Đường viền trên
-    borderColor: "#e0e0e0", // Màu đường viền
-    paddingVertical: 10, // Khoảng cách giữa icon và mép
+    justifyContent: "space-between",
+    paddingHorizontal: 15,
+    paddingVertical: 10,
   },
   iconPost: {
     marginRight: 12,
   },
   myPost: {
     backgroundColor: COLOR.offWhite,
-    width: "100%",
-    borderRadius: 10,
+    // width: "100%",
+    borderRadius: 20,
     ...SHADOWS.small,
-    marginBottom: 10,
+    marginBottom: 5,
+    position: "relative",
+    paddingHorizontal: 10,
+    marginTop: 10,
+    marginHorizontal: 10,
+
   },
+
   modal: {
     flex: 1,
     justifyContent: "center",
@@ -685,14 +771,19 @@ const styles = StyleSheet.create({
   buttonLoc: {
     backgroundColor: COLOR.bg_color1,
     paddingVertical: 12,
-    marginLeft: 3,
-    borderTopLeftRadius: 20,
-    borderTopRightRadius: 20,
-    paddingHorizontal: 30
+    // marginLeft: 3,
+    paddingHorizontal: 25,
+    flexDirection: "row",
+    justifyContent: "center",
+    alignContent: "center",
+    alignItems: "center",
+    borderRadius: 20,
+    marginLeft: 10,
   },
   buttonText: {
     color: '#FFF',
     fontSize: 16,
+    marginRight: 8,
   },
   activeButton: {
     backgroundColor: COLOR.PRIMARY, // Màu xanh khi active
@@ -700,6 +791,16 @@ const styles = StyleSheet.create({
   activeButtonText: {
     fontWeight: 'bold', // In đậm khi active
   },
+  //KhamPhaItem
+  KhamPha: {
+    padding: 15,
+    backgroundColor: "#C4FFC1",
+    marginHorizontal: 5,
+    ...SHADOWS.small,
+    borderRadius: 20,
+    marginBottom: 10,
+
+  }
 });
 
 export default HomeIndex;

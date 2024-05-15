@@ -51,22 +51,33 @@ export default StyleSheet.create({
         paddingHorizontal:20,
 
     },
+    title: {
+        textAlign: 'center',
+        marginBottom: 5,
+        fontSize: 18,
+        fontWeight: 'bold',
+      },
     containerMotel: {
-        width: "98%",
-        ...SHADOWS.medium,
-        // borderRadius:30,
-        backgroundColor: COLOR.offWhite,
-        padding: 10,
-        // borderTopLeftRadius: 40,
-        // borderTopRightRadius: 30,
-
-        marginTop: 10,
-        borderRadius: 30,
-        marginBottom: 10
-    },
+        backgroundColor: 'white',
+        padding: 15,
+        marginBottom: 15,
+        borderRadius: 10,
+        elevation: 3,
+      },
+      infoContainer: {
+        flexDirection: 'row',
+        marginBottom: 10,
+        alignItems: 'center',
+      },
+      infoItem: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        marginRight: 15,
+      },
     imgMotel: {
-        width: "55%",
+        width: "50%",
         height: 200,
+        padding:20
     },
     tag: {
         flexDirection: "row",
@@ -124,8 +135,84 @@ export default StyleSheet.create({
     },
     imageContainer: {
         position: "relative"
-    }
-
+    },
+    containerMotel: {
+        backgroundColor:"#89F4A4",
+        padding: 15,
+        marginBottom: 15,
+        borderRadius: 10,
+        elevation: 3,
+        marginHorizontal:10,
+        marginTop:10,
+        width:"92.5%"
+    },
+    title: {
+        textAlign: 'center',
+        marginBottom: 5,
+        fontSize: 18,
+        fontWeight: 'bold',
+    },
+    infoContainer: {
+        flexDirection: 'row',
+        marginBottom: 10,
+        alignItems: 'center',
+    },
+    infoItem: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        marginRight: 15,
+    },
+    icon: {
+        marginRight: 5,
+    },
+    infoText: {
+        fontSize: 14,
+        // color:COLOR.PRIMARY,
+        // fontWeight:"bold"
+    },
+    locationContainer: {
+        flexDirection: 'row',
+        marginBottom: 10,
+        alignItems: 'center',
+    },
+    locationText: {
+        fontSize: 14,
+        // color:COLOR.PRIMARY,
+        // fontWeight:"bold",
+        width:"94%"
+    },
+    image: {
+        borderRadius: 10,
+        marginBottom: 10,
+    },
+    buttonContainer: {
+        flexDirection: 'row',
+        justifyContent: 'flex-end',
+        marginTop:10,
+    },
+    button: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        paddingHorizontal: 10,
+        paddingVertical: 5,
+        borderRadius: 5,
+        marginLeft:10,
+        ...SHADOWS.medium
+    },
+    editText: {
+        color: 'black',
+        marginRight: 5,
+    },
+    buttonText: {
+        color: '#fff',
+        fontSize: 12,
+    },
+    editButton: {
+        backgroundColor: 'orange',
+    },
+    deleteButton: {
+        backgroundColor: 'red',
+    },
 
 
 

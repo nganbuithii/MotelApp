@@ -92,11 +92,11 @@ const PlusOwner = () => {
         const interval = setInterval(() => {
             fetchMotels();
         }, 30000); // 60000 milliseconds = 1 phút
-    
+
         // Xóa interval khi component bị unmount để tránh memory leak
         return () => clearInterval(interval);
     }, []); // Dùng mảng rỗng để chỉ chạy useEffect một lần sau khi component được render
-    
+
     // const renderHouseItem = ({ item }) => (
     //     <View style={styles.imageContainer}>
     //         <Image
@@ -208,27 +208,24 @@ const PlusOwner = () => {
                     {storedMotels.map((item, index) => (
 
                         <View key={index} style={PlusOwnerStyle.containerMotel}>
-                            <Text>Id: {item.id}</Text>
-                            <Text style={{ textAlign: "center", marginBottom: 5 }}>{item.name}</Text>
-                            <View >
-                                <View style={{ flexDirection: "row" }}>
-                                    <View style={PlusOwnerStyle.tag}>
-                                        <MaterialIcons name="attach-money" style={PlusOwnerStyle.iconTag} size={20} color="green" />
-                                        <Text style={{ fontSize: 12 }}>{item.price} VNĐ</Text>
-                                    </View>
-                                    <View style={PlusOwnerStyle.tag}>
-                                        <FontAwesome6 name="house-chimney-window" style={PlusOwnerStyle.iconTag} size={20} color="green" />
-                                        <Text style={{ fontSize: 12 }}>{item.area} m2</Text>
-                                    </View>
-                                    <View style={PlusOwnerStyle.tag}>
-                                        <FontAwesome name="users" style={PlusOwnerStyle.iconTag} size={20} color="green" />
-                                        <Text>{item.max_people} Người</Text>
-                                    </View>
+                            <Text style={PlusOwnerStyle.title}>{item.name}</Text>
+                            <View style={PlusOwnerStyle.infoContainer}>
+                                <View style={PlusOwnerStyle.infoItem}>
+                                    <MaterialIcons name="attach-money" style={PlusOwnerStyle.icon} size={20} color="orange" />
+                                    <Text style={PlusOwnerStyle.infoText}>{item.price} VNĐ</Text>
                                 </View>
-                                <View style={{ flexDirection: "row", marginBottom: 10 }}>
-                                    <FontAwesome6 style={PlusOwnerStyle.iconTag} name="location-dot" size={20} color="green" />
-                                    <Text style={{ fontSize: 12 }}>{item.ward}- {item.district}- {item.city}</Text>
+                                <View style={PlusOwnerStyle.infoItem}>
+                                    <FontAwesome6 name="house-chimney-window" style={PlusOwnerStyle.icon} size={20} color="orange" />
+                                    <Text style={PlusOwnerStyle.infoText}>{item.area} m2</Text>
                                 </View>
+                                <View style={PlusOwnerStyle.infoItem}>
+                                    <FontAwesome name="users" style={PlusOwnerStyle.icon} size={20} color="orange" />
+                                    <Text style={PlusOwnerStyle.infoText}>{item.max_people} Người</Text>
+                                </View>
+                            </View>
+                            <View style={PlusOwnerStyle.locationContainer}>
+                                <FontAwesome6 name="location-dot" style={PlusOwnerStyle.icon} size={20} color="orange" />
+                                <Text style={PlusOwnerStyle.locationText}>{item.ward}- {item.district}- {item.city}</Text>
                             </View>
                             <FlatList
                                 data={item.images || []}
@@ -247,24 +244,22 @@ const PlusOwner = () => {
                             <View style={PlusOwnerStyle.buttonContainer}>
                                 {item.approved ? (
                                     <TouchableOpacity onPress={() => handleEdit(item)} style={[PlusOwnerStyle.button, PlusOwnerStyle.editButton]}>
-                                        <FontAwesome name="edit" size={13} color="black" />
+                                        <FontAwesome name="edit" size={13} color="#fff" />
                                         <Text style={PlusOwnerStyle.buttonText}>Chỉnh sửa</Text>
                                     </TouchableOpacity>
                                 ) : (
                                     <TouchableOpacity style={[PlusOwnerStyle.button, PlusOwnerStyle.editButton]}>
-                                        <FontAwesome name="hourglass-half" size={13} color="black" />
+                                        <FontAwesome name="hourglass-half" size={13} color="#fff" />
                                         <Text style={PlusOwnerStyle.buttonText}>Đang chờ duyệt</Text>
                                     </TouchableOpacity>
                                 )}
-
                                 <TouchableOpacity onPress={() => handleDelete(item.id)} style={[PlusOwnerStyle.button, PlusOwnerStyle.deleteButton]}>
-                                    <FontAwesome name="trash" size={13} color="black" />
+                                    <FontAwesome name="trash" size={13} color="#fff" />
                                     <Text style={PlusOwnerStyle.buttonText}>Xóa</Text>
                                 </TouchableOpacity>
-
-
                             </View>
                         </View>
+
                     ))}
                 </ScrollView>)}
 
@@ -272,8 +267,9 @@ const PlusOwner = () => {
     )
 }
 
-const styles = StyleSheet.create({
-    
-});
+const styles = {
+
+};
+
 
 export default PlusOwner;

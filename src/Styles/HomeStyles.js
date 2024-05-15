@@ -94,7 +94,18 @@ export default StyleSheet.create({
         width: "100%"
     },
     iconPost: {
-        marginRight: 12
+        marginRight: 12,
+        
+    },
+    textKP:{
+        fontWeight:"500",
+        color:COLOR.PRIMARY,
+        fontSize:12
+    },
+    textDetail:{
+        color:COLOR.PRIMARY,
+        fontSize:12,
+        textAlign:"right"
     },
     tab: {
         flexDirection: "row",
@@ -168,7 +179,7 @@ export default StyleSheet.create({
     modalContainer: {
         position: "absolute",
         top: 80,
-        right: 20,
+        right: 50,
         backgroundColor: COLOR.bg_color1,
         padding: 10,
         zIndex: 9999,
@@ -191,11 +202,12 @@ export default StyleSheet.create({
     //modal box
     modalContainer: {
         position: "absolute",
-        top: 80,
-        right: 20,
-        backgroundColor: COLOR.bg_color1,
+        top: 40,
+        right: 50,
+        backgroundColor: "#fff",
+
         // borderRadius: 10,
-        padding: 10,
+        padding: 30,
         zIndex: 9999,
         elevation: 5, // Độ đục của modal (Android)
         borderBottomRightRadius: 20,
@@ -206,6 +218,8 @@ export default StyleSheet.create({
         fontSize: 16,
         paddingVertical: 10,
         paddingHorizontal: 20,
+        color:COLOR.PRIMARY,
+        fontWeight:"bold"
     },
     //mô tả
     desc: {
@@ -215,14 +229,11 @@ export default StyleSheet.create({
     //BADGE
     badgeContainer: {
         backgroundColor: COLOR.color12,
-        width: "12%",
         padding: 7,
         borderRadius: 15,
-        paddingVertical: 7,
-        paddingHorizontal: 10,
         position: "absolute",
-        right: "4%", // Thay vị trí cố định bằng phần trăm
-        top: "80%", // Thay vị trí cố định bằng phần trăm
+        right: "5%", 
+        top: "85%",
     },
     badgeText: {
         color: "#fff",

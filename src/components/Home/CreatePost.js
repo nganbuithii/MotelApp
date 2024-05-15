@@ -8,6 +8,7 @@ import { FontAwesome } from '@expo/vector-icons';
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { authApi, endpoints } from "../../configs/API";
 import { Ionicons } from '@expo/vector-icons';
+import PostCreateStyle from "../../Styles/PostCreateStyle";
 
 const CreatePost = ({ navigation }) => {
     const [motels, setMotels] = useState([]);
@@ -70,54 +71,54 @@ const CreatePost = ({ navigation }) => {
     }
 
     return (
-        <ScrollView style={styles.scrollView}>
-            <View style={styles.container}>
-                <View style={styles.userInfo}>
+        <ScrollView style={PostCreateStyle.scrollView}>
+            <View style={PostCreateStyle.container}>
+                <View style={PostCreateStyle.userInfo}>
                     <Image
                         source={{ uri: user.avatar }} // Thay đổi đường dẫn của ảnh mặc định
-                        style={styles.avatar} />
-                    <Text style={styles.username}>{user.username}</Text>
+                        style={PostCreateStyle.avatar} />
+                    <Text style={PostCreateStyle.username}>{user.username}</Text>
                 </View>
-                <View style={styles.containerBody}>
+                <View style={PostCreateStyle.containerBody}>
 
-                    <Text style={styles.sectionTitle}>Mô tả</Text>
-                    {!!contentError && <Text style={styles.errorText}><Ionicons name="warning" size={12} color="red" />{contentError}</Text>}
+                    <Text style={PostCreateStyle.sectionTitle}>Mô tả</Text>
+                    {!!contentError && <Text style={PostCreateStyle.errorText}><Ionicons name="warning" size={12} color="red" />{contentError}</Text>}
 
-                    <View style={styles.inputContainer}>
-                        <TextInput placeholder="Hãy mô tả bài đăng nhà trọ của bạn?" style={styles.input} multiline={true} value={content} onChangeText={(text) => setContent(text)}
+                    <View style={PostCreateStyle.inputContainer}>
+                        <TextInput placeholder="Hãy mô tả bài đăng nhà trọ của bạn?" style={PostCreateStyle.input} multiline={true} value={content} onChangeText={(text) => setContent(text)}
                             onFocus={() => setContentError("")} />
                     </View>
-                    {!!houseError && <Text style={styles.errorText}><Ionicons name="warning" size={12} color="red" />{houseError}</Text>}
+                    {!!houseError && <Text style={PostCreateStyle.errorText}><Ionicons name="warning" size={12} color="red" />{houseError}</Text>}
 
-                    <TouchableOpacity style={styles.imagePicker} onPress={() => {
+                    <TouchableOpacity style={PostCreateStyle.imagePicker} onPress={() => {
                         getMotel();
                         setHouseError(""); // Ẩn thông báo lỗi cho nhà trọ khi người dùng chọn
                     }} >
-                        <MaterialCommunityIcons name="home-circle" size={24} color="black" style={styles.inputIcon} />
-                        <Text style={styles.imagePickerText}>Nhà trọ</Text>
+                        <MaterialCommunityIcons name="home-circle" size={24} color="black" style={PostCreateStyle.inputIcon} />
+                        <Text style={PostCreateStyle.imagePickerText}>Nhà trọ</Text>
                     </TouchableOpacity>
 
                     {selectedHouse && (
-                        <View style={styles.houseDetailContainer}>
-                            <Text style={styles.houseTitle}>{selectedHouse.title}</Text>
-                            <TouchableOpacity style={styles.houseItem} >
-                                <Image source={{ uri: selectedHouse.images[0].url }} style={styles.thumbnail} />
-                                <View style={styles.houseInfo}>
-                                    <Text style={styles.ItemTitle}>Nhà trọ đã chọn <FontAwesome name="check-circle" size={20} color="green" /></Text>
-                                    <Text style={styles.houseAddress}>Địa chỉ: {selectedHouse.ward}, {selectedHouse.district},{selectedHouse.city}</Text>
+                        <View style={PostCreateStyle.houseDetailContainer}>
+                            <Text style={PostCreateStyle.houseTitle}>{selectedHouse.title}</Text>
+                            <TouchableOpacity style={PostCreateStyle.houseItem} >
+                                <Image source={{ uri: selectedHouse.images[0].url }} style={PostCreateStyle.thumbnail} />
+                                <View style={PostCreateStyle.houseInfo}>
+                                    <Text style={PostCreateStyle.ItemTitle}>Nhà trọ đã chọn <FontAwesome name="check-circle" size={20} color="green" /></Text>
+                                    <Text style={PostCreateStyle.houseAddress}>Địa chỉ: {selectedHouse.ward}, {selectedHouse.district},{selectedHouse.city}</Text>
                                 </View>
                             </TouchableOpacity>
                         </View>
                     )}
 
                     {showHouseList && (
-                        <View style={styles.houseListContainer}>
+                        <View style={PostCreateStyle.houseListContainer}>
                             {motels.map((house, index) => (
-                                <TouchableOpacity key={house.id} style={styles.houseItem} onPress={() => selectHouse(house)}>
-                                    <Image source={{ uri: house.images[0].url }} style={styles.thumbnail} />
-                                    <View style={styles.houseInfo}>
-                                        <Text style={styles.ItemTitle}>{`Nhà trọ ${index + 1}`}</Text>
-                                        <Text style={styles.itemAddress}>Địa chỉ: {house.ward}, {house.district}, {house.city}</Text>
+                                <TouchableOpacity key={house.id} style={PostCreateStyle.houseItem} onPress={() => selectHouse(house)}>
+                                    <Image source={{ uri: house.images[0].url }} style={PostCreateStyle.thumbnail} />
+                                    <View style={PostCreateStyle.houseInfo}>
+                                        <Text style={PostCreateStyle.ItemTitle}>{`Nhà trọ ${index + 1}`}</Text>
+                                        <Text style={PostCreateStyle.itemAddress}>Địa chỉ: {house.ward}, {house.district}, {house.city}</Text>
                                     </View>
                                 </TouchableOpacity>
                             ))}
@@ -130,134 +131,5 @@ const CreatePost = ({ navigation }) => {
     );
 };
 
-const styles = StyleSheet.create({
-    scrollView: {
-        flex: 1,
-        backgroundColor: COLOR.bg_color1,
-    },
-    container: {
-        flex: 1,
-        padding: 10,
-
-        alignItems: 'center',
-
-    },
-    containerBody: {
-        backgroundColor: COLOR.offWhite,
-        // padding:10,
-        borderRadius: 15,
-        marginTop: 20,
-        width: "100%",
-        paddingBottom: 20,
-        alignContent: "center",
-        alignItems: "center",
-        ...SHADOWS.medium
-    },
-    userInfo: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        marginBottom: 10,
-        marginRight: 'auto'
-    },
-    avatar: {
-        width: 70,
-        height: 70,
-        borderRadius: 40,
-        marginRight: 10,
-        borderWidth: 2,
-        borderColor: COLOR.PRIMARY
-    },
-    username: {
-        fontSize: 16,
-        fontWeight: 'bold',
-        color: '#000',
-    },
-    inputContainer: {
-        borderWidth: 0,
-        marginBottom: 10,
-        width: "100%",
-    },
-    input: {
-        padding: 10,
-        fontSize: 18,
-        minHeight: 100,
-        backgroundColor: 'rgba(0, 0, 0, 0.05)',
-        borderRadius: 10,
-        marginHorizontal: 12
-    },
-    input1: {
-        padding: 10,
-        fontSize: 18,
-        minHeight: 60,
-        backgroundColor: 'rgba(0, 0, 0, 0.05)',
-        borderRadius: 10,
-        marginHorizontal: 12
-    },
-    imagePicker: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        backgroundColor: '#f0f0f0',
-        padding: 10,
-        borderRadius: 10,
-        marginBottom: 8,
-        marginHorizontal: 10,
-        ...SHADOWS.small,
-        width: "94%"
-    },
-    imagePickerText: {
-        marginLeft: 10,
-        fontSize: 16,
-        color: '#333',
-    },
-    inputIcon: {
-        marginRight: 10,
-        color: COLOR.PRIMARY
-    },
-    houseItem: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        backgroundColor: COLOR.bg_color1,
-        borderRadius: 10,
-        marginBottom: 10,
-        padding: 10,
-        ...SHADOWS.small,
-        width: "94%",
-        alignContent: "center",
-        paddingVertical: 10,
-        paddingHorizontal: 10,
-        marginHorizontal: 10,
-    },
-    thumbnail: {
-        width: 80,
-        height: 80,
-        borderRadius: 10,
-        marginRight: 10,
-    },
-    houseInfo: {
-        flex: 1,
-    },
-    ItemTitle: {
-        fontSize: 18,
-        fontWeight: 'bold',
-        marginBottom: 5,
-    },
-    itemAddress: {
-        fontSize: 16,
-        color: '#333333',
-    },
-    sectionTitle: {
-        fontSize: 18,
-        fontWeight: 'bold',
-        marginBottom: 5,
-        alignSelf: 'flex-start',
-        marginLeft: 12,
-        marginTop: 15
-    },
-    errorText: {
-        color: "red",
-        fontWeight: "500",
-        textAlign: "right"
-    }
-});
 
 export default CreatePost;

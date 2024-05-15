@@ -55,10 +55,9 @@ export default StyleSheet.create({
     },
     serviceRow: {
         flexDirection: "row",
-        flexWrap: "wrap", // Cho phép flex wrap khi chiều rộng hết chỗ
-        //justifyContent: "space-between", // Căn các ô điện đều nhau theo chiều ngang
-        width: "90%", // Đảm bảo chiều rộng tối đa là 90% của serviceInfo
-        marginTop: 10, // Khoảng cách giữa các dòng
+        flexWrap: "wrap", 
+        width: "90%",
+        marginTop: 10, 
     },
     serviceIt: {
         flexDirection: "column", // Xếp theo hàng ngang
@@ -71,7 +70,9 @@ export default StyleSheet.create({
         justifyContent: "center", // Căn các phần tử đều nhau theo chiều ngang
         paddingHorizontal: 10, // Khoảng cách ngang bên trong
         marginVertical: 5, // Khoảng cách dọc
-        marginHorizontal:5
+        marginHorizontal:5,
+        backgroundColor:COLOR.PRIMARY,
+        ...SHADOWS.small
     },
     iconEdit: {
         padding: 5,
