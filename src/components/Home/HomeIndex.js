@@ -11,17 +11,14 @@ import { COLOR, SHADOWS } from "../common/color";
 import { useNavigation } from "@react-navigation/native";
 import API, { authApi, endpoints } from "../../configs/API";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { SimpleLineIcons } from '@expo/vector-icons';
 import Modal from 'react-native-modalbox';
-import { FontAwesome6 } from '@expo/vector-icons';
 import { Button } from "react-native-paper";
 import HomeStyles from "../../Styles/HomeStyles";
 import showToast from "../common/ToastMessage";
 import { FontAwesome } from '@expo/vector-icons';
-import RentPostsList from "./RentPostList";
 import PostCreateStyle from "../../Styles/PostCreateStyle";
 
-const HomeIndex = ({ route }) => {
+const HomeIndex = ({ route ,  onDataLoaded}) => {
   const [postContent, setPostContent] = useState("");
   const [user, dispatch] = useContext(MyContext);
   const navigation = useNavigation();
@@ -92,6 +89,8 @@ const HomeIndex = ({ route }) => {
   useEffect(() => {
     fetchDataGetAllPost();
     // getAllPostForRent();
+    onDataLoaded();
+
 
   }, [render]);
   // Khôi phục likedState từ AsyncStorage khi tải trang
@@ -239,8 +238,9 @@ const HomeIndex = ({ route }) => {
 
       showToast({ type: "success", text1: "Thành công", text2: "Cập nhật thành công" });
       console.log("Cập nhật bài đăng:", postId);
-
+      setRender(!render);
       handleModalClose();
+
 
     } catch (error) {
       console.error("Lỗi khi cập nhật bài đăng:", error);
@@ -405,7 +405,9 @@ const HomeIndex = ({ route }) => {
     getAllMotel();
     console.log("DATAAAAA3J23IO23:", dataMotel);
   }, [])
+  const handelDetailKP = () => {
 
+  }
   return (
     <View style={MyStyles.container}>
 
@@ -442,7 +444,7 @@ const HomeIndex = ({ route }) => {
             horizontal
             showsHorizontalScrollIndicator={false}
             renderItem={({ item }) => (
-              <TouchableWithoutFeedback>
+              <TouchableWithoutFeedback onPress={() => handleDetail(item.id)}>
                 <View style={HomeStyles.KhamPha}>
                   <ImageBackground
                     source={{ uri: item.images[0]?.url }}
@@ -512,14 +514,19 @@ const HomeIndex = ({ route }) => {
 
                 <Text style={HomeStyles.userName}>{post.user.username}</Text>
               </View>
-              <TouchableOpacity
-                style={HomeStyles.btnFollow}
-                onPress={() => handleFollow(post.user.id)}>
-                {post.user.followed ? <Text style={{ color: COLOR.PRIMARY, fontSize: 12 }}>Đang theo dõi</Text> :
-                  <Text style={{ color: COLOR.PRIMARY, fontSize: 12 }}>Theo dõi</Text>
-                }
-                <Entypo name={post.user.followed ? "minus" : "plus"} size={10} color="lightgreen" />
-              </TouchableOpacity>
+              {post.user.id !== user.id && (
+                <TouchableOpacity
+                  style={HomeStyles.btnFollow}
+                  onPress={() => handleFollow(post.user.id)}
+                >
+                  {post.user.followed ? (
+                    <Text style={{ color: COLOR.PRIMARY, fontSize: 12 }}>Đang theo dõi</Text>
+                  ) : (
+                    <Text style={{ color: COLOR.PRIMARY, fontSize: 12 }}>Theo dõi</Text>
+                  )}
+                  <Entypo name={post.user.followed ? "minus" : "plus"} size={10} color="lightgreen" />
+                </TouchableOpacity>
+              )}
 
 
             </View>
@@ -586,11 +593,21 @@ const HomeIndex = ({ route }) => {
               </Modal>
             )}
 
-            <TouchableWithoutFeedback onPress={() => handleDetail(post.motel.id)}>
+            <TouchableWithoutFeedback onPress={() => {
+              // Kiểm tra nếu vai trò của người dùng là TENANT thì không thực hiện hành động chuyển trang
+              if (post.user.user_role === "TENANT") {
+                return;
+              }
+              // Kiểm tra nếu vai trò của người dùng là MOTEL_OWNER thì thực hiện hành động chuyển trang
+              if (post.user.user_role === "MOTEL_OWNER") {
+                handleDetail(post.motel.id, post.user.user_role);
+              }
+            }}>
               <View>
                 <View style={{ flexDirection: "row", width: "100%", paddingHorizontal: 10 }}>
                   <Entypo name="location-pin" size={20} color="orange" />
                   <View style={{ flex: 1 }}>
+                    <Text>ID : {post.id}</Text>
                     <Text style={{ color: "gray" }}>
                       {post.motel ? `${post.motel.ward}, ${post.motel.district}, ${post.motel.city}` : `${post.ward}, ${post.district}, ${post.city}`}
                     </Text>

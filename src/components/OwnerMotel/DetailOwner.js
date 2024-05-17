@@ -103,27 +103,25 @@ const DetailOwner = ({ route }) => {
                             source={{ uri: owner.avatar }} // Thay đổi đường dẫn của ảnh mặc định
                             style={DetailOwnerStyle.avatar}
                         />
-                        <Text>{ownerId}</Text>
-                        <View style={{ flexDirection: "row" }}>
-                            <TouchableOpacity style={DetailOwnerStyle.btnFollow1}>
-                                <Text style={{ color: "#fff" }}> Nhắn tin</Text>
-                                <Entypo name="chat" size={10} color="#fff" />
-                            </TouchableOpacity>
-                            <TouchableOpacity
-                                style={[DetailOwnerStyle.btnFollow2, ownerFollowed ? DetailOwnerStyle.followingButton : DetailOwnerStyle.followButton]}
-                                onPress={handleFollow}>
-                                {follow ? <Text style={{ color: "#fff" }}>Đang theo dõi</Text> :
-                                    <Text style={{ color: "#fff" }}>Theo dõi</Text>
-                                }
-                                {/* <Text style={{ color: "#fff" }}>{ownerFollowed ? "Đang theo dõi" : "Theo dõi"}</Text> */}
-                                <Entypo name={ownerFollowed ? "minus" : "plus"} size={10} color="#fff" />
-                            </TouchableOpacity>
-
-
-
-
-
-
+                        {/* <Text>{ownerId}</Text> */}
+                        <View style={{ flexDirection: "row", marginTop:10 }}>
+                            {/* Ẩn nút nhắn tin và nút theo dõi nếu ownerId trùng với user.id */}
+                            {ownerId !== user.id && (
+                                <>
+                                    <TouchableOpacity style={DetailOwnerStyle.btnFollow1}>
+                                        <Text style={{ color: "#fff" }}> Nhắn tin</Text>
+                                        <Entypo name="chat" size={10} color="#fff" />
+                                    </TouchableOpacity>
+                                    <TouchableOpacity
+                                        style={[DetailOwnerStyle.btnFollow2, ownerFollowed ? DetailOwnerStyle.followingButton : DetailOwnerStyle.followButton]}
+                                        onPress={handleFollow}>
+                                        {follow ? <Text style={{ color: "#fff" }}>Đang theo dõi</Text> :
+                                            <Text style={{ color: "#fff" }}>Theo dõi</Text>
+                                        }
+                                        <Entypo name={ownerFollowed ? "minus" : "plus"} size={10} color="#fff" />
+                                    </TouchableOpacity>
+                                </>
+                            )}
                         </View>
                     </View>
                     <View style={DetailOwnerStyle.containerInfo}>
@@ -147,12 +145,13 @@ const DetailOwner = ({ route }) => {
                             <Text style={DetailOwnerStyle.infoText}>Ngày tham gia: {join}</Text>
                         </View>
                     </View>
-
+                    {role === "Chủ nhà trọ" && (
                     <View style={DetailOwnerStyle.buttonContainer}>
                         <Text style={DetailOwnerStyle.buttonText}>Thông tin nhà trọ</Text>
                         {motelData && motelData.length > 0 ? (
                             motelData.map((item, index) => (
                                 <View style={DetailOwnerStyle.infoContainer} key={index}>
+                                     <Text style={DetailOwnerStyle.buttonText}>Nhà trọ {index + 1}</Text>
                                     <View style={DetailOwnerStyle.infoRow}>
                                         <Octicons style={DetailOwnerStyle.icon} name="location" size={24}
                                             color={COLOR.PRIMARY} />
@@ -192,7 +191,7 @@ const DetailOwner = ({ route }) => {
                                 </View>
                             ))) : (<Text>Không có dữ liệu nhà trọ.</Text>
                         )}
-                    </View>
+                    </View>)}
 
 
 

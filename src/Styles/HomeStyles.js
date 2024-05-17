@@ -220,7 +220,7 @@ export default StyleSheet.create({
         borderRadius: 10,
         ...SHADOWS.small,
         position: "absolute",
-        left: 142,
+        left: 138,
         top: -1
     },
     //BADGE

@@ -13,6 +13,7 @@ import MyStyles from '../../Styles/MyStyles';
 import showToast from '../common/ToastMessage';
 import Modal from 'react-native-modalbox';
 import InputField from '../common/InputField';
+import PostStyle from '../Tenant/PostStyle';
 
 import { FlatList } from 'react-native-gesture-handler';
 
@@ -185,9 +186,13 @@ const ProfileDetail = () => {
 
     return (
         <View style={styles.containerDetail}>
+             <Image
+                source={require("../../assets/images/green.jpg")}
+                style={[PostStyle.backgroundImage,{opacity: 0.3,}]}
+            />
             <Image
                 source={image ? { uri: image } : avatar ? { uri: avatar } : require('../../assets/images/avt.png')} // Sử dụng ảnh mới nếu có, nếu không sử dụng avatar, nếu không có avatar sử dụng ảnh mặc định
-                style={styles.imgBg}
+                style={[styles.imgBg,{opacity: 0.5}]}
             />
             <View style={styles.containerAvt}>
                 <TouchableOpacity onPress={addImage} >
@@ -197,11 +202,11 @@ const ProfileDetail = () => {
                     />
                     <AntDesign name="camera" style={styles.iconCam} size={20} color={COLOR.PRIMARY} />
                 </TouchableOpacity>
-                <Text style={{ textAlign: "center", color: "green", fontSize: 20, fontWeight: "500", backgroundColor:"pink" }}>{user.username}</Text>
+                <Text style={{ textAlign: "center", color: "green", fontSize: 20, fontWeight: "500" }}>{user.username}</Text>
             </View>
 
 
-            <View style={[MyStyles.flex, {}]}>
+            <View style={[MyStyles.flex, {marginBottom:15}]}>
                 <TouchableOpacity style={styles.badgeContainer} onPress={getFollow}>
                     <Text style={styles.badgeText}>{user.follower_count}</Text>
                     <Text style={styles.badgeLabel}>Người theo dõi</Text>
@@ -251,7 +256,7 @@ const ProfileDetail = () => {
             </Modal>
 
             <View style={styles.inputContainer}>
-                <InputField label="Tên" value={lastname}
+                <InputField  label="Tên" value={lastname}
                     onChangeText={(text) => setLastName(text)}/>
             </View>
             <View style={styles.inputContainer}>
@@ -270,6 +275,7 @@ const ProfileDetail = () => {
                 onChangeText={(text) => setPhoneNumber(text)}/>
             </View>
             {loading ? (<ActivityIndicator />) : (
+                
                 <ButtonAuth onPress={handleUpdate} title="Lưu thay đổi" />)}
         </View>
     );
@@ -278,12 +284,16 @@ const ProfileDetail = () => {
 const styles = StyleSheet.create({
     containerDetail: {
         flex: 1,
-        alignItems: 'center',
-        justifyContent: 'center',
-        paddingHorizontal: 20,
+        alignItems: 'center', // Căn giữa theo chiều ngang
+        justifyContent: 'center', // Căn giữa theo chiều dọc
         width: '100%',
         backgroundColor: "#fff",
-        position: "relative"
+        position: "relative",
+    },
+    inputContainer: {
+        width: '80%', // Đảm bảo input chiếm 80% chiều ngang màn hình
+        marginBottom: 15,
+        ...SHADOWS.medium,
     },
     avatar: {
         width: 120,
@@ -295,13 +305,7 @@ const styles = StyleSheet.create({
         // position: 'relative',
         // aspectRatio: 1, // Đảm bảo tỷ lệ khung hình là 1:1
     },
-    inputContainer: {
-        
-        // marginBottom: 10,
-        width: '100%',
-        ...SHADOWS.medium,
-        marginTop:15
-    },
+
     label: {
         marginBottom: 5,
         fontSize: 16,
@@ -357,7 +361,7 @@ const styles = StyleSheet.create({
     },
     imgBg: {
         width: "100%",
-        height: 100,
+        height: 120,
         opacity: 0.3,
     },
     containerAvt: {
@@ -369,11 +373,11 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'space-between', // Để các phần tử nằm ngang và đều nhau
-        marginBottom: 20, // Thay đổi khoảng cách giữa các mục nếu cần
+        marginBottom: 10, // Thay đổi khoảng cách giữa các mục nếu cần
         paddingHorizontal: 20, // Thay đổi khoảng cách từ mép trái đến phần tử đầu tiên nếu cần
         paddingVertical: 10, // Thay đổi khoảng cách dọc của mỗi mục nếu cần
         backgroundColor: COLOR.bg_color1,
-        borderRadius: 30,
+        // borderRadius: 30,
         ...SHADOWS.medium
     },
 

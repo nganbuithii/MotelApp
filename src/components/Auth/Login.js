@@ -31,10 +31,10 @@ const Login = ({ navigation }) => {
             let data = {
                 // username: username,
                 // password: password,
-                // username:"ngan",
-                // password:"123456",
-                username:"M",
-                password:"Meomeo@123",
+                username:"ngan",
+                password:"123456",
+                // username:"M",
+                // password:"Meomeo@123",
                 client_id: "8OdjuOvhjzLFCigIbuw3mbDAlhWTirzeM7s1W1g2",
                 client_secret:
                     "8pj5yZzwnH0vN3hflMrJJ7QBENDCsMKfIUlGQ15Gyg9GPTRCFXsIxm7iiF7xmcPf2IOz5uIXmfD9TjXJI3mKWHIQQ1HStaY3duHkIrSc4GWJGcyg1ZQgKtYIOxRksXia",
@@ -68,9 +68,9 @@ const Login = ({ navigation }) => {
             console.log("role", userData.user_role);
             // Xác định màn hình chuyển hướng
             if (userData.user_role === "TENANT") {
-                navigation.navigate("Home");
+                navigation.navigate("LoadingPage");
             } else {
-                let targetScreen = hasMotelData ? 'Home' : 'RegisterMotel';
+                let targetScreen = hasMotelData ? 'LoadingPage' : 'RegisterMotel';
 
                 // Chuyển hướng đến màn hình tương ứng
                 navigation.navigate(targetScreen);

@@ -52,7 +52,7 @@ const Editpost = ({ navigation, route }) => {
         setImage(post.image);
         console.log(city);
         console.log(ward);
-    }, [city, ward, district]); // Thêm city, ward, district vào mảng dependency
+    }, []); 
     
 
 
@@ -214,7 +214,7 @@ const Editpost = ({ navigation, route }) => {
                     },
                 });
                 console.log("Cập nhật thành công");
-
+                // setLoading(true);
                 navigation.navigate("HomeIndex", { myPost: res.data })
             }
 
@@ -243,9 +243,9 @@ const Editpost = ({ navigation, route }) => {
                         style={PostStyle.avatar} />
                     <Text style={PostStyle.username}>{user.username}</Text>
                 </View>
-                <TouchableOpacity onPress={test}>
+                {/* <TouchableOpacity onPress={test}>
                     <Text> Helo</Text>
-                </TouchableOpacity>
+                </TouchableOpacity> */}
 
                 <View>
 

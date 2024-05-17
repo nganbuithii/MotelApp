@@ -12,14 +12,6 @@ import MyContext from '../../configs/MyContext';
 import SearchStack from './SearchStack';
 import PlusOwner from '../OwnerMotel/PlusOwner';
 
-const MusicRoute = () => <Text>Music</Text>;
-
-const AlbumsRoute = () => <Text>Albums</Text>;
-
-const RecentsRoute = () => <Text>Recents</Text>;
-
-const NotificationsRoute = () => <Text>Notifications</Text>;
-
 const Home = () => {
     const [index, setIndex] = React.useState(0);
     const [user, dispatch] = React.useContext(MyContext);

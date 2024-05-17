@@ -65,7 +65,7 @@ const CreatePost = ({ navigation }) => {
                 });
                 console.log("Đăng bài thành công");
                 console.log("res daata post:", res.data);
-                navigation.navigate("HomeIndex", { myPost: res.data })
+                navigation.goBack();
 
             }
         } catch (ex) {

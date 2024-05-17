@@ -1,11 +1,16 @@
-// LoadingPage.js
-import React from "react";
+import React, { useEffect } from "react";
 import { View, Text, Image, StyleSheet } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { StyleDefault } from "../../Styles/StyleDefault";
 import { COLOR } from "../common/color";
+import HomeIndex from "../Home/HomeIndex";
 
-const LoadingPage = () => {
+const LoadingPage = ({ navigation, route }) => {
+    const handleDataLoaded = () => {
+        console.log("Trang Home đã tải xong dữ liệu");
+        navigation.navigate("Home"); // Chuyển đến trang Home khi dữ liệu đã được tải xong
+    };
+
     return (
         <SafeAreaView style={[StyleDefault.container, styles.container]}>
             <View style={StyleDefault.flexBoxCol}>
@@ -13,8 +18,10 @@ const LoadingPage = () => {
                     source={require("../../assets/images/loading.gif")}
                     style={styles.loadingImage}
                 />
-                <Text style={styles.loadingText}>Chào bạn đến với Naca app</Text>
+                {/* <Text style={styles.loadingText}>Chào bạn đến với Naca app</Text> */}
             </View>
+            <HomeIndex route={route} onDataLoaded={handleDataLoaded} />
+ 
         </SafeAreaView>
     );
 };
@@ -31,7 +38,7 @@ const styles = StyleSheet.create({
     loadingText: {
         fontSize: 24,
         fontWeight: "700",
-        color:COLOR.secondary
+        color: COLOR.secondary
     },
 });
 

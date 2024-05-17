@@ -140,7 +140,7 @@ const AddPrice = ({ route }) => {
     }
 
     return (
-        <ScrollView style={styles.container}>
+        <ScrollView style={styles.container} contentContainerStyle={{ alignItems: 'center' }}>
             <View style={modalVisible ? styles.modalBackground : null} />
             <View style={styles.box}>
                 <Text style={EditMotelStyle.label}>Loại dịch vụ</Text>
@@ -253,7 +253,7 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         alignContent: "center",
-        alignItems: "center"
+        // alignItems: "center"
     },
     box: {
         // flex: 0.7,

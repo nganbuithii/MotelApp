@@ -89,7 +89,13 @@ export default function App() {
             options={{ headerTitle: 'Thêm dịch vụ' }} />
 
           <Stack.Screen name="Payment" component={Payment}
-            options={{ headerTitle: 'Thanh toán' }} />
+            options={{
+              headerShown: true,// Tắt header cho màn hình Slider
+              headerTitle: 'Thanh toán',
+              headerTintColor: COLOR.PRIMARY,
+
+
+            }}/>
           <Stack.Screen name="CreatePostRent" component={CreatePostRent}
             options={{ headerTitle: 'Tạo bài viết' }} />
           <Stack.Screen name="Comment" component={Comment}

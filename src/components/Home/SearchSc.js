@@ -1,6 +1,7 @@
 import React, { useContext, useState, useEffect } from "react";
 import {
   View, Text, TextInput, TouchableOpacity, StyleSheet, ScrollView, Image, ActivityIndicator,
+  TouchableNativeFeedback,
 } from "react-native";
 import { COLOR, SHADOWS } from "../common/color";
 import RNPickerSelect from "react-native-picker-select";
@@ -16,6 +17,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { authApi, endpoints } from "../../configs/API";
 import { Entypo } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
+import { TouchableWithoutFeedback } from "react-native-gesture-handler";
 
 
 const SearchSc = ({ route }) => {
@@ -127,6 +129,12 @@ const SearchSc = ({ route }) => {
   // const getWardNameById = (wardId) => {
   //   return wardMapping[wardId] || '';
   // };
+  const handleDetail = (idMotel) => {
+    console.log(idMotel);
+    navigation.navigate("PostDetail", { idMotel: idMotel })
+
+
+  }
   const handleSubmit = async () => {
     try {
       setSearchStarted(true); // Đánh dấu việc bắt đầu tìm kiếm
@@ -178,6 +186,7 @@ const SearchSc = ({ route }) => {
     setData([]);
   };
   const renderItem = ({ item }) => (
+    <TouchableWithoutFeedback onPress={() => handleDetail(item.id)}>
     <View style={SearchStyle.itemContainer} key={item.id}>
       <Image source={require('../../assets/images/1.jpg')} style={SearchStyle.image} />
       <View style={SearchStyle.infoContainer}>
@@ -185,14 +194,14 @@ const SearchSc = ({ route }) => {
         <Text style={SearchStyle.title}><Octicons name="location" size={15} color={COLOR.PRIMARY} />ㅤ{item.city}</Text>
         <Text><Octicons name="location" size={15} color={COLOR.PRIMARY} />ㅤ{item.district}</Text>
         <Text><Octicons name="location" size={15} color={COLOR.PRIMARY} />ㅤ{item.other_address}</Text>
-        <Text>Giá: {item.price} VNĐ</Text>
-        <Text>Diện tích: {item.area} m2</Text>
+        <Text style={{fontWeight:"bold"}}>Giá: {item.price} VNĐ</Text>
+        <Text style={{fontWeight:"bold"}}>Diện tích: {item.area} m2</Text>
         <TouchableOpacity>
           <Text style={{ textAlign: "right", color: "lightgreen" }}> Xem chi tiết <AntDesign name="caretright" size={15} color="lightgreen" /> </Text>
         </TouchableOpacity>
 
       </View>
-    </View>
+    </View></TouchableWithoutFeedback>
   );
   const nextMap = () => {
     navigation.navigate('MapSearch', { previousScreen: 'SearchSc' });
@@ -273,8 +282,8 @@ const SearchSc = ({ route }) => {
             onValueChange={(value) => setPriceFilter(value)}
             placeholder={{ label: 'Lọc theo giá', value: null }}
             items={[
-              { label: 'Giá giảm', value: 'descrease' },
-              { label: 'Giá tăng', value: 'increase' },
+              { label: 'Giá giảm dần', value: 'descrease' },
+              { label: 'Giá tăng dần', value: 'increase' },
               { label: 'Dưới 2 triệu', value: 'under_2m' },
               { label: 'Từ 2 đến 5 triệu', value: '2m_to_5m' },
               { label: 'Trên 8 triệu', value: 'over_8m' },

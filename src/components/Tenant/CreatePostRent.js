@@ -187,7 +187,7 @@ const CreatePostRent = ({ navigation, route }) => {
                 });
                 console.log("Đăng bài thành công");
 
-                navigation.navigate("HomeIndex", { myPost: res.data })
+                navigation.goBack();
             }
 
         } catch (ex) {
