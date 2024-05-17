@@ -26,9 +26,12 @@ const CreatePost = ({ navigation }) => {
             const token = await AsyncStorage.getItem("access-token");
             let response = await authApi(token).get(endpoints['detailMotelOwner'](user.id));
             let motelData = response.data;
-            setMotels(response.data);
-            console.log("Get data nhà trọ của user:", response.data);
-            return motelData;
+            // Lọc ra các bài đăng có cờ approved là true
+        const approvedMotels = motelData.filter(motel => motel.approved === true);
+        
+        setMotels(approvedMotels);
+        console.log("Get data nhà trọ của user:", approvedMotels);
+        return approvedMotels;
         } catch (ex) {
             console.error(ex);
         }

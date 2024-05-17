@@ -22,8 +22,8 @@ const PlusOwner = () => {
 
     const navigation = useNavigation();
     const [isLoading, setIsLoading] = useState(true); // State để kiểm soát trạng thái của việc tải dữ liệu
-    const [showHouseList, setShowHouseList] = useState(false);
-    const [content, setContent] = useState('');
+    // const [showHouseList, setShowHouseList] = useState(false);
+    // const [content, setContent] = useState('');
     const [user, dispatch] = useContext(MyContext);
     const [triggerRender, setTriggerRender] = useState(false);
     const [motels, setMotels] = useState([]);
@@ -211,20 +211,20 @@ const PlusOwner = () => {
                             <Text style={PlusOwnerStyle.title}>{item.name}</Text>
                             <View style={PlusOwnerStyle.infoContainer}>
                                 <View style={PlusOwnerStyle.infoItem}>
-                                    <MaterialIcons name="attach-money" style={PlusOwnerStyle.icon} size={20} color="orange" />
+                                    <MaterialIcons name="attach-money" style={PlusOwnerStyle.icon} size={20} color={COLOR.PRIMARY} />
                                     <Text style={PlusOwnerStyle.infoText}>{item.price} VNĐ</Text>
                                 </View>
                                 <View style={PlusOwnerStyle.infoItem}>
-                                    <FontAwesome6 name="house-chimney-window" style={PlusOwnerStyle.icon} size={20} color="orange" />
+                                    <FontAwesome6 name="house-chimney-window" style={PlusOwnerStyle.icon} size={20} color={COLOR.PRIMARY} />
                                     <Text style={PlusOwnerStyle.infoText}>{item.area} m2</Text>
                                 </View>
                                 <View style={PlusOwnerStyle.infoItem}>
-                                    <FontAwesome name="users" style={PlusOwnerStyle.icon} size={20} color="orange" />
+                                    <FontAwesome name="users" style={PlusOwnerStyle.icon} size={20} color={COLOR.PRIMARY} />
                                     <Text style={PlusOwnerStyle.infoText}>{item.max_people} Người</Text>
                                 </View>
                             </View>
                             <View style={PlusOwnerStyle.locationContainer}>
-                                <FontAwesome6 name="location-dot" style={PlusOwnerStyle.icon} size={20} color="orange" />
+                                <FontAwesome6 name="location-dot" style={PlusOwnerStyle.icon} size={20} color={COLOR.PRIMARY} />
                                 <Text style={PlusOwnerStyle.locationText}>{item.ward}- {item.district}- {item.city}</Text>
                             </View>
                             <FlatList

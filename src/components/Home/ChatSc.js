@@ -43,6 +43,12 @@ const ChatSc = () => {
         <Text style={HomeStyles.textHead}>Tin nhắn của bạn</Text>
 
       </View>
+      <TouchableOpacity onPress={()=> navigation.navigate("LoadingPage")}> 
+        <Text>lOADING PAGE</Text>
+      </TouchableOpacity>
+      <TouchableOpacity onPress={()=> navigation.navigate("Search")}> 
+        <Text>lOADING PAGE</Text>
+      </TouchableOpacity>
       <Searchbar
         placeholder="Search"
         onChangeText={setSearchQuery}

@@ -29,7 +29,9 @@ export default StyleSheet.create({
     },
     input: {
         width: "75%",
-        color:"gray"
+        color:"gray",
+        paddingHorizontal:10,
+        paddingVertical:10,
     },
     label: {
         color: COLOR.finally,
@@ -39,7 +41,7 @@ export default StyleSheet.create({
     },
     serviceInfo: {
         marginTop: 15,
-        backgroundColor: "#D7FAD4",
+        backgroundColor:COLOR.bg_color1,
         width: "92%",
         alignItems: "center", // Căn giữa theo chiều ngang
         borderRadius:20,
@@ -60,18 +62,18 @@ export default StyleSheet.create({
         marginTop: 10, 
     },
     serviceIt: {
-        flexDirection: "column", // Xếp theo hàng ngang
-        alignItems: "center", // Căn giữa theo chiều dọc
-        borderColor: COLOR.PRIMARY,
+        flexDirection: "column", 
+        alignItems: "center", 
+        borderColor: COLOR.offWhite,
         borderWidth: 1,
-        width: "45%", // Chiều rộng mỗi ô điện
+        width: "45%", 
         borderRadius: 10,
         height: 140,
         justifyContent: "center", // Căn các phần tử đều nhau theo chiều ngang
         paddingHorizontal: 10, // Khoảng cách ngang bên trong
         marginVertical: 5, // Khoảng cách dọc
         marginHorizontal:5,
-        backgroundColor:COLOR.PRIMARY,
+        backgroundColor:COLOR.offWhite,
         ...SHADOWS.small
     },
     iconEdit: {

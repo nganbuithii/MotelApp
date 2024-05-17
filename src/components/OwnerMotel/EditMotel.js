@@ -4,16 +4,11 @@ import { Entypo, Foundation, MaterialIcons } from "@expo/vector-icons";
 import { COLOR, SHADOWS } from "../common/color";
 import { AntDesign } from "@expo/vector-icons";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
-
-import { FontAwesome } from "@expo/vector-icons";
-import { FontAwesome6 } from "@expo/vector-icons";
-import { FontAwesome5 } from "@expo/vector-icons";
 import EditMotelStyle from "../../Styles/EditMotelStyle";
 import * as ImagePicker from "expo-image-picker";
 import { useEffect, useState } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { authApi, endpoints } from "../../configs/API";
-import InputEditMotel from "../common/InputEditMotel";
 import showToast from "../common/ToastMessage";
 
 const EditMotel = ({ navigation, route }) => {
@@ -27,7 +22,7 @@ const EditMotel = ({ navigation, route }) => {
     const [district, setDistrict] = useState("");
     const [city, setCity] = useState("");
     const [other, setOther] = useState("");
-    const [loading, setLoading] = useState(false);
+    // const [loading, setLoading] = useState(false);
     const [images, setImages] = useState([]);
     const [prices, setPrices] = useState([]);
     const [render, setRender] = useState(false);
@@ -37,6 +32,7 @@ const EditMotel = ({ navigation, route }) => {
     // const lon = route.params?.lon;
     // const lat = route.params?.lat;
     // const nameLoc = route.params?.nameLoc;
+    const [loading, setLoading] = useState(true);
     const [initialState, setInitialState] = useState({
         ward: "",
         district: "",
@@ -48,13 +44,13 @@ const EditMotel = ({ navigation, route }) => {
         desc: ""
     });
 
-    useEffect(() => {
-        console.log("Route params:", route.params);
-        if (route.params?.nameLoc) {
-            console.log("Here", route.params.nameLoc);
-            setOther(route.params.nameLoc);
-        }
-    }, [route.params?.nameLoc]);
+    // useEffect(() => {
+    //     console.log("Route params:", route.params);
+    //     if (route.params?.nameLoc) {
+    //         console.log("Here", route.params.nameLoc);
+    //         setOther(route.params.nameLoc);
+    //     }
+    // }, [route.params?.nameLoc]);
     const exitModal = () => {
         setEditingService("");
     }
@@ -167,6 +163,7 @@ const EditMotel = ({ navigation, route }) => {
                 maxpeople: String(res.data.max_people),
                 desc: res.data.description
             });
+            setLoading(false);
         } catch (error) {
             console.error("Error fetching motel detail:", error);
             // Xử lý lỗi nếu có
@@ -388,137 +385,145 @@ const EditMotel = ({ navigation, route }) => {
                 />
                 <Text style={HomeStyles.textHead}>Thông Tin Nhà Trọ</Text>
             </View>
-            <ScrollView
-                contentContainerStyle={EditMotelStyle.scrollContainer}
-                showsVerticalScrollIndicator={false}
-            >
-                <View style={EditMotelStyle.infoContainer}>
-                    {/* <Text>Thông tin phòng</Text> */}
-
-                    <Text style={EditMotelStyle.labelService}> Thông tin phòng</Text>
-                    {/* <Text> {idMotel}</Text> */}
-                    <Text style={EditMotelStyle.label}>Xã/Phường</Text>
-
-                    <View style={styles.inputContainer}>
-                        <MaterialIcons style={styles.icon} name="edit-location" size={24} color="black" />
-                        <TextInput style={styles.input} value={ward} onChangeText={setWard}
-                            placeholder="Xã/phường" />
-                    </View>
-                    <Text style={EditMotelStyle.label}> Quận/Huyện</Text>
-                    <View style={styles.inputContainer}>
-                        <MaterialIcons style={styles.icon} name="edit-location" size={24} color="black" />
-                        <TextInput style={styles.input} value={district} onChangeText={setDistrict}
-                            placeholder="Quận/ Huyện" />
-                    </View>
-                    <Text style={EditMotelStyle.label}>Tỉnh/Thành phố</Text>
-                    <View style={styles.inputContainer}>
-                        <MaterialIcons style={styles.icon} name="edit-location" size={24} color="black" />
-                        <TextInput style={styles.input} value={city} onChangeText={setCity}
-                            placeholder="Tỉnh/ Thành phố" />
-                    </View>
-                    <Text style={EditMotelStyle.label}> Địa chỉ khác</Text>
-                    <View style={styles.inputContainer}>
-                        <MaterialIcons style={styles.icon} name="edit-location" size={24} color="black" />
-                        <TextInput style={styles.input} value={ward} onChangeText={setWard}
-                            placeholder="Địa chỉ khác" />
-                    </View>
-
-                    <Text style={EditMotelStyle.label}> Tiền phòng</Text>
-                    <View style={styles.inputContainer}>
-                    <Foundation style={styles.icon} name="dollar" size={24} color="black" />
-                       
-                        <TextInput style={styles.input} value={price} onChangeText={setPrice}
-                            placeholder="Tiền phòng" />
-                    </View>
-                    <Text style={EditMotelStyle.label}> Diện tích</Text>
-                    <View style={styles.inputContainer}>
-                    <AntDesign style={styles.icon} name="areachart" size={24} color="black" />
-                        <TextInput style={styles.input} value={area} onChangeText={setArea}
-                            placeholder="Diện tích" />
-                    </View>
-                    <Text style={EditMotelStyle.label}> Mô tả</Text>
-
-                    <View style={styles.inputContainer}>
-                    <MaterialIcons style={styles.icon} name="mode-edit-outline" size={24} color="black" />
-                        <TextInput style={styles.input} value={desc} onChangeText={setDesc}
-                            placeholder="Mô tả" />
-                    </View>
-                    <Text style={EditMotelStyle.label}> Số người</Text>
-
-                    <View style={styles.inputContainer}>
-                    <MaterialIcons style={styles.icon} name="supervised-user-circle" size={24} color="black" />
-                        <TextInput style={styles.input} value={maxpeople} onChangeText={setMaxpeople}
-                            placeholder="Số người ở" />
-                    </View>
+            {loading ? (
+                <View style={styles.activityIndicatorContainer}>
+                    <ActivityIndicator size="large" color={COLOR.PRIMARY} />
                 </View>
+            ) : (
 
-                <View style={EditMotelStyle.serviceInfo}>
-                    <Text style={EditMotelStyle.labelService}>Thông tin dịch vụ</Text>
-                    <TouchableOpacity onPress={addPrice}>
-                        <AntDesign
-                            style={{ marginLeft: "auto", paddingRight: 20 }}
-                            name="pluscircleo"
-                            size={24}
-                            color={COLOR.PRIMARY}
-                        />
-                    </TouchableOpacity>
 
-                    <View style={EditMotelStyle.serviceRow}>
-                        {prices.map((item, index) => (
-                            <View key={index} style={EditMotelStyle.serviceIt}>
-                                <Text>{item.label}</Text>
-                                <Text>{item.name}</Text>
-                                <Text>
-                                    {item.value} đ/{item.period}
-                                </Text>
-                                <View style={{ flexDirection: "row" }}>
-                                    <TouchableOpacity onPress={() => handleEdit(item)}>
-                                        <AntDesign style={EditMotelStyle.iconEdit} name="edit" size={24} color="green" />
-                                    </TouchableOpacity>
-                                    <TouchableOpacity onPress={() => deletePrices(item)}>
-                                        <MaterialCommunityIcons style={EditMotelStyle.iconEdit} name="delete-circle-outline" size={24} color="red" />
-                                    </TouchableOpacity>
-                                </View>
+                <ScrollView
+                    contentContainerStyle={EditMotelStyle.scrollContainer}
+                    showsVerticalScrollIndicator={false}
+                >
+                    <View style={EditMotelStyle.infoContainer}>
+                        {/* <Text>Thông tin phòng</Text> */}
 
-                            </View>
-                        ))}
+                        <Text style={EditMotelStyle.labelService}> Thông tin phòng</Text>
+                        {/* <Text> {idMotel}</Text> */}
+                        <Text style={EditMotelStyle.label}>Xã/Phường</Text>
+
+                        <View style={styles.inputContainer}>
+                            <MaterialIcons style={styles.icon} name="edit-location" size={24} color="black" />
+                            <TextInput style={styles.input} value={ward} onChangeText={setWard}
+                                placeholder="Xã/phường" />
+                        </View>
+                        <Text style={EditMotelStyle.label}> Quận/Huyện</Text>
+                        <View style={styles.inputContainer}>
+                            <MaterialIcons style={styles.icon} name="edit-location" size={24} color="black" />
+                            <TextInput style={styles.input} value={district} onChangeText={setDistrict}
+                                placeholder="Quận/ Huyện" />
+                        </View>
+                        <Text style={EditMotelStyle.label}>Tỉnh/Thành phố</Text>
+                        <View style={styles.inputContainer}>
+                            <MaterialIcons style={styles.icon} name="edit-location" size={24} color="black" />
+                            <TextInput style={styles.input} value={city} onChangeText={setCity}
+                                placeholder="Tỉnh/ Thành phố" />
+                        </View>
+                        <Text style={EditMotelStyle.label}> Địa chỉ khác</Text>
+                        <View style={styles.inputContainer}>
+                            <MaterialIcons style={styles.icon} name="edit-location" size={24} color="black" />
+                            <TextInput style={styles.input} value={ward} onChangeText={setWard}
+                                placeholder="Địa chỉ khác" />
+                        </View>
+
+                        <Text style={EditMotelStyle.label}> Tiền phòng</Text>
+                        <View style={styles.inputContainer}>
+                            <Foundation style={styles.icon} name="dollar" size={24} color="black" />
+
+                            <TextInput style={styles.input} value={price} onChangeText={setPrice}
+                                placeholder="Tiền phòng" />
+                        </View>
+                        <Text style={EditMotelStyle.label}> Diện tích</Text>
+                        <View style={styles.inputContainer}>
+                            <AntDesign style={styles.icon} name="areachart" size={24} color="black" />
+                            <TextInput style={styles.input} value={area} onChangeText={setArea}
+                                placeholder="Diện tích" />
+                        </View>
+                        <Text style={EditMotelStyle.label}> Mô tả</Text>
+
+                        <View style={styles.inputContainer}>
+                            <MaterialIcons style={styles.icon} name="mode-edit-outline" size={24} color="black" />
+                            <TextInput style={styles.input} value={desc} onChangeText={setDesc}
+                                placeholder="Mô tả" />
+                        </View>
+                        <Text style={EditMotelStyle.label}> Số người</Text>
+
+                        <View style={styles.inputContainer}>
+                            <MaterialIcons style={styles.icon} name="supervised-user-circle" size={24} color="black" />
+                            <TextInput style={styles.input} value={maxpeople} onChangeText={setMaxpeople}
+                                placeholder="Số người ở" />
+                        </View>
                     </View>
-                </View>
 
-                <View style={EditMotelStyle.serviceInfo}>
-                    <Text style={EditMotelStyle.labelService}> Ảnh phòng</Text>
-                    <FlatList
-                        data={images}
-                        renderItem={renderImageItem}
-                        keyExtractor={(item, index) => index.toString()}
-                        horizontal
-                        showsHorizontalScrollIndicator={false}
-                    />
-
-                    <TouchableOpacity
-                        style={EditMotelStyle.addButton}
-                        onPress={handleAddImage}
-                    >
-                        <Text style={EditMotelStyle.addButtonText}>Thêm</Text>
-                        <AntDesign name="camera" size={20} color="#fff" />
-                    </TouchableOpacity>
-                </View>
-                <View style={EditMotelStyle.containerBtn}>
-                    <TouchableOpacity style={EditMotelStyle.button} onPress={handleExit}>
-                        <Text style={EditMotelStyle.buttonText}> Thoát</Text>
-                    </TouchableOpacity>
-                    {loading ? (
-                        <ActivityIndicator color={COLOR.PRIMARY} />
-                    ) : (
-                        <TouchableOpacity
-                            style={[EditMotelStyle.button, EditMotelStyle.saveButton]}
-                            onPress={handleUpdate}
-                        >
-                            <Text style={EditMotelStyle.buttonText}> Lưu thông tin</Text>
+                    <View style={EditMotelStyle.serviceInfo}>
+                        <Text style={EditMotelStyle.labelService}>Thông tin dịch vụ</Text>
+                        <TouchableOpacity onPress={addPrice}>
+                            <AntDesign
+                                style={{ marginLeft: "auto", paddingRight: 20 }}
+                                name="pluscircleo"
+                                size={30}
+                                color={COLOR.PRIMARY}
+                            />
                         </TouchableOpacity>
-                    )}
-                </View>
-            </ScrollView>
+
+                        <View style={EditMotelStyle.serviceRow}>
+                            {prices.map((item, index) => (
+                                <View key={index} style={EditMotelStyle.serviceIt}>
+                                    <Text>{item.label}</Text>
+                                    <Text>{item.name}</Text>
+                                    <Text>
+                                        {item.value} đ/{item.period}
+                                    </Text>
+                                    <View style={{ flexDirection: "row" }}>
+                                        <TouchableOpacity onPress={() => handleEdit(item)}>
+                                            <AntDesign style={EditMotelStyle.iconEdit} name="edit" size={24} color="green" />
+                                        </TouchableOpacity>
+                                        <TouchableOpacity onPress={() => deletePrices(item)}>
+                                            <MaterialCommunityIcons style={EditMotelStyle.iconEdit} name="delete-circle-outline" size={24} color="red" />
+                                        </TouchableOpacity>
+                                    </View>
+
+                                </View>
+                            ))}
+                        </View>
+                    </View>
+
+                    <View style={EditMotelStyle.serviceInfo}>
+                        <Text style={EditMotelStyle.labelService}> Ảnh phòng</Text>
+                        <FlatList
+                            data={images}
+                            renderItem={renderImageItem}
+                            keyExtractor={(item, index) => index.toString()}
+                            horizontal
+                            showsHorizontalScrollIndicator={false}
+                        />
+
+                        <TouchableOpacity
+                            style={EditMotelStyle.addButton}
+                            onPress={handleAddImage}
+                        >
+                            <Text style={EditMotelStyle.addButtonText}>Thêm</Text>
+                            <AntDesign name="camera" size={20} color="#fff" />
+                        </TouchableOpacity>
+                    </View>
+                    <View style={EditMotelStyle.containerBtn}>
+                        <TouchableOpacity style={EditMotelStyle.button} onPress={handleExit}>
+                            <Text style={EditMotelStyle.buttonText}> Thoát</Text>
+                        </TouchableOpacity>
+                        {loading ? (
+                            <ActivityIndicator color={COLOR.PRIMARY} />
+                        ) : (
+                            <TouchableOpacity
+                                style={[EditMotelStyle.button, EditMotelStyle.saveButton]}
+                                onPress={handleUpdate}
+                            >
+                                <Text style={EditMotelStyle.buttonText}> Lưu thông tin</Text>
+                            </TouchableOpacity>
+                        )}
+                    </View>
+                </ScrollView>
+            )}
         </View>
     );
 };
@@ -533,14 +538,19 @@ const styles = StyleSheet.create({
         marginVertical: 5,
         backgroundColor: "#fff",
         ...SHADOWS.small,
-        width:"90%",
-        marginLeft:20,
-        alignContent:"center",
+        width: "90%",
+        marginLeft: 20,
+        alignContent: "center",
         // justifyContent:"center"
     },
     icon: {
         width: 45,
         color: COLOR.PRIMARY,
+    },
+    activityIndicatorContainer: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center'
     },
 })
 export default EditMotel;

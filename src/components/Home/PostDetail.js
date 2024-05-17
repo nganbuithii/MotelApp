@@ -13,6 +13,8 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { authApi, endpoints } from "../../configs/API";
 import { ScrollView } from "react-native-gesture-handler";
 import { ActivityIndicator } from "react-native-paper";
+// import Carousel from 'react-native-reanimated-carousel';r
+
 
 const windowWidth = Dimensions.get("window").width;
 
@@ -143,8 +145,7 @@ const styles = StyleSheet.create({
         // borderRadius: 30,
         borderColor: COLOR.PRIMARY,
         borderWidth: 1,
-        borderTopLeftRadius: 20,
-        borderBottomRightRadius: 20,
+        borderRadius:10,
         marginBottom: 10,
 
     },

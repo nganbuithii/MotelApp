@@ -9,6 +9,8 @@ import EditMotelStyle from "../../Styles/EditMotelStyle";
 import { authApi, endpoints } from "../../configs/API";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import Toast from "react-native-toast-message";
+import { ScrollView } from "react-native-gesture-handler";
+import showToast from "../common/ToastMessage";
 
 const AddPrice = ({ route }) => {
     const { idMotel } = route.params;
@@ -51,25 +53,6 @@ const AddPrice = ({ route }) => {
         setTenDichVu(type); // Cập nhật tên dịch vụ dựa trên loại dịch vụ được chọn
         setModalTypeVisible(false);
     };
-
-    const showToast1 = () => {
-        Toast.show({
-            type: 'success',
-            text1: 'Thành công',
-            text2: 'Thêm thông tin thành công.',
-            visibilityTime: 3000, // Thời gian tồn tại của toast (milliseconds)
-            autoHide: true, // Tự động ẩn toast sau khi hết thời gian tồn tại
-        });
-    }
-    const showToast2 = () => {
-        Toast.show({
-            type: 'error',
-            text1: 'Thất bại',
-            text2: 'Thêm thông tin thất bại.',
-            visibilityTime: 3000, // Thời gian tồn tại của toast (milliseconds)
-            autoHide: true, // Tự động ẩn toast sau khi hết thời gian tồn tại
-        });
-    }
     const selectService = (service) => {
         setSelectedService(service);
         if (service === "Theo chỉ số đồng hồ") {
@@ -111,7 +94,8 @@ const AddPrice = ({ route }) => {
             };
 
             if (!selectedService || (selectedService === "Theo chỉ số đồng hồ" && !donViDo)) {
-                showToast2();
+                showToast({ type: "error", text1: "Lỗi", text2: "Thêm thông tin thất bại " });
+
                 return;
             }
             const serviceLabels = {
@@ -147,7 +131,8 @@ const AddPrice = ({ route }) => {
             console.log(res.data);
             resetInputFields();
             console.log("Thanh công add price");
-            showToast1();
+            showToast({ type: "success", text1: "Thành công", text2: "Thêm thông tin thành công " });
+
 
         } catch (ex) {
             console.error(ex);
@@ -155,7 +140,7 @@ const AddPrice = ({ route }) => {
     }
 
     return (
-        <View style={styles.container}>
+        <ScrollView style={styles.container}>
             <View style={modalVisible ? styles.modalBackground : null} />
             <View style={styles.box}>
                 <Text style={EditMotelStyle.label}>Loại dịch vụ</Text>
@@ -260,7 +245,7 @@ const AddPrice = ({ route }) => {
 
                 <ButtonAuth title="Thêm dịch vụ" onPress={handleSubmit} />
             </View>
-        </View>
+        </ScrollView>
     );
 };
 

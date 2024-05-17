@@ -137,7 +137,7 @@ export default StyleSheet.create({
         position: "relative"
     },
     containerMotel: {
-        backgroundColor:"#89F4A4",
+        backgroundColor:COLOR.offWhite,
         padding: 15,
         marginBottom: 15,
         borderRadius: 10,
@@ -206,6 +206,7 @@ export default StyleSheet.create({
     buttonText: {
         color: '#fff',
         fontSize: 12,
+        marginLeft:5,
     },
     editButton: {
         backgroundColor: 'orange',

@@ -34,6 +34,9 @@ import CreatePostRent from './src/components/Tenant/CreatePostRent';
 import Editpost from './src/components/Tenant/Editpost';
 import MapSearch from './src/components/common/MapSearch';
 import SearchSc from './src/components/Home/SearchSc';
+import LoadingPage from '././src/components/Loading/LoadingPage'
+
+
 //Điều hướng kiểu stack
 const Stack = createStackNavigator();
 
@@ -60,6 +63,8 @@ export default function App() {
           <Stack.Screen name="ProfileDetail" component={ProfileDetail}
             options={{ headerTitle: 'Tài khoản của bạn' }} />
           <Stack.Screen name="HomeIndex" component={HomeIndex}
+            options={{ headerShown: false }} />
+          <Stack.Screen name="LoadingPage" component={LoadingPage}
             options={{ headerShown: false }} />
 
           <Stack.Screen name="NotificationsSc" component={NotificationsSc}

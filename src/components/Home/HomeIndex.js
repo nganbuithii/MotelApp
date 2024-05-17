@@ -1,5 +1,5 @@
 import React, { useContext, useEffect, useState } from "react";
-import { View, Text, Image, StyleSheet, TextInput, Dimensions, TouchableWithoutFeedback, Alert, } from "react-native";
+import { View, Text, Image, StyleSheet, TextInput, Dimensions, TouchableWithoutFeedback, Alert, ImageBackground, } from "react-native";
 import { FontAwesome5 } from '@expo/vector-icons';
 import MyStyles from "../../Styles/MyStyles";
 import { FlatList, ScrollView, TouchableOpacity, } from "react-native-gesture-handler";
@@ -86,7 +86,7 @@ const HomeIndex = ({ route }) => {
       });
       setLikedState(newLikedState);
     } catch (ex) {
-      console.error(ex);
+      console.error("lỗi fetch data get motel all post", ex);
     }
   };
   useEffect(() => {
@@ -129,6 +129,7 @@ const HomeIndex = ({ route }) => {
         }
         return post;
       }));
+      setRender(!render);
     } catch (ex) {
       console.error(ex);
       console.log("Lỗi like bài");
@@ -256,7 +257,7 @@ const HomeIndex = ({ route }) => {
       setMotels(response.data);
       return motelData;
     } catch (ex) {
-      console.error(ex);
+      console.error("Lỗi get motel", ex);
     }
   }
   const getAllPostForRent = async () => {
@@ -275,7 +276,7 @@ const HomeIndex = ({ route }) => {
       });
       setLikedState(newLikedState);
     } catch (ex) {
-      console.error("Lỗi", ex);
+      console.error("Lỗi get all post for rent", ex);
     }
   }
   const handleTinTimNha = async () => {
@@ -313,7 +314,7 @@ const HomeIndex = ({ route }) => {
       }
       setFetchPage(true);
     } catch (ex) {
-      console.error(ex);
+      console.error("lỗi fetchNextPagePost", ex);
     }
   }
   const handleScroll = (event) => {
@@ -354,28 +355,52 @@ const HomeIndex = ({ route }) => {
       }
 
     } catch (ex) {
-      console.error(ex);
+      console.error("Lỗi folloe", ex);
     }
   }
+
   const getAllMotel = async () => {
     try {
       const token = await AsyncStorage.getItem("access-token");
       let res = await authApi(token).get(endpoints["getMotelFilter"]);
       console.log("DATAAAAAAAA NHÀ TRỌ ALL:", res.data);
-      setDataMotel(res.data.results);
+
+      const updatedResults = [];
+      for (const motel of res.data.results) {
+        const updatedMotel = await DetailMotelById(motel.id);
+        updatedResults.push(updatedMotel);
+      }
+
+      setDataMotel(updatedResults);
+      console.log("DATA UPDATED RESULTS:", updatedResults);
     } catch (ex) {
-      console.error(ex);
+      console.error("lỗi get all motel", ex);
     }
   }
-  const DetailMotelById =async (id) => {
-    try{
-      const token =await AsyncStorage.getItem("access-token");
+
+  const DetailMotelById = async (id) => {
+    try {
+      const token = await AsyncStorage.getItem("access-token");
       const res = await authApi(token).get(endpoints["detailMotel"](id));
       console.log(res.data);
-    }catch(ex){
-      console.error(ex);
+
+      // Kiểm tra xem có hình ảnh được trả về hay không
+      if (res.data.images && res.data.images.length > 0) {
+        // Thêm các hình ảnh vào kết quả của nhà trọ
+        const motelIndex = dataMotel.findIndex(motel => motel.id === id);
+        if (motelIndex !== -1) {
+          dataMotel[motelIndex].images = res.data.images;
+        }
+      }
+
+      return res.data; // Trả về dữ liệu của nhà trọ đã được cập nhật
+    } catch (ex) {
+      console.error("Lỗi detail motel í", ex);
+      return null;
     }
   }
+
+
   useEffect(() => {
     getAllMotel();
     console.log("DATAAAAA3J23IO23:", dataMotel);
@@ -385,7 +410,7 @@ const HomeIndex = ({ route }) => {
     <View style={MyStyles.container}>
 
       {/* Bài viết */}
-      <ScrollView style={styles.scrollContainer}
+      <ScrollView style={HomeStyles.flex}
 
         onScroll={handleScroll}
         scrollEventThrottle={16} // Tần số gọi hàm khi cuộn (16ms = 60fps)
@@ -407,70 +432,67 @@ const HomeIndex = ({ route }) => {
         </View>
 
         <View style={{
-          backgroundColor: COLOR.offWhite, paddingVertical: 10,
+          backgroundColor: COLOR.offWhite,
+          paddingVertical: 10,
         }}>
           <Text style={[PostCreateStyle.sectionTitle, { color: COLOR.PRIMARY }]}>Khám phá phòng trọ</Text>
           <FlatList
             data={dataMotel}
             keyExtractor={(item, index) => index.toString()}
             horizontal
+            showsHorizontalScrollIndicator={false}
             renderItem={({ item }) => (
-              <View style={styles.KhamPha}>
-                <Image
-                  source={{ uri: user.avatar }}
-                  style={{ width: 120, height: 150, borderRadius: 10, }}
-                />
-                <Text>{item.id}</Text>
-                <View style={{ flexDirection: "row", marginTop: 5 }}>
-                  <Entypo name="pencil" size={15} color="orange" style={HomeStyles.iconPost} />
-                  <Text style={HomeStyles.textKP}>{item.description}</Text>
+              <TouchableWithoutFeedback>
+                <View style={HomeStyles.KhamPha}>
+                  <ImageBackground
+                    source={{ uri: item.images[0]?.url }}
+                    style={{ width: 150, height: 180, borderRadius: 10, overflow: 'hidden' }}
+                    blurRadius={7} // Đặt độ mờ ở đây
+                  >
+                    <Text style={{ color: 'white', fontSize: 16, position: 'absolute', bottom: 10, left: 10 }}>{item.id}</Text>
+                    <View style={HomeStyles.kpContainer}>
+                      {/* <FontAwesome6 name="location-dot" size={15} color="orange" style={HomeStyles.iconPost} /> */}
+                      <Text style={HomeStyles.kpText}>{item.city}</Text>
+                    </View>
+                  </ImageBackground>
                 </View>
-
-                <View style={{ flexDirection: "row" }}>
-                  <FontAwesome6 name="location-dot" size={15} color="orange" style={HomeStyles.iconPost} />
-                  <Text style={HomeStyles.textKP}>{item.city}</Text>
-                </View>
-                <View style={{ flexDirection: "row" }}>
-                  <Feather name="dollar-sign" size={15} color="orange" style={HomeStyles.iconPost} />
-                  <Text style={HomeStyles.textKP}>{item.price} VNĐ</Text>
-                </View>
-                <Text style={HomeStyles.textDetail}>xem chi tiết </Text>
-
-              </View>
+              </TouchableWithoutFeedback>
             )}
           />
         </View>
+
+
         {/* <TouchableOpacity onPress={fetchNextPagePost}><Text>khfwkehf</Text></TouchableOpacity> */}
-        <View style={styles.buttonContainer}>
-          <TouchableOpacity style={[styles.buttonLoc, tinChoThueActive ? styles.activeButton : null]} onPress={handleTinChoThue}>
-            <Text style={[styles.buttonText, tinChoThueActive ? styles.activeButtonText : null]}>Tin bài cho thuê</Text>
+        <View style={HomeStyles.buttonContainer}>
+          <TouchableOpacity style={[HomeStyles.buttonLoc, tinChoThueActive ? HomeStyles.activeButton : null]} onPress={handleTinChoThue}>
+            <Text style={[HomeStyles.buttonText, tinChoThueActive ? HomeStyles.activeButtonText : null]}>Tin bài cho thuê</Text>
             <FontAwesome name="home" size={15} color="#fff" />
           </TouchableOpacity>
 
-          <TouchableOpacity style={[styles.buttonLoc, tinTimNhaActive ? styles.activeButton : null,]} onPress={handleTinTimNha}>
-            <Text style={[styles.buttonText, tinTimNhaActive ? styles.activeButtonText : null]}>Tin tìm nhà</Text>
+          <TouchableOpacity style={[HomeStyles.buttonLoc, tinTimNhaActive ? styles.activeButton : null,]} onPress={handleTinTimNha}>
+            <Text style={[HomeStyles.buttonText, tinTimNhaActive ? HomeStyles.activeButtonText : null]}>Tin tìm nhà</Text>
             <FontAwesome5 name="search" size={15} color="#fff" />
           </TouchableOpacity>
         </View>
         <View style={styles.textContainer}>
-        {tinChoThueActive && <Text style={[PostCreateStyle.sectionTitle, { color: COLOR.PRIMARY }]}>Bảng tin bài đăng cho thuê nhà</Text>}
-        {tinTimNhaActive && <Text style={[PostCreateStyle.sectionTitle, { color: COLOR.PRIMARY }]}>Bảng tin tìm nhà</Text>}
-      </View>
+          {tinChoThueActive && <Text style={[PostCreateStyle.sectionTitle, { color: COLOR.PRIMARY }]}>Bảng tin bài đăng cho thuê nhà</Text>}
+          {tinTimNhaActive && <Text style={[PostCreateStyle.sectionTitle, { color: COLOR.PRIMARY }]}>Bảng tin tìm nhà</Text>}
+        </View>
         {posts.map((post, index) => (
           <View key={index} style={styles.myPost}>
             {/* <Text>id: {post.id}</Text> */}
             {post.user.id === user.id && (
               <TouchableWithoutFeedback onPress={() => setShowOptions({ ...showOptions, [post.id]: !showOptions[post.id] })}>
-                <Entypo name="dots-three-horizontal" style={styles.iconDetail} size={24} color="black" />
+                <Entypo name="dots-three-horizontal" style={HomeStyles.iconDetail} size={24} color="black" />
               </TouchableWithoutFeedback>
             )}
 
-            <View style={styles.postContainer}>
+            <View style={HomeStyles.postContainer}>
 
-              <View style={styles.userInfoContainer}>
+              <View style={HomeStyles.userInfoContainer}>
 
                 <TouchableOpacity
-                  style={styles.avatarContainer}
+                  style={HomeStyles.avatarContainer}
                   onPress={() => {
                     navigation.navigate("DetailOwner", { ownerId: post.user.id });
                     navigation.addListener('focus', async () => {
@@ -484,14 +506,14 @@ const HomeIndex = ({ route }) => {
                 >
                   <Image
                     source={{ uri: post.user.avatar }}
-                    style={styles.userAvatar}
+                    style={HomeStyles.userAvatar}
                   />
                 </TouchableOpacity>
 
-                <Text style={styles.userName}>{post.user.username}</Text>
+                <Text style={HomeStyles.userName}>{post.user.username}</Text>
               </View>
               <TouchableOpacity
-                style={styles.btnFollow}
+                style={HomeStyles.btnFollow}
                 onPress={() => handleFollow(post.user.id)}>
                 {post.user.followed ? <Text style={{ color: COLOR.PRIMARY, fontSize: 12 }}>Đang theo dõi</Text> :
                   <Text style={{ color: COLOR.PRIMARY, fontSize: 12 }}>Theo dõi</Text>
@@ -643,70 +665,12 @@ const HomeIndex = ({ route }) => {
 };
 
 const styles = StyleSheet.create({
-  scrollContainer: {
-    flex: 1,
-  },
-  postContainer: {
-    flexDirection: "row",
-    alignItems: "center",
-    marginVertical: 10,
-    paddingHorizontal: 10,
-    position: "relative",
-
-  },
-  userInfoContainer: {
-    // width: "60%",
-    flexDirection: "row",
-    alignItems: "center",
-    marginBottom: 6,
-    marginTop: 20,
-  },
-  avatarContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  userAvatar: {
-    width: 50,
-    height: 50,
-    borderRadius: 30,
-    marginRight: 8,
-  },
-  userName: {
-    fontSize: 16,
-    fontWeight: 'bold',
-  },
-  btnFollow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: "#fff", // Thay màu nền bằng màu bạn muốn
-    paddingVertical: 8,
-    paddingHorizontal: 12,
-    borderRadius: 10,
-    ...SHADOWS.small,
-    position: "absolute",
-    left: 142,
-    top: -1
-
-  },
-  btnText: {
-    color: COLOR.PRIMARY,
-    marginRight: 4,
-  },
-  iconDetail: {
-    position: 'absolute',
-    top: 0,
-    right: 25, // Đặt left thành 0 để biểu tượng được đặt ở góc trái
-    padding: 10,
-  },
   // ảnh bài đăng
   image: {
     height: 260,
     resizeMode: "cover",
     position: "relative",
     marginBottom: 10,
-    // borderColor:"#fff",
-    // borderWidth:3
-
   },
   iconContainer: {
     flexDirection: "row",
@@ -719,7 +683,6 @@ const styles = StyleSheet.create({
   },
   myPost: {
     backgroundColor: COLOR.offWhite,
-    // width: "100%",
     borderRadius: 20,
     ...SHADOWS.small,
     marginBottom: 5,
@@ -739,19 +702,14 @@ const styles = StyleSheet.create({
     width: "100%",
   },
   input: {
-    // flex: 1,
-
     marginBottom: 10,
-    height: 80, // Hoặc một giá trị phù hợp
-    // paddingVertical:20,
+    height: 80,
     paddingHorizontal: 20,
-    // height:50,
-    // padding: 5,
     backgroundColor: "#fff",
   },
 
   button: {
-    width: "48%", // Sử dụng một phần trăm của chiều rộng của Modal
+    width: "48%",
     marginTop: 10,
     marginRight: 10
   },
@@ -761,46 +719,7 @@ const styles = StyleSheet.create({
     marginTop: 5,
     borderRadius: 15
   },
-  buttonContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    alignContent: "center",
-    marginTop: 10,
 
-  },
-  buttonLoc: {
-    backgroundColor: COLOR.bg_color1,
-    paddingVertical: 12,
-    // marginLeft: 3,
-    paddingHorizontal: 25,
-    flexDirection: "row",
-    justifyContent: "center",
-    alignContent: "center",
-    alignItems: "center",
-    borderRadius: 20,
-    marginLeft: 10,
-  },
-  buttonText: {
-    color: '#FFF',
-    fontSize: 16,
-    marginRight: 8,
-  },
-  activeButton: {
-    backgroundColor: COLOR.PRIMARY, // Màu xanh khi active
-  },
-  activeButtonText: {
-    fontWeight: 'bold', // In đậm khi active
-  },
-  //KhamPhaItem
-  KhamPha: {
-    padding: 15,
-    backgroundColor: "#C4FFC1",
-    marginHorizontal: 5,
-    ...SHADOWS.small,
-    borderRadius: 20,
-    marginBottom: 10,
-
-  }
 });
 
 export default HomeIndex;

@@ -75,12 +75,66 @@ export default StyleSheet.create({
         padding: 15,
         marginLeft: 'auto',
     },
+    iconDetail: {
+        position: 'absolute',
+        top: 0,
+        right: 25,
+        padding: 10,
+    },
     txtSmall: {
         marginRight: "auto",
         marginHorizontal: 20,
         marginVertical: 10,
         color: COLOR.color_1,
         fontWeight: "bold"
+    },
+    KhamPha: {
+        // padding: 15,
+        backgroundColor: "#fff",
+        marginHorizontal: 5,
+        ...SHADOWS.small,
+        borderRadius: 30,
+        marginBottom: 10,
+
+    },
+    kpContainer: {
+        flexDirection: "row", position: 'absolute', top: 10, left: 10
+
+    },
+    kpText: {
+        color:COLOR.offWhite ,
+        fontSize: 26,
+        fontWeight: "bold"
+    },
+    buttonLoc: {
+        backgroundColor: COLOR.bg_color1,
+        paddingVertical: 12,
+        // marginLeft: 3,
+        paddingHorizontal: 25,
+        flexDirection: "row",
+        justifyContent: "center",
+        alignContent: "center",
+        alignItems: "center",
+        borderRadius: 20,
+        marginLeft: 10,
+    },
+    buttonContainer: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        alignContent: "center",
+        marginTop: 10,
+
+    },
+    activeButton: {
+        backgroundColor: COLOR.PRIMARY, // Màu xanh khi active
+    },
+    activeButtonText: {
+        fontWeight: 'bold', // In đậm khi active
+    },
+    buttonText: {
+        color: '#FFF',
+        fontSize: 16,
+        marginRight: 8,
     },
     // ProfileDetail
     imageProfile: {
@@ -95,17 +149,17 @@ export default StyleSheet.create({
     },
     iconPost: {
         marginRight: 12,
-        
+
     },
-    textKP:{
-        fontWeight:"500",
-        color:COLOR.PRIMARY,
-        fontSize:12
+    textKP: {
+        fontWeight: "500",
+        color: COLOR.PRIMARY,
+        fontSize: 12
     },
-    textDetail:{
-        color:COLOR.PRIMARY,
-        fontSize:12,
-        textAlign:"right"
+    textDetail: {
+        color: COLOR.PRIMARY,
+        fontSize: 12,
+        textAlign: "right"
     },
     tab: {
         flexDirection: "row",
@@ -138,27 +192,36 @@ export default StyleSheet.create({
         paddingHorizontal: 10,
     },
     userInfoContainer: {
-        width: "70%",
         flexDirection: "row",
         alignItems: "center",
+        marginBottom: 6,
+        marginTop: 20,
     },
     userAvatar: {
-        width: 40,
-        height: 40,
-        borderRadius: 20,
-        marginRight: 10,
-        borderWidth: 2,
-        borderColor: COLOR.color3,
+        width: 50,
+        height: 50,
+        borderRadius: 30,
+        marginRight: 8,
     },
     userName: {
-        fontWeight: "bold",
+        fontSize: 16,
+        fontWeight: 'bold',
+    },
+    avatarContainer: {
+        flexDirection: 'row',
+        alignItems: 'center',
     },
     btnFollow: {
-        backgroundColor: COLOR.input_default,
-        padding: 5,
-        paddingVertical: 5,
-        borderRadius: 25,
-        flexDirection: "row",
+        flexDirection: 'row',
+        alignItems: 'center',
+        backgroundColor: "#fff", // Thay màu nền bằng màu bạn muốn
+        paddingVertical: 8,
+        paddingHorizontal: 12,
+        borderRadius: 10,
+        ...SHADOWS.small,
+        position: "absolute",
+        left: 142,
+        top: -1
     },
     //BADGE
     badgeContainer: {
@@ -218,8 +281,8 @@ export default StyleSheet.create({
         fontSize: 16,
         paddingVertical: 10,
         paddingHorizontal: 20,
-        color:COLOR.PRIMARY,
-        fontWeight:"bold"
+        color: COLOR.PRIMARY,
+        fontWeight: "bold"
     },
     //mô tả
     desc: {
@@ -232,7 +295,7 @@ export default StyleSheet.create({
         padding: 7,
         borderRadius: 15,
         position: "absolute",
-        right: "5%", 
+        right: "5%",
         top: "85%",
     },
     badgeText: {

@@ -32,6 +32,7 @@ const DetailOwner = ({ route }) => {
     const [render, setRender] = useState();
     const [isFollowing, setIsFollowing] = useState(false);// CHƯA ai follow
     const [follow, setFollow] = useState(false); // chưa follow
+    const [role, setRole] = useState();
 
     // const renderHouseItem = ({ item }) => (
     //     <View style={styles.imageContainer}>
@@ -49,6 +50,9 @@ const DetailOwner = ({ route }) => {
             const dateJoined = dateFormat(res.data.date_joined, "dd/mm/yyyy");
             setJoin(dateJoined);
             (res.data.followed == true) ? setFollow(true) : setFollow(false);
+            console.log("USERRR", res.data);
+
+            setRole(res.data.user_role === "MOTEL_OWNER" ? "Chủ nhà trọ" : "Người thuê nhà");
 
         } catch (ex) {
             console.error(ex);
@@ -76,12 +80,12 @@ const DetailOwner = ({ route }) => {
             console.log("follow họ thành công");
             setRender(!render);
             setIsFollowing(!isFollowing);
-            if(follow ==false){
-                dispatch({ type: 'update_user', payload: { ...user, following_count: user.following_count +1 } }); // Cập nhật số người đang theo dõi
-            }else{
-                dispatch({ type: 'update_user', payload: { ...user, following_count: user.following_count -1 } }); // Cập nhật số người đang theo dõi
+            if (follow == false) {
+                dispatch({ type: 'update_user', payload: { ...user, following_count: user.following_count + 1 } }); // Cập nhật số người đang theo dõi
+            } else {
+                dispatch({ type: 'update_user', payload: { ...user, following_count: user.following_count - 1 } }); // Cập nhật số người đang theo dõi
             }
-            
+
         } catch (ex) {
             console.error(ex);
         }
@@ -101,9 +105,12 @@ const DetailOwner = ({ route }) => {
                         />
                         <Text>{ownerId}</Text>
                         <View style={{ flexDirection: "row" }}>
-
+                            <TouchableOpacity style={DetailOwnerStyle.btnFollow1}>
+                                <Text style={{ color: "#fff" }}> Nhắn tin</Text>
+                                <Entypo name="chat" size={10} color="#fff" />
+                            </TouchableOpacity>
                             <TouchableOpacity
-                                style={[DetailOwnerStyle.btnFollow1, ownerFollowed ? DetailOwnerStyle.followingButton : DetailOwnerStyle.followButton]}
+                                style={[DetailOwnerStyle.btnFollow2, ownerFollowed ? DetailOwnerStyle.followingButton : DetailOwnerStyle.followButton]}
                                 onPress={handleFollow}>
                                 {follow ? <Text style={{ color: "#fff" }}>Đang theo dõi</Text> :
                                     <Text style={{ color: "#fff" }}>Theo dõi</Text>
@@ -116,10 +123,7 @@ const DetailOwner = ({ route }) => {
 
 
 
-                            <TouchableOpacity style={DetailOwnerStyle.btnFollow2}>
-                                <Text style={{ color: "#fff" }}> Nhắn tin</Text>
-                                <Entypo name="chat" size={10} color="#fff" />
-                            </TouchableOpacity>
+
                         </View>
                     </View>
                     <View style={DetailOwnerStyle.containerInfo}>
@@ -131,12 +135,15 @@ const DetailOwner = ({ route }) => {
                             <Text style={DetailOwnerStyle.infoText}>Đang theo dõi: {owner.following_count}</Text>
                         </View>
                         <View style={DetailOwnerStyle.infoRow}>
+                            <FontAwesome6 style={DetailOwnerStyle.icon} name="user-check" size={24} color={COLOR.PRIMARY} />
+                            <Text style={DetailOwnerStyle.infoText}>{role}</Text>
+                        </View>
+                        <View style={DetailOwnerStyle.infoRow}>
                             <MaterialIcons
                                 style={DetailOwnerStyle.icon}
                                 name="calendar-month"
-                                size={20}
-                                color="black"
-                            />
+                                size={24}
+                                color={COLOR.PRIMARY} />
                             <Text style={DetailOwnerStyle.infoText}>Ngày tham gia: {join}</Text>
                         </View>
                     </View>
@@ -147,18 +154,25 @@ const DetailOwner = ({ route }) => {
                             motelData.map((item, index) => (
                                 <View style={DetailOwnerStyle.infoContainer} key={index}>
                                     <View style={DetailOwnerStyle.infoRow}>
-                                        <Octicons style={DetailOwnerStyle.icon} name="location" size={21} color="black" />
+                                        <Octicons style={DetailOwnerStyle.icon} name="location" size={24}
+                                            color={COLOR.PRIMARY} />
                                         <Text style={DetailOwnerStyle.infoText}>
-                                            Địa chỉ: {item.other_address}, {item.ward}, {item.district}, {item.city}
+                                            Địa chỉ khác: {item.other_address}
+                                        </Text>
+                                    </View>
+                                    <View style={DetailOwnerStyle.infoRow}>
+                                        <Octicons style={DetailOwnerStyle.icon} name="location" size={24} color={COLOR.PRIMARY} />
+                                        <Text style={DetailOwnerStyle.infoText}>
+                                            Địa chỉ: {item.ward}, {item.district}, {item.city}
                                         </Text>
                                     </View>
 
                                     <View style={DetailOwnerStyle.infoRow}>
-                                        <FontAwesome6 style={DetailOwnerStyle.icon} name="house-user" size={20} color="black" />
+                                        <FontAwesome6 style={DetailOwnerStyle.icon} name="house-user" size={20} color={COLOR.PRIMARY} />
                                         <Text style={DetailOwnerStyle.infoText}>Diện tích: {item.area}</Text>
                                     </View>
                                     <View style={DetailOwnerStyle.infoRow}>
-                                        <MaterialIcons style={DetailOwnerStyle.icon} name="attach-money" size={24} color="black" />
+                                        <MaterialIcons style={DetailOwnerStyle.icon} name="attach-money" size={24} color={COLOR.PRIMARY} />
                                         <Text style={DetailOwnerStyle.infoText}>Giá cả: {item.price}</Text>
                                     </View>
                                     <FlatList
