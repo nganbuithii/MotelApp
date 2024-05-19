@@ -17,8 +17,9 @@ import HomeStyles from "../../Styles/HomeStyles";
 import showToast from "../common/ToastMessage";
 import { FontAwesome } from '@expo/vector-icons';
 import PostCreateStyle from "../../Styles/PostCreateStyle";
+import LoadingPage from "../Loading/LoadingPage";
 
-const HomeIndex = ({ route ,  onDataLoaded}) => {
+const HomeIndex = ({ route }) => {
   const [postContent, setPostContent] = useState("");
   const [user, dispatch] = useContext(MyContext);
   const navigation = useNavigation();
@@ -28,6 +29,7 @@ const HomeIndex = ({ route ,  onDataLoaded}) => {
   const [showOptions, setShowOptions] = useState({});
   const [selectedHouse, setSelectedHouse] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [loadData, setLoadData] = useState(true);
 
   const [fetchPage, setFetchPage] = useState(false);
 
@@ -82,6 +84,7 @@ const HomeIndex = ({ route ,  onDataLoaded}) => {
         }
       });
       setLikedState(newLikedState);
+      // setLoadData(false);
     } catch (ex) {
       console.error("lỗi fetch data get motel all post", ex);
     }
@@ -89,35 +92,16 @@ const HomeIndex = ({ route ,  onDataLoaded}) => {
   useEffect(() => {
     fetchDataGetAllPost();
     // getAllPostForRent();
-    onDataLoaded();
+
 
 
   }, [render]);
-  // Khôi phục likedState từ AsyncStorage khi tải trang
-  // useEffect(() => {
-  //   const restoreLikedState = async () => {
-  //     try {
-  //       const likeStateArr = await AsyncStorage.getItem("liked");
-  //       if (likeStateArr !== null) {
-  //         setLikedState(JSON.parse(likeStateArr));
-  //         console.log("Khôi phục trạng thái thành công");
-  //       }
-  //     } catch (error) {
-  //       console.error("Lỗi khôi phục trạng thái đã thích:", error);
-  //     }
-  //   };
 
-  //   restoreLikedState();
-  // }, []);
   const handleLike = async (postId) => {
     try {
       const token = await AsyncStorage.getItem("access-token");
-      // console.log(token);
-      // console.log(postId);
       await authApi(token).post(endpoints['likePost'](postId));
       console.log("like bài thành công");
-      // setRender(!render);
-      // Cập nhật likedState sau khi thay đổi trạng thái like
       // Cập nhật trạng thái liked cho bài đăng đã được thích trong state likedState
       setLikedState(prevLikedState => ({ ...prevLikedState, [postId]: true }));
 
@@ -373,6 +357,7 @@ const HomeIndex = ({ route ,  onDataLoaded}) => {
 
       setDataMotel(updatedResults);
       console.log("DATA UPDATED RESULTS:", updatedResults);
+      setLoadData(false);
     } catch (ex) {
       console.error("lỗi get all motel", ex);
     }
@@ -410,273 +395,275 @@ const HomeIndex = ({ route ,  onDataLoaded}) => {
   }
   return (
     <View style={MyStyles.container}>
-
-      {/* Bài viết */}
-      <ScrollView style={HomeStyles.flex}
-
-        onScroll={handleScroll}
-        scrollEventThrottle={16} // Tần số gọi hàm khi cuộn (16ms = 60fps)
-      >
-        {/* Thanh đăng bài nằm ngang */}
-        <View style={HomeStyles.postBar}>
-          <Image
-            source={{ uri: user.avatar }} // Thay đổi đường dẫn của ảnh mặc định
-            style={HomeStyles.image}
-          />
-          <TouchableOpacity onPress={handleCreatePost}>
-            <View style={HomeStyles.postInputContainer}>
-              <Text style={HomeStyles.postInputPlaceholder}>
-                Bạn muốn đăng bài?
-              </Text>
-              <AntDesign name="pluscircleo" size={24} color="black" />
-            </View>
-          </TouchableOpacity>
-        </View>
-
-        <View style={{
-          backgroundColor: COLOR.offWhite,
-          paddingVertical: 10,
-        }}>
-          <Text style={[PostCreateStyle.sectionTitle, { color: COLOR.PRIMARY }]}>Khám phá phòng trọ</Text>
-          <FlatList
-            data={dataMotel}
-            keyExtractor={(item, index) => index.toString()}
-            horizontal
-            showsHorizontalScrollIndicator={false}
-            renderItem={({ item }) => (
-              <TouchableWithoutFeedback onPress={() => handleDetail(item.id)}>
-                <View style={HomeStyles.KhamPha}>
-                  <ImageBackground
-                    source={{ uri: item.images[0]?.url }}
-                    style={{ width: 150, height: 180, borderRadius: 10, overflow: 'hidden' }}
-                    blurRadius={7} // Đặt độ mờ ở đây
-                  >
-                    <Text style={{ color: 'white', fontSize: 16, position: 'absolute', bottom: 10, left: 10 }}>{item.id}</Text>
-                    <View style={HomeStyles.kpContainer}>
-                      {/* <FontAwesome6 name="location-dot" size={15} color="orange" style={HomeStyles.iconPost} /> */}
-                      <Text style={HomeStyles.kpText}>{item.city}</Text>
-                    </View>
-                  </ImageBackground>
-                </View>
-              </TouchableWithoutFeedback>
-            )}
-          />
-        </View>
+      {loadData ? <LoadingPage /> : (
 
 
-        {/* <TouchableOpacity onPress={fetchNextPagePost}><Text>khfwkehf</Text></TouchableOpacity> */}
-        <View style={HomeStyles.buttonContainer}>
-          <TouchableOpacity style={[HomeStyles.buttonLoc, tinChoThueActive ? HomeStyles.activeButton : null]} onPress={handleTinChoThue}>
-            <Text style={[HomeStyles.buttonText, tinChoThueActive ? HomeStyles.activeButtonText : null]}>Tin bài cho thuê</Text>
-            <FontAwesome name="home" size={15} color="#fff" />
-          </TouchableOpacity>
 
-          <TouchableOpacity style={[HomeStyles.buttonLoc, tinTimNhaActive ? styles.activeButton : null,]} onPress={handleTinTimNha}>
-            <Text style={[HomeStyles.buttonText, tinTimNhaActive ? HomeStyles.activeButtonText : null]}>Tin tìm nhà</Text>
-            <FontAwesome5 name="search" size={15} color="#fff" />
-          </TouchableOpacity>
-        </View>
-        <View style={styles.textContainer}>
-          {tinChoThueActive && <Text style={[PostCreateStyle.sectionTitle, { color: COLOR.PRIMARY }]}>Bảng tin bài đăng cho thuê nhà</Text>}
-          {tinTimNhaActive && <Text style={[PostCreateStyle.sectionTitle, { color: COLOR.PRIMARY }]}>Bảng tin tìm nhà</Text>}
-        </View>
-        {posts.map((post, index) => (
-          <View key={index} style={styles.myPost}>
-            {/* <Text>id: {post.id}</Text> */}
-            {post.user.id === user.id && (
-              <TouchableWithoutFeedback onPress={() => setShowOptions({ ...showOptions, [post.id]: !showOptions[post.id] })}>
-                <Entypo name="dots-three-horizontal" style={HomeStyles.iconDetail} size={24} color="black" />
-              </TouchableWithoutFeedback>
-            )}
+        <ScrollView style={HomeStyles.flex}
 
-            <View style={HomeStyles.postContainer}>
-
-              <View style={HomeStyles.userInfoContainer}>
-
-                <TouchableOpacity
-                  style={HomeStyles.avatarContainer}
-                  onPress={() => {
-                    navigation.navigate("DetailOwner", { ownerId: post.user.id });
-                    navigation.addListener('focus', async () => {
-                      if (tinTimNhaActive == true) {
-                        getAllPostForRent();
-                      } else if (tinChoThueActive == true) {
-                        setRender(!render);
-                      }
-                    });
-                  }}
-                >
-                  <Image
-                    source={{ uri: post.user.avatar }}
-                    style={HomeStyles.userAvatar}
-                  />
-                </TouchableOpacity>
-
-                <Text style={HomeStyles.userName}>{post.user.username}</Text>
+          onScroll={handleScroll}
+          scrollEventThrottle={16} // Tần số gọi hàm khi cuộn (16ms = 60fps)
+        >
+          {/* Thanh đăng bài nằm ngang */}
+          <View style={HomeStyles.postBar}>
+            <Image
+              source={{ uri: user.avatar }} // Thay đổi đường dẫn của ảnh mặc định
+              style={HomeStyles.image}
+            />
+            <TouchableOpacity onPress={handleCreatePost}>
+              <View style={HomeStyles.postInputContainer}>
+                <Text style={HomeStyles.postInputPlaceholder}>
+                  Bạn muốn đăng bài?
+                </Text>
+                <AntDesign name="pluscircleo" size={24} color="black" />
               </View>
-              {post.user.id !== user.id && (
-                <TouchableOpacity
-                  style={HomeStyles.btnFollow}
-                  onPress={() => handleFollow(post.user.id)}
-                >
-                  {post.user.followed ? (
-                    <Text style={{ color: COLOR.PRIMARY, fontSize: 12 }}>Đang theo dõi</Text>
-                  ) : (
-                    <Text style={{ color: COLOR.PRIMARY, fontSize: 12 }}>Theo dõi</Text>
-                  )}
-                  <Entypo name={post.user.followed ? "minus" : "plus"} size={10} color="lightgreen" />
-                </TouchableOpacity>
+            </TouchableOpacity>
+          </View>
+
+          <View style={{
+            backgroundColor: COLOR.offWhite,
+            paddingVertical: 10,
+          }}>
+            <Text style={[PostCreateStyle.sectionTitle, { color: COLOR.PRIMARY }]}>Khám phá phòng trọ</Text>
+            <FlatList
+              data={dataMotel}
+              keyExtractor={(item, index) => index.toString()}
+              horizontal
+              showsHorizontalScrollIndicator={false}
+              renderItem={({ item }) => (
+                <TouchableWithoutFeedback onPress={() => handleDetail(item.id)}>
+                  <View style={HomeStyles.KhamPha}>
+                    <ImageBackground
+                      source={{ uri: item.images[0]?.url }}
+                      style={{ width: 150, height: 180, borderRadius: 10, overflow: 'hidden' }}
+                      blurRadius={7} // Đặt độ mờ ở đây
+                    >
+                      <Text style={{ color: 'white', fontSize: 16, position: 'absolute', bottom: 10, left: 10 }}>{item.id}</Text>
+                      <View style={HomeStyles.kpContainer}>
+                        {/* <FontAwesome6 name="location-dot" size={15} color="orange" style={HomeStyles.iconPost} /> */}
+                        <Text style={HomeStyles.kpText}>{item.city}</Text>
+                      </View>
+                    </ImageBackground>
+                  </View>
+                </TouchableWithoutFeedback>
+              )}
+            />
+          </View>
+
+
+          {/* <TouchableOpacity onPress={fetchNextPagePost}><Text>khfwkehf</Text></TouchableOpacity> */}
+          <View style={HomeStyles.buttonContainer}>
+            <TouchableOpacity style={[HomeStyles.buttonLoc, tinChoThueActive ? HomeStyles.activeButton : null]} onPress={handleTinChoThue}>
+              <Text style={[HomeStyles.buttonText, tinChoThueActive ? HomeStyles.activeButtonText : null]}>Tin bài cho thuê</Text>
+              <FontAwesome name="home" size={15} color="#fff" />
+            </TouchableOpacity>
+
+            <TouchableOpacity style={[HomeStyles.buttonLoc, tinTimNhaActive ? styles.activeButton : null,]} onPress={handleTinTimNha}>
+              <Text style={[HomeStyles.buttonText, tinTimNhaActive ? HomeStyles.activeButtonText : null]}>Tin tìm nhà</Text>
+              <FontAwesome5 name="search" size={15} color="#fff" />
+            </TouchableOpacity>
+          </View>
+          <View style={styles.textContainer}>
+            {tinChoThueActive && <Text style={[PostCreateStyle.sectionTitle, { color: COLOR.PRIMARY }]}>Bảng tin bài đăng cho thuê nhà</Text>}
+            {tinTimNhaActive && <Text style={[PostCreateStyle.sectionTitle, { color: COLOR.PRIMARY }]}>Bảng tin tìm nhà</Text>}
+          </View>
+          {posts.map((post, index) => (
+            <View key={index} style={styles.myPost}>
+              {/* <Text>id: {post.id}</Text> */}
+              {post.user.id === user.id && (
+                <TouchableWithoutFeedback onPress={() => setShowOptions({ ...showOptions, [post.id]: !showOptions[post.id] })}>
+                  <Entypo name="dots-three-horizontal" style={HomeStyles.iconDetail} size={24} color="black" />
+                </TouchableWithoutFeedback>
               )}
 
+              <View style={HomeStyles.postContainer}>
 
-            </View>
+                <View style={HomeStyles.userInfoContainer}>
 
-            {showOptions[post.id] && (
-              <View style={HomeStyles.modalContainer}>
-                <TouchableOpacity onPress={() => handleEdit(post.id, post)}>
-                  <Text style={HomeStyles.optionText}>Sửa bài</Text>
-                </TouchableOpacity>
-                <TouchableOpacity onPress={() => handleDelete(post.id)}>
-                  <Text style={HomeStyles.optionText}>Xóa bài</Text>
-                </TouchableOpacity>
-              </View>
-            )}
-
-            {/* Ẩn hiện Modal chỉnh sửa */}
-
-            {modalsEdit[post.id] && (
-              <Modal
-                isOpen={true}
-                onClosed={handleModalClose}
-                style={styles.modal}
-              >
-                <View>
-                  <Text style={{ color: "#fff" }}>Mô tả</Text>
-                  <TextInput
-                    style={styles.input}
-                    onChangeText={(text) => setContent(text)}
-                    value={content}
-                    placeholder="Nội dung mới"
-                  />
-                  <Text style={{ color: "#fff" }}>Chọn nhà trọ khác</Text>
-                  <View style={styles.container}>
-                    {motels.map((item) => (
-                      <TouchableOpacity
-                        key={item.id.toString()}
-                        onPress={() => selectHouse(item)}
-                      >
-                        <Text style={styles.houseItem}>
-                          {item.title}: {item.ward}, {item.district}, {item.city}
-                          {selectedHouse && selectedHouse.id === item.id && (
-                            <MaterialCommunityIcons
-                              name="check"
-                              size={24}
-                              color="green"
-                              style={{ position: "absolute", right: 10 }}
-                            />
-                          )}
-                        </Text>
-                      </TouchableOpacity>
-                    ))}
-
-                  </View>
-
-                  <View style={{ flexDirection: "row" }}>
-                    <Button mode="contained" onPress={() => handleUpdatePost(post.id)} style={styles.button}>
-                      Cập nhật
-                    </Button>
-                    <Button mode="outlined" onPress={handleModalClose} style={styles.button} >
-                      Hủy
-                    </Button>
-                  </View>
-                </View>
-              </Modal>
-            )}
-
-            <TouchableWithoutFeedback onPress={() => {
-              // Kiểm tra nếu vai trò của người dùng là TENANT thì không thực hiện hành động chuyển trang
-              if (post.user.user_role === "TENANT") {
-                return;
-              }
-              // Kiểm tra nếu vai trò của người dùng là MOTEL_OWNER thì thực hiện hành động chuyển trang
-              if (post.user.user_role === "MOTEL_OWNER") {
-                handleDetail(post.motel.id, post.user.user_role);
-              }
-            }}>
-              <View>
-                <View style={{ flexDirection: "row", width: "100%", paddingHorizontal: 10 }}>
-                  <Entypo name="location-pin" size={20} color="orange" />
-                  <View style={{ flex: 1 }}>
-                    <Text>ID : {post.id}</Text>
-                    <Text style={{ color: "gray" }}>
-                      {post.motel ? `${post.motel.ward}, ${post.motel.district}, ${post.motel.city}` : `${post.ward}, ${post.district}, ${post.city}`}
-                    </Text>
-                  </View>
-                </View>
-
-                <View>
-                  <Text style={HomeStyles.desc}>{post.content}</Text>
-                  {/* Ảnh bài đăng */}
-                  {post.motel ? (
-                    <FlatList
-                      data={post.motel.images}
-                      renderItem={renderItem}
-                      keyExtractor={(item, index) => index.toString()} // Sử dụng index của mảng làm key
-                      horizontal // Hiển thị ngang
-                      pagingEnabled // Cuộn trang theo trang
-                      showsHorizontalScrollIndicator={false} // Ẩn thanh trượt ngang
-                      onViewableItemsChanged={onViewableItemsChanged}
-                    />
-                  ) : (
+                  <TouchableOpacity
+                    style={HomeStyles.avatarContainer}
+                    onPress={() => {
+                      navigation.navigate("DetailOwner", { ownerId: post.user.id });
+                      navigation.addListener('focus', async () => {
+                        if (tinTimNhaActive == true) {
+                          getAllPostForRent();
+                        } else if (tinChoThueActive == true) {
+                          setRender(!render);
+                        }
+                      });
+                    }}
+                  >
                     <Image
-                      source={{ uri: post.image }} // Sử dụng uri từ post.image như là nguồn hình ảnh
-                      style={styles.image} // Thêm style cho hình ảnh nếu cần
+                      source={{ uri: post.user.avatar }}
+                      style={HomeStyles.userAvatar}
                     />
+                  </TouchableOpacity>
+
+                  <Text style={HomeStyles.userName}>{post.user.username}</Text>
+                </View>
+                {post.user.id !== user.id && (
+                  <TouchableOpacity
+                    style={HomeStyles.btnFollow}
+                    onPress={() => handleFollow(post.user.id)}
+                  >
+                    {post.user.followed ? (
+                      <Text style={{ color: COLOR.PRIMARY, fontSize: 12 }}>Đang theo dõi</Text>
+                    ) : (
+                      <Text style={{ color: COLOR.PRIMARY, fontSize: 12 }}>Theo dõi</Text>
+                    )}
+                    <Entypo name={post.user.followed ? "minus" : "plus"} size={10} color="lightgreen" />
+                  </TouchableOpacity>
+                )}
+
+
+              </View>
+
+              {showOptions[post.id] && (
+                <View style={HomeStyles.modalContainer}>
+                  <TouchableOpacity onPress={() => handleEdit(post.id, post)}>
+                    <Text style={HomeStyles.optionText}>Sửa bài</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity onPress={() => handleDelete(post.id)}>
+                    <Text style={HomeStyles.optionText}>Xóa bài</Text>
+                  </TouchableOpacity>
+                </View>
+              )}
+
+              {/* Ẩn hiện Modal chỉnh sửa */}
+
+              {modalsEdit[post.id] && (
+                <Modal
+                  isOpen={true}
+                  onClosed={handleModalClose}
+                  style={styles.modal}
+                >
+                  <View>
+                    <Text style={{ color: "#fff" }}>Mô tả</Text>
+                    <TextInput
+                      style={styles.input}
+                      onChangeText={(text) => setContent(text)}
+                      value={content}
+                      placeholder="Nội dung mới"
+                    />
+                    <Text style={{ color: "#fff" }}>Chọn nhà trọ khác</Text>
+                    <View style={styles.container}>
+                      {motels.map((item) => (
+                        <TouchableOpacity
+                          key={item.id.toString()}
+                          onPress={() => selectHouse(item)}
+                        >
+                          <Text style={styles.houseItem}>
+                            {item.title}: {item.ward}, {item.district}, {item.city}
+                            {selectedHouse && selectedHouse.id === item.id && (
+                              <MaterialCommunityIcons
+                                name="check"
+                                size={24}
+                                color="green"
+                                style={{ position: "absolute", right: 10 }}
+                              />
+                            )}
+                          </Text>
+                        </TouchableOpacity>
+                      ))}
+
+                    </View>
+
+                    <View style={{ flexDirection: "row" }}>
+                      <Button mode="contained" onPress={() => handleUpdatePost(post.id)} style={styles.button}>
+                        Cập nhật
+                      </Button>
+                      <Button mode="outlined" onPress={handleModalClose} style={styles.button} >
+                        Hủy
+                      </Button>
+                    </View>
+                  </View>
+                </Modal>
+              )}
+
+              <TouchableWithoutFeedback onPress={() => {
+                // Kiểm tra nếu vai trò của người dùng là TENANT thì không thực hiện hành động chuyển trang
+                if (post.user.user_role === "TENANT") {
+                  return;
+                }
+                // Kiểm tra nếu vai trò của người dùng là MOTEL_OWNER thì thực hiện hành động chuyển trang
+                if (post.user.user_role === "MOTEL_OWNER") {
+                  handleDetail(post.motel.id, post.user.user_role);
+                }
+              }}>
+                <View>
+                  <View style={{ flexDirection: "row", width: "100%", paddingHorizontal: 10 }}>
+                    <Entypo name="location-pin" size={20} color="orange" />
+                    <View style={{ flex: 1 }}>
+                      <Text>ID : {post.id}</Text>
+                      <Text style={{ color: "gray" }}>
+                        {post.motel ? `${post.motel.ward}, ${post.motel.district}, ${post.motel.city}` : `${post.ward}, ${post.district}, ${post.city}`}
+                      </Text>
+                    </View>
+                  </View>
+
+                  <View>
+                    <Text style={HomeStyles.desc}>{post.content}</Text>
+                    {/* Ảnh bài đăng */}
+                    {post.motel ? (
+                      <FlatList
+                        data={post.motel.images}
+                        renderItem={renderItem}
+                        keyExtractor={(item, index) => index.toString()} // Sử dụng index của mảng làm key
+                        horizontal // Hiển thị ngang
+                        pagingEnabled // Cuộn trang theo trang
+                        showsHorizontalScrollIndicator={false} // Ẩn thanh trượt ngang
+                        onViewableItemsChanged={onViewableItemsChanged}
+                      />
+                    ) : (
+                      <Image
+                        source={{ uri: post.image }} // Sử dụng uri từ post.image như là nguồn hình ảnh
+                        style={styles.image} // Thêm style cho hình ảnh nếu cần
+                      />
+                    )}
+
+                  </View>
+                  {/* Hiển thị badge */}
+                  {post.motel && (
+                    <View style={HomeStyles.badgeContainer}>
+                      <Text style={HomeStyles.badgeText}>
+                        {currentIndex + 1}/{post.motel.images.length}
+                      </Text>
+                    </View>
                   )}
 
                 </View>
-                {/* Hiển thị badge */}
-                {post.motel && (
-                  <View style={HomeStyles.badgeContainer}>
-                    <Text style={HomeStyles.badgeText}>
-                      {currentIndex + 1}/{post.motel.images.length}
-                    </Text>
-                  </View>
-                )}
+              </TouchableWithoutFeedback>
+              {/* icon */}
+              <View style={styles.iconContainer}>
+                <View style={MyStyles.flex}>
+                  <Text style={{ fontWeight: "bold" }}>{post.like_count} </Text>
+                  <TouchableWithoutFeedback onPress={() => handleLike(post.id)}>
+                    {likedState[post.id] ? <AntDesign style={HomeStyles.iconPost} name="heart" size={24} color="red" /> :
+                      <Feather style={HomeStyles.iconPost} name="heart" size={24} color="black" />}
+                  </TouchableWithoutFeedback>
+                  <Text style={{ fontWeight: "bold" }}>{post.comment_count} </Text>
 
+                  <TouchableWithoutFeedback onPress={() => handleComment(post.id)}>
+                    <Feather
+                      style={HomeStyles.iconPost}
+                      name="message-circle"
+                      size={24}
+                      color="black"
+                    /></TouchableWithoutFeedback>
+                  <TouchableOpacity onPress={() => handleShare(post.id)}>
+
+                    <Feather name="send" size={24} color="black" />
+                  </TouchableOpacity>
+
+                </View>
+                {/* <Feather name="bookmark" size={24} color="black" /> */}
               </View>
-            </TouchableWithoutFeedback>
-            {/* icon */}
-            <View style={styles.iconContainer}>
-              <View style={MyStyles.flex}>
-                <Text style={{ fontWeight: "bold" }}>{post.like_count} </Text>
-                <TouchableWithoutFeedback onPress={() => handleLike(post.id)}>
-                  {likedState[post.id] ? <AntDesign style={HomeStyles.iconPost} name="heart" size={24} color="red" /> :
-                    <Feather style={HomeStyles.iconPost} name="heart" size={24} color="black" />}
-                </TouchableWithoutFeedback>
-                <Text style={{ fontWeight: "bold" }}>{post.comment_count} </Text>
-
-                <TouchableWithoutFeedback onPress={() => handleComment(post.id)}>
-                  <Feather
-                    style={HomeStyles.iconPost}
-                    name="message-circle"
-                    size={24}
-                    color="black"
-                  /></TouchableWithoutFeedback>
-                <TouchableOpacity onPress={() => handleShare(post.id)}>
-
-                  <Feather name="send" size={24} color="black" />
-                </TouchableOpacity>
-
-              </View>
-              {/* <Feather name="bookmark" size={24} color="black" /> */}
             </View>
-          </View>
-        ))}
+          ))}
 
 
 
-      </ScrollView>
+        </ScrollView>)}
     </View>
   );
 };

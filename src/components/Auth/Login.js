@@ -56,21 +56,15 @@ const Login = ({ navigation }) => {
                 payload: userData,
             });
 
-            //  // Điều hướng đến màn hình chính
-            // if (userData.user_role === 'MOTEL_OWNER') {
-            //     navigation.navigate("RegisterMotel"); // Điều hướng đến màn hình đăng ký cho chủ nhà trọ
-            // } else {
-            //     navigation.navigate("Home"); // Điều hướng đến màn hình chính
-            // }
             // Gọi hàm kiểm tra nhà trọ của người dùng và chờ đợi kết quả
             const hasMotelData = await checkMotel(userData.id);
             console.log("hasmotel:", hasMotelData);
             console.log("role", userData.user_role);
             // Xác định màn hình chuyển hướng
             if (userData.user_role === "TENANT") {
-                navigation.navigate("LoadingPage");
+                navigation.navigate("HomeIndex");
             } else {
-                let targetScreen = hasMotelData ? 'LoadingPage' : 'RegisterMotel';
+                let targetScreen = hasMotelData ? 'HomeIndex' : 'RegisterMotel';
 
                 // Chuyển hướng đến màn hình tương ứng
                 navigation.navigate(targetScreen);
