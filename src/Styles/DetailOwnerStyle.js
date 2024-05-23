@@ -77,7 +77,16 @@ export default StyleSheet.create({
         paddingHorizontal: 10,
     },
     infoText: {
-        marginLeft: 10,
+        
+        marginLeft: 20,
+        width:"90%"
+        // color:COLOR.PRIMARY,
+        // fontWeight:"500"
+    },
+    infoTxt: {
+        
+        marginLeft: 20,
+        // width:"90%"
         // color:COLOR.PRIMARY,
         // fontWeight:"500"
     },
@@ -123,5 +132,84 @@ export default StyleSheet.create({
     },
     followingButton: {
         backgroundColor: COLOR.PRIMARY, // Màu xanh (hoặc bất kỳ màu nào bạn muốn)
+    },
+    btnOption:{
+        backgroundColor:COLOR.PRIMARY,
+        // marginHorizontal:10,
+        padding:20,
+        width:"50%"
+    },
+    btnOption2:{
+        backgroundColor:COLOR.PRIMARY,
+        // marginHorizontal:10,
+        padding:20,
+        width:"100%"
+    },
+    containerOption:{
+        flexDirection:"row",
+        justifyContent:"center"
+    },
+    //POST
+    postContainer: {
+        marginBottom: 20,
+        backgroundColor: '#ffffff',
+        padding: 10,
+        borderRadius: 8,
+        borderWidth: 1,
+        borderColor: '#e0e0e0',
+        shadowColor: "#000",
+        shadowOffset: {
+            width: 0,
+            height: 2,
+        },
+        shadowOpacity: 0.25,
+        shadowRadius: 3.84,
+        elevation: 5,
+        marginTop:10,
+    },
+    postTitle: {
+        fontSize: 18,
+        fontWeight: 'bold',
+        marginBottom: 10,
+    },
+    userInfoContainer: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        marginBottom: 10,
+    },
+    userAvatar: {
+        width: 30,
+        height: 30,
+        borderRadius: 15,
+        marginRight: 10,
+    },
+    username: {
+        fontSize: 16,
+        fontWeight: 'bold',
+    },
+    postContent: {
+        marginBottom: 10,
+    },
+    postImage: {
+        width: '100%',
+        height: 200,
+        resizeMode: 'cover',
+        borderRadius: 8,
+    },
+    noPostsText: {
+        fontSize: 16,
+        fontStyle: 'italic',
+    },
+    postActions: {
+        flexDirection: 'row',
+        justifyContent:"flex-end"
+    },
+    postActionIcon: {
+        marginLeft: 10,
+        marginTop:20,
+        padding:10,
+        backgroundColor:COLOR.offWhite,
+        ...SHADOWS.small,
+        borderRadius:10,
     },
 });

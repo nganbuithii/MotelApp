@@ -62,9 +62,9 @@ const Login = ({ navigation }) => {
             console.log("role", userData.user_role);
             // Xác định màn hình chuyển hướng
             if (userData.user_role === "TENANT") {
-                navigation.navigate("HomeIndex");
+                navigation.navigate("Home");
             } else {
-                let targetScreen = hasMotelData ? 'HomeIndex' : 'RegisterMotel';
+                let targetScreen = hasMotelData ? 'Home' : 'RegisterMotel';
 
                 // Chuyển hướng đến màn hình tương ứng
                 navigation.navigate(targetScreen);

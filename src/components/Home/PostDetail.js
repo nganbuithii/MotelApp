@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import {
     View, FlatList, Image, StyleSheet, Dimensions, Text,
     TouchableOpacity,
+    TouchableWithoutFeedback,
 } from "react-native";
 import { COLOR, SHADOWS } from "../common/color";
 import { MaterialIcons } from "@expo/vector-icons";

@@ -16,6 +16,7 @@ import showToast from "../common/ToastMessage";
 import * as ImagePicker from "expo-image-picker";
 import PostStyle from "./PostStyle";
 import SearchStyle from "../../Styles/SearchStyle";
+import LoadingPage from "../Loading/LoadingPage";
 
 const CreatePostRent = ({ navigation, route }) => {
     const [cities, setCities] = useState([]); // State để lưu trữ danh sách các tỉnh/thành phố
@@ -37,6 +38,8 @@ const CreatePostRent = ({ navigation, route }) => {
     const [cityErr, setCityErr] = useState("");
     const [districtErr, setDistrictErr] = useState("");
     const [otherErr, setOtherErr] = useState("");
+
+    // const [loading, setLoading] = useState(true);
 
     const lon = route.params?.lon;
     const lat = route.params?.lat;
@@ -76,7 +79,12 @@ const CreatePostRent = ({ navigation, route }) => {
         }
     };
 
-
+    useEffect(() => {
+        if (image) {
+            setImgErr(""); // Đặt imgErr thành rỗng nếu có hình ảnh được chọn
+        }
+    }, [image]);
+    
     // Hàm để lấy danh sách quận/huyện dựa trên tỉnh/thành phố được chọn
     const fetchDistricts = async (cityId) => {
         try {
@@ -160,7 +168,7 @@ const CreatePostRent = ({ navigation, route }) => {
             if (!ward) { setWardErr("Vui lòng chọn xã phường"); } else { setWardErr(""); }
             if (!city) { setCityErr("Vui lòng chọn thành phố"); } else { setCityErr(""); }
             if (!district) { setDistrictErr("Vui lòng chọn quận huyện"); } else { setDistrictErr(""); }
-            if (!other) { setOtherErr("Vui lòng chọn quận huyện"); } else { setOtherErr(""); }
+            if (!other) { setOtherErr("Vui lòng chọn địa chỉ khác"); } else { setOtherErr(""); }
             if (content && ward && district && city && other && image) {
                 let token = await AsyncStorage.getItem("access-token");
                 console.log(token);
@@ -186,6 +194,7 @@ const CreatePostRent = ({ navigation, route }) => {
                     },
                 });
                 console.log("Đăng bài thành công");
+                setLoading(true);
 
                 navigation.goBack();
             }
@@ -218,10 +227,11 @@ const CreatePostRent = ({ navigation, route }) => {
                     {!!contentError && <Text style={PostStyle.errorText}><Ionicons name="warning" size={12} color="red" />{contentError}</Text>}
                     <View style={PostStyle.inputContainer}>
                         <TextInput placeholder="Hãy viết nội dung cho bài viết của bạn?" style={PostStyle.input} multiline={true} value={content} onChangeText={(text) => setContent(text)}
+                            onFocus={() => setContentError("")}
                         />
                     </View>
                     {!!imgErr && <Text style={PostStyle.errorText}><Ionicons name="warning" size={12} color="red" />{imgErr}</Text>}
-                    <TouchableOpacity style={PostStyle.uploadButton} onPress={addImage}>
+                    <TouchableOpacity style={PostStyle.uploadButton} onPress={addImage} >
                         <Ionicons name="camera" size={24} color="lightgreen" />
                         <Text style={PostStyle.uploadText}>Thêm hình ảnh</Text>
                     </TouchableOpacity>
@@ -243,17 +253,21 @@ const CreatePostRent = ({ navigation, route }) => {
                         <Text style={PostStyle.uploadText}>Thêm vị trí</Text>
                     </TouchableOpacity> */}
                 </View>
-                {!!wardErr && <Text style={PostStyle.errorText}><Ionicons name="warning" size={12} color="red" />{wardErr}</Text>}
+                {!!cityErr && <Text style={PostStyle.errorText}><Ionicons name="warning" size={12} color="red" />{cityErr}</Text>}
                 <View style={PostStyle.selectContainer}>
                     {/* <Text>Chọn tỉnh/thành phố:</Text> */}
                     <RNPickerSelect
                         value={city}
                         onValueChange={(value) => {
                             setCity(value);
-                            handleCityChange(value); // Gọi hàm xử lý khi tỉnh/thành phố được chọn
+                            if (value !== '') {
+                                setCityErr(""); // Đặt error thành rỗng nếu có giá trị được chọn
+                            }
+                            handleCityChange(value);
                         }}
                         placeholder={{ label: 'Chọn tỉnh/thành phố', value: null }}
                         items={cities.map(city => ({ label: city.full_name, value: city.id }))}
+
                     />
                 </View>
                 {!!districtErr && <Text style={PostStyle.errorText}><Ionicons name="warning" size={12} color="red" />{districtErr}</Text>}
@@ -262,17 +276,25 @@ const CreatePostRent = ({ navigation, route }) => {
                         value={district}
                         onValueChange={(value) => {
                             setDistrict(value);
-                            handleDistrictChange(value); // Gọi hàm xử lý khi quận/huyện được chọn
+                            if (value !== '') {
+                                setDistrictErr(""); // Đặt error thành rỗng nếu có giá trị được chọn
+                            }
+                            handleDistrictChange(value);
                         }}
                         placeholder={{ label: 'Chọn quận/huyện', value: null }}
                         items={districts.map(district => ({ label: district.full_name, value: district.id }))}
                     />
                 </View>
-                {!!cityErr && <Text style={PostStyle.errorText}><Ionicons name="warning" size={12} color="red" />{cityErr}</Text>}
+                {!!wardErr && <Text style={PostStyle.errorText}><Ionicons name="warning" size={12} color="red" />{wardErr}</Text>}
                 <View style={PostStyle.selectContainer}>
                     <RNPickerSelect
                         value={ward}
-                        onValueChange={(value) => setWard(value)}
+                        onValueChange={(value) => {
+                            setWard(value);
+                            if (value !== '') {
+                                setWardErr(""); // Đặt error thành rỗng nếu có giá trị được chọn
+                            }
+                        }}
                         placeholder={{ label: 'Chọn xã/phường', value: null }}
                         items={wards.map(ward => ({ label: ward.full_name, value: ward.id }))}
                     />
@@ -299,7 +321,7 @@ const CreatePostRent = ({ navigation, route }) => {
                 </View>
 
                 <View style={PostStyle.buttonContainer}>
-                    {loading ? (<ActivityIndicator />) : (
+                    {loading == true ? (<ActivityIndicator />) : (
                         <ButtonAuth title="Đăng bài" onPress={handleSubmit} />)}
                 </View>
             </ScrollView>

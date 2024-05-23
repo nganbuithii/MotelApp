@@ -15,6 +15,7 @@ import PlusOwner from '../OwnerMotel/PlusOwner';
 const Home = () => {
     const [index, setIndex] = React.useState(0);
     const [user, dispatch] = React.useContext(MyContext);
+    
     const [routesDefault] = React.useState([
         { key: 'home', focusedIcon: HomeIcon, unfocusedIcon: HomeIcon },
         { key: 'search', focusedIcon: SearchIcon, unfocusedIcon: SearchIcon },

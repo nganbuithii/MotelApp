@@ -17,6 +17,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         borderRadius: 5,
         marginTop: 15,
+        marginBottom:20
     },
     buttonText: {
     color: COLOR.offWhite,

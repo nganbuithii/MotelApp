@@ -14,7 +14,8 @@ const ProfileScreen = () => {
   const [user, dispatch] = React.useContext(MyContext); // Lấy thông tin người dùng từ context
 
   const goToProfileDetail = () => {
-    navigation.navigate('ProfileDetail'); // Điều hướng đến màn hình ProfileDetail
+    // navigation.navigate('ProfileDetail'); // Điều hướng đến màn hình ProfileDetail
+    navigation.navigate("DetailOwner", {ownerId: user.id});
     console.log("USER",user);
   };
   const goToService = () => {

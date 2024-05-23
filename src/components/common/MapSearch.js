@@ -245,7 +245,7 @@ const styles = StyleSheet.create({
     },
     confirmButton: {
         padding: 20,
-        backgroundColor:"lightpink",
+        backgroundColor:"lightgreen",
         borderRadius: 30,
         marginHorizontal: 90,
         marginTop:10

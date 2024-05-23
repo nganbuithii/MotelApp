@@ -20,12 +20,12 @@ const Register = ({ navigation }) => {
     return (
         <View style={[MyStyles.container]}>
             <Image
-            source={require("../../assets/images/helo.gif")}
+            source={require("../../assets/images/helo1.gif")}
             style={{
             width: 340,
-            height: 300,
+            height: 200,
             alignSelf: "center",
-            marginBottom: 10,
+            // marginBottom: 10,
             marginTop: 40,
             }}
         />

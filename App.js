@@ -17,7 +17,7 @@ import RegisterMotel from './src/components/Auth/RegisterMotel';
 import UploadImgHouse from './src/components/Auth/UploadImgHouse';
 import PostDetail from './src/components/Home/PostDetail';
 import DetailOwner from './src/components/OwnerMotel/DetailOwner';
-import Toast, { ToastProvider } from 'react-native-toast-message';
+import Toast from 'react-native-toast-message';
 import NotificationsSc from './src/components/Home/NotificationsSc';
 import PlusOwner from './src/components/OwnerMotel/PlusOwner';
 import ChatDetail from './src/components/Home/ChatDetail';
@@ -28,13 +28,12 @@ import AddPrice from './src/components/OwnerMotel/AddPrice';
 import DetailPrices from './src/components/OwnerMotel/DetailPrices';
 import { COLOR } from './src/components/common/color';
 import Payment from './src/components/Tenant/Payment';
-import HomeIndex from './src/components/Home/HomeIndex';
 import Comment from './src/components/Home/Comment';
 import CreatePostRent from './src/components/Tenant/CreatePostRent';
 import Editpost from './src/components/Tenant/Editpost';
 import MapSearch from './src/components/common/MapSearch';
-import SearchSc from './src/components/Home/SearchSc';
-import LoadingPage from './src/components/Loading/LoadingPage';
+import { MaterialIcons } from '@expo/vector-icons';
+import { TouchableOpacity } from 'react-native-gesture-handler';
 
 //Điều hướng kiểu stack
 const Stack = createStackNavigator();
@@ -42,6 +41,7 @@ const Stack = createStackNavigator();
 export default function App() {
   // khởi gán là null, và cấp cho các con xài
   const [user, dispatch] = useReducer(MyUserReducer, null);
+
   return (
 
     <MyContext.Provider value={[user, dispatch]}>
@@ -60,9 +60,9 @@ export default function App() {
               /> */}
 
           <Stack.Screen name="ProfileDetail" component={ProfileDetail}
-            options={{ headerTitle: 'Tài khoản của bạn' }} />
-          <Stack.Screen name="HomeIndex" component={HomeIndex}
-            options={{ headerShown: false }} />
+            options={{ headerTitle: user.username }} />
+          {/* <Stack.Screen name="HomeIndex" component={HomeIndex}
+            options={{ headerShown: false }} /> */}
           {/* <Stack.Screen name="LoadingPage" component={LoadingPage}
             options={{ headerShown: false }} /> */}
 
@@ -94,7 +94,7 @@ export default function App() {
               headerTintColor: COLOR.PRIMARY,
 
 
-            }}/>
+            }} />
           <Stack.Screen name="CreatePostRent" component={CreatePostRent}
             options={{ headerTitle: 'Tạo bài viết' }} />
           <Stack.Screen name="Comment" component={Comment}
@@ -108,15 +108,19 @@ export default function App() {
             component={RegisterMotel}
             options={{ headerShown: false }} // Tắt header cho màn hình Slider
           /> */}
-          <Stack.Screen
-            name="DetailOwner"
-            component={DetailOwner}
-            options={{
-              headerShown: true,// Tắt header cho màn hình Slider
-              headerTitle: 'Thông tin chi tiết',
-              headerTintColor: COLOR.PRIMARY,
-            }}
-          />
+          <Stack.Screen name="DetailOwner" component={DetailOwner} options={({ navigation }) => ({
+            headerRight: () => (
+              user && (
+                <TouchableOpacity onPress={() => navigation.navigate("ProfileDetail")} style={{marginRight:20}}>
+                  <MaterialIcons name="edit" size={24} color={COLOR.PRIMARY} />
+                </TouchableOpacity>
+              )
+            ),
+            headerTitle: 'Thông tin chi tiết',
+            // headerTintColor: COLOR.PRIMARY,
+          })} />
+
+
           <Stack.Screen
             name="PostDetail"
             component={PostDetail}

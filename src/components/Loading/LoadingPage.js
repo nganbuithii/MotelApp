@@ -24,12 +24,15 @@ const LoadingPage = () => {
 
 const styles = StyleSheet.create({
     container: {
+        ...StyleSheet.absoluteFillObject, // Chiếm toàn bộ không gian
+        backgroundColor: 'rgba(255, 255, 255, 0.8)', // Màu nền mờ
         alignItems: "center",
         justifyContent: "center",
+        zIndex: 9999, // Sắp xếp trên tất cả các thành phần khác
     },
     loadingImage: {
-        width: 120,
-        height: 120,
+        width: 100,
+        height: 100,
     },
     loadingText: {
         fontSize: 24,

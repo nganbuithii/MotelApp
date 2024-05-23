@@ -91,6 +91,7 @@ const HomeIndex = ({ route }) => {
   };
   useEffect(() => {
     fetchDataGetAllPost();
+    setLoading(false); 
     // getAllPostForRent();
 
 
@@ -112,7 +113,11 @@ const HomeIndex = ({ route }) => {
         }
         return post;
       }));
-      setRender(!render);
+      if (tinTimNhaActive == true) {
+        getAllPostForRent();
+      } else if (tinChoThueActive == true) {
+        setRender(!render);
+      }
     } catch (ex) {
       console.error(ex);
       console.log("Lỗi like bài");
@@ -322,7 +327,7 @@ const HomeIndex = ({ route }) => {
     const URL = `https://motel.pythonanywhere.com/posts/${id}`;
 
     // Hiển thị URL ảo cho người dùng
-    Alert.alert('Chia sẻ link ', URL);
+    Alert.alert('Chia sẻ liên kết ', URL);
   };
   const handleFollow = async (idUser) => {
     try {
@@ -396,9 +401,6 @@ const HomeIndex = ({ route }) => {
   return (
     <View style={MyStyles.container}>
       {loadData ? <LoadingPage /> : (
-
-
-
         <ScrollView style={HomeStyles.flex}
 
           onScroll={handleScroll}
@@ -458,7 +460,7 @@ const HomeIndex = ({ route }) => {
               <FontAwesome name="home" size={15} color="#fff" />
             </TouchableOpacity>
 
-            <TouchableOpacity style={[HomeStyles.buttonLoc, tinTimNhaActive ? styles.activeButton : null,]} onPress={handleTinTimNha}>
+            <TouchableOpacity style={[HomeStyles.buttonLoc, tinTimNhaActive ? HomeStyles.activeButton : null,]} onPress={handleTinTimNha}>
               <Text style={[HomeStyles.buttonText, tinTimNhaActive ? HomeStyles.activeButtonText : null]}>Tin tìm nhà</Text>
               <FontAwesome5 name="search" size={15} color="#fff" />
             </TouchableOpacity>
