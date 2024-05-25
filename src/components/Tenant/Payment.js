@@ -1,14 +1,16 @@
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import { Text, View, TouchableOpacity, StyleSheet, Image, TextInput } from "react-native";
 import InputField from "../common/InputField";
 import ButtonAuth from "../common/ButtonAuth";
 import SearchStyle from "../../Styles/SearchStyle";
 import { COLOR } from "../common/color";
+import MyContext from "../../configs/MyContext";
 
 const Payment = () => {
-    const [fullName, setFullName] = useState("");
+    const [user] = useContext(MyContext);
+    const [fullName, setFullName] = useState(user.first_name+ " " +user.last_name);
     const [amount, setAmount] = useState("1000000");
-    const [phoneNumber, setPhoneNumber] = useState("");
+    const [phoneNumber, setPhoneNumber] = useState(user.phone);
     const [paymentMethod, setPaymentMethod] = useState("");
 
     const handlePayment = () => {

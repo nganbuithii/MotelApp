@@ -118,7 +118,7 @@ export default function App() {
                 // Kiểm tra xem người dùng hiện tại có phải là chủ sở hữu không
                 if (user && user.id === route.params.ownerId) {
                   return (
-                    <TouchableOpacity onPress={() => navigation.navigate("Editpost", { postId: route.params.ownerId })} style={{ marginRight: 20 }}>
+                    <TouchableOpacity onPress={() => navigation.navigate("ProfileDetail", { postId: route.params.ownerId })} style={{ marginRight: 20 }}>
                       <MaterialIcons name="edit" size={24} color="black" />
                     </TouchableOpacity>
                   );

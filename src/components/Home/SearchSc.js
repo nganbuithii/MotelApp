@@ -41,6 +41,8 @@ const SearchSc = ({ route }) => {
   const nameLoc = route.params?.nameLoc;
   useEffect(() => {
     console.log("Route params:", route.params);
+    console.log("Lon", lon);
+    console.log("lat", lat);
     if (route.params?.nameLoc) {
         console.log("Here", route.params.nameLoc);
         setOther(route.params.nameLoc);

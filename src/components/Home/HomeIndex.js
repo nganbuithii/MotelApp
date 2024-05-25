@@ -18,6 +18,7 @@ import showToast from "../common/ToastMessage";
 import { FontAwesome } from '@expo/vector-icons';
 import PostCreateStyle from "../../Styles/PostCreateStyle";
 import LoadingPage from "../Loading/LoadingPage";
+import AdsSlider from "../../components/Home/AdsSlider"
 
 const HomeIndex = ({ route }) => {
   const [postContent, setPostContent] = useState("");
@@ -421,7 +422,11 @@ const HomeIndex = ({ route }) => {
               </View>
             </TouchableOpacity>
           </View>
+          <View style={{flex:1}}>
+    <AdsSlider />
+</View>
 
+          
           <View style={{
             backgroundColor: COLOR.offWhite,
             paddingVertical: 10,
