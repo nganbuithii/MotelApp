@@ -17,6 +17,7 @@ import { ScrollView } from "react-native-gesture-handler";
 import { ActivityIndicator } from "react-native-paper";
 import Carousel, { Pagination } from 'react-native-snap-carousel';
 import { FontAwesome } from '@expo/vector-icons';
+import LoadingPage from "../Loading/LoadingPage";
 
 
 
@@ -76,10 +77,7 @@ const PostDetail = ({ navigation, route }) => {
     return (
         <View style={{ flex: 1, paddingBottom: 30 }}>
             {loading ? (
-                <View style={styles.loadingContainer}>
-                    <ActivityIndicator color= {COLOR.PRIMARY
-                    }/>
-                </View>
+                <LoadingPage />
             ) : (
                 <ScrollView contentContainerStyle={{ alignItems: 'center' }}>
 
@@ -94,7 +92,7 @@ const PostDetail = ({ navigation, route }) => {
 
                     />
                     <View style={styles.infoContainer}>
-                        {owner == null ? <ActivityIndicator color= {COLOR.PRIMARY}/>: (
+                        {owner == null ? <LoadingPage/>: (
                             <TouchableWithoutFeedback onPress={() => handleDetail(owner.id)}>
                                 <View style={styles.infoRow}>
                                 {/* <Text> {owner.id}</Text> */}

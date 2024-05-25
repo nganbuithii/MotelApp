@@ -190,12 +190,15 @@ export default StyleSheet.create({
         alignItems: "center",
         marginVertical: 10,
         paddingHorizontal: 10,
+        position:"relative"
     },
     userInfoContainer: {
         flexDirection: "row",
         alignItems: "center",
         marginBottom: 6,
         marginTop: 20,
+        width:"100%",
+        // backgroundColor:"pink"
     },
     userAvatar: {
         width: 50,
@@ -220,8 +223,10 @@ export default StyleSheet.create({
         borderRadius: 10,
         ...SHADOWS.small,
         position: "absolute",
-        left: 138,
-        top: -1
+        right:0,
+        // top: -1,
+        zIndex:9999,
+        // width:"50%"
     },
     //BADGE
     badgeContainer: {

@@ -251,10 +251,10 @@ const DetailOwner = ({ route, navigation }) => {
                             source={{ uri: owner.avatar }} // Thay đổi đường dẫn của ảnh mặc định
                             style={DetailOwnerStyle.avatar}
                         />
-                        <Text>{ownerId}</Text>
-                        <TouchableOpacity onPress={getAllPostByUser}>
+                        {/* <Text>{ownerId}</Text> */}
+                        {/* <TouchableOpacity onPress={getAllPostByUser}>
                             <Text> bài đăng</Text>
-                        </TouchableOpacity>
+                        </TouchableOpacity> */}
                         <View style={{ flexDirection: "row", marginTop: 10 }}>
                             {/* Ẩn nút nhắn tin và nút theo dõi nếu ownerId trùng với user.id */}
                             {ownerId !== user.id && (

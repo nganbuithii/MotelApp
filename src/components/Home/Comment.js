@@ -9,6 +9,7 @@ import MyContext from '../../configs/MyContext';
 import showToast from '../common/ToastMessage';
 import Modal from 'react-native-modalbox';
 import { ScrollView } from 'react-native-gesture-handler';
+import LoadingPage from '../Loading/LoadingPage';
 
 
 const Comment = ({ route }) => {
@@ -175,7 +176,7 @@ const Comment = ({ route }) => {
     return (
         <View style={styles.container}>
             {loading ? (
-                <ActivityIndicator />
+                <LoadingPage />
             ) : (
                 <View style={{ flex: 1 }}>
                     {/* Hiển thị ảnh khi không có bình luận */}

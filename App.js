@@ -58,9 +58,11 @@ export default function App() {
               component={Login}
               options={{ headerShown: false }} // Tắt header cho màn hình Login
               /> */}
+          {user != null && (
+            <Stack.Screen name="ProfileDetail" component={ProfileDetail}
+              options={{ headerTitle: user.username }} />
+          )}
 
-          <Stack.Screen name="ProfileDetail" component={ProfileDetail}
-            options={{ headerTitle: user.username }} />
           {/* <Stack.Screen name="HomeIndex" component={HomeIndex}
             options={{ headerShown: false }} /> */}
           {/* <Stack.Screen name="LoadingPage" component={LoadingPage}
@@ -108,17 +110,28 @@ export default function App() {
             component={RegisterMotel}
             options={{ headerShown: false }} // Tắt header cho màn hình Slider
           /> */}
-          <Stack.Screen name="DetailOwner" component={DetailOwner} options={({ navigation }) => ({
-            headerRight: () => (
-              user && (
-                <TouchableOpacity onPress={() => navigation.navigate("ProfileDetail")} style={{marginRight:20}}>
-                  <MaterialIcons name="edit" size={24} color={COLOR.PRIMARY} />
-                </TouchableOpacity>
-              )
-            ),
-            headerTitle: 'Thông tin chi tiết',
-            // headerTintColor: COLOR.PRIMARY,
-          })} />
+          <Stack.Screen
+            name="DetailOwner"
+            component={DetailOwner}
+            options={({ route, navigation }) => ({
+              headerRight: () => {
+                // Kiểm tra xem người dùng hiện tại có phải là chủ sở hữu không
+                if (user && user.id === route.params.ownerId) {
+                  return (
+                    <TouchableOpacity onPress={() => navigation.navigate("Editpost", { postId: route.params.ownerId })} style={{ marginRight: 20 }}>
+                      <MaterialIcons name="edit" size={24} color="black" />
+                    </TouchableOpacity>
+                  );
+                } else {
+                  return null; // Không hiển thị icon "Edit" trên header
+                }
+              },
+              headerTitle: 'Thông tin chi tiết',
+              // headerTintColor: COLOR.PRIMARY,
+            })}
+          />
+
+
 
 
           <Stack.Screen

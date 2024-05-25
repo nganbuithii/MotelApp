@@ -140,41 +140,75 @@ const SearchSc = ({ route }) => {
       setSearchStarted(true); // Đánh dấu việc bắt đầu tìm kiếm
       const token = await AsyncStorage.getItem("access-token");
       const params = {};
-
+  
       if (ward) { params['ward'] = ward; }
       if (district) { params['district'] = district; }
       if (city) { params['city'] = city; }
       if (other) { params['other_address'] = other; }
-      if (priceFilter == "descrease") {
-        params['ordering'] = '-price';
-      } else if (priceFilter == "increase") {
-        params['ordering'] = 'price';
+  
+      // Set min_price and max_price based on the selected price filter
+      if (priceFilter) {
+        switch (priceFilter) {
+          case 'under_2m':
+            params['min_price'] = 0;
+            params['max_price'] = 2000000;
+            break;
+          case '2m_to_5m':
+            params['min_price'] = 2000000;
+            params['max_price'] = 5000000;
+            break;
+          case 'over_8m':
+            params['min_price'] = 8000000;
+            params['max_price'] = 15000000;
+            break;
+          case 'descrease':
+            params['ordering'] = '-price';
+            break;
+          case 'increase':
+            params['ordering'] = 'price';
+            break;
+          default:
+            break;
+        }
       }
-      else {
-        params['price'] = priceFilter;
+  
+      // Set ordering based on the selected area filter
+      if (areaFilter) {
+        switch (areaFilter) {
+          case 'under_20m':
+            params['area'] = 'under_20m';
+            break;
+          case '20m_to_50m':
+            params['area'] = '20m_to_50m';
+            break;
+          case '50m_to_100m':
+            params['area'] = '50m_to_100m';
+            break;
+          case 'desc':
+            params['ordering'] = '-area';
+            break;
+          case 'asc':
+            params['ordering'] = 'area';
+            break;
+          default:
+            break;
+        }
       }
-      if (areaFilter == "desc") {
-        params['ordering'] = '-area'
-      }
-      else if (areaFilter == "asc") {
-        params['ordering'] = 'area'
-      }
-      else {
-        params['area'] = areaFilter;
-      }
+  
       console.log("PARAMS:", params);
-
+  
       let res = await authApi(token).get(endpoints["getMotelFilter"], {
         params: params
       });
       console.log("ok");
       console.log(res.data);
       setData(res.data.results);
-
+  
     } catch (ex) {
       console.error(ex);
     }
   };
+  
   const handleClearFilter = () => {
     setCity(null);
     setDistrict(null);

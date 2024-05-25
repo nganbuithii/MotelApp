@@ -10,10 +10,10 @@ const LoadingPage = () => {
 
             <View style={StyleDefault.flexBoxCol}>
                 <Image
-                    source={require("../../assets/images/loading.gif")}
+                    source={require("../../assets/images/load.gif")}
                     style={styles.loadingImage}
                 />
-                <Text>Vui lòng đợi giây lát</Text>
+                {/* <Text>Vui lòng đợi giây lát</Text> */}
             </View>
 
 
