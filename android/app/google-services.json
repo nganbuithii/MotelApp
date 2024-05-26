@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "852307293200",
+    "project_id": "nacamotelchat",
+    "storage_bucket": "nacamotelchat.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:852307293200:android:108c523b95723284224695",
+        "android_client_info": {
+          "package_name": "com.motelapp"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyANlKvoG2aBA2zT5yc18D00EiA4uxa_9sQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

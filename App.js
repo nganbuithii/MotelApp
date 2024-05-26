@@ -83,7 +83,7 @@ export default function App() {
           <Stack.Screen name="EditMotel" component={EditMotel}
             options={{ headerShown: false }} />
           <Stack.Screen name="ChatSc" component={ChatSc}
-            options={{ headerShown: true }} />
+            options={{ headerShown: false }} />
           <Stack.Screen name="CreatePost" component={CreatePost}
             options={{ headerTitle: 'Bài viết mới' }} />
           <Stack.Screen name="AddPrice" component={AddPrice}

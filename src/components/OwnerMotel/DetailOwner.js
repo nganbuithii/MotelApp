@@ -236,7 +236,11 @@ const DetailOwner = ({ route, navigation }) => {
             </View>
         );
     };
-
+    const chatUser = (id) => {
+        navigation.navigate("ChatDetail", { ownerId:id });
+    }
+    
+    
     return (
         <ScrollView contentContainerStyle={DetailOwnerStyle.scrollViewContent}>
             {loading ? <ActivityIndicator color={COLOR.PRIMARY} /> : (
@@ -259,7 +263,7 @@ const DetailOwner = ({ route, navigation }) => {
                             {/* Ẩn nút nhắn tin và nút theo dõi nếu ownerId trùng với user.id */}
                             {ownerId !== user.id && (
                                 <>
-                                    <TouchableOpacity style={DetailOwnerStyle.btnFollow1}>
+                                    <TouchableOpacity style={DetailOwnerStyle.btnFollow1} onPress={() => chatUser(owner.id)}>
                                         <Text style={{ color: "#fff" }}> Nhắn tin</Text>
                                         <Entypo name="chat" size={10} color="#fff" />
                                     </TouchableOpacity>

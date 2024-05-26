@@ -1,120 +1,161 @@
-import React, { useContext, useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, FlatList, Image, StyleSheet } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
-import MyContext from '../../configs/MyContext';
+import React, { useCallback, useContext, useEffect, useState } from "react";
+import { Text, View } from "react-native";
+import { Avatar } from "react-native-paper";
+import { GiftedChat, Bubble } from "react-native-gifted-chat";
+import { firestore } from "../../configs/firebase";
+import { addDoc, collection, orderBy, query, onSnapshot, updateDoc, doc, setDoc, getDoc } from "firebase/firestore";
+import MyContext from "../../configs/MyContext";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { authApi, endpoints } from "../../configs/API";
+import { COLOR } from "../common/color";
+import HomeStyles from "../../Styles/HomeStyles";
+import { Ionicons, Octicons } from "@expo/vector-icons";
+import { Entypo } from '@expo/vector-icons';
+import { TouchableWithoutFeedback } from "react-native-gesture-handler";
+import { useNavigation } from "@react-navigation/native";
+import LoadingPage from "../Loading/LoadingPage";
 
-const ChatDetail = () => {
-  const [messages, setMessages] = useState([]);
-  const [inputText, setInputText] = useState('');
+const ChatDetail = ({ route }) => {
+  const { ownerId } = route.params;
   const [user, dispatch] = useContext(MyContext);
+  const chatId = [user.id.toString(), (ownerId || '').toString()].sort().join('_') + '_message';
+  const navigation = useNavigation();
+  const [owner, setOwner] = useState();
+  const [messages, setMessages] = useState([]);
+  const [loading, setLoading] = useState(true);
 
-  const handleSendMessage = () => {
-    if (inputText.trim() === '') {
-      return;
+  const getInfoOwner = async () => {
+    try {
+      const token = await AsyncStorage.getItem("access-token");
+      const res = await authApi(token).get(endpoints["detailOwner"](ownerId));
+      setOwner(res.data);
+      console.log("SET OWNER THÀNH CÔNG");
+      console.log("LẤY DATAAAA");
+      console.log(res.data);
+      setLoading(false);
+    } catch (ex) {
+      console.error(ex);
     }
+  };
 
-    const newMessage = {
-      id: messages.length + 1,
-      text: inputText,
-      // Add sender information here
-      sender: {
-        name: 'Me',
-        avatar: require('../../assets/images/a1.png'), // Change this to your avatar source
-      },
-      // Add a flag to identify your messages
-      isMyMessage: true,
+  useEffect(() => {
+    getInfoOwner();
+  }, []);
+
+  useEffect(() => {
+    const subscriber = collection(firestore, "chats", chatId, "messages");
+    const shortSubscriber = query(subscriber, orderBy("createdAt", "desc"));
+
+    const unsubscribe = onSnapshot(shortSubscriber, (querySnapshot) => {
+      const allMessages = querySnapshot.docs.map((doc) => {
+        return { ...doc.data(), createdAt: doc.data().createdAt.toDate() };
+      });
+      setMessages(allMessages);
+    });
+    return () => unsubscribe();
+  }, []);
+
+  const onSend = useCallback(async (messages = []) => {
+    const msg = messages[0];
+    const timestamp = new Date();
+    const chatSessionDocRef = doc(firestore, "chatSessions", chatId);
+  
+    try {
+      // Kiểm tra xem owner đã được gán dữ liệu hay chưa
+      if (owner != null) {
+        const chatSessionDoc = await getDoc(chatSessionDocRef);
+        if (!chatSessionDoc.exists()) {
+          await setDoc(chatSessionDocRef, {
+            ownerId: ownerId,
+            ownerName: owner.username,
+            ownerAvatar: owner.avatar,
+            lastMessage: msg.text,
+            lastMessageTime: timestamp
+          });
+          console.log("Lưu vào chat session thành công");
+        } else {
+          await updateDoc(chatSessionDocRef, {
+            lastMessage: msg.text,
+            lastMessageTime: timestamp
+          });
+          console.log("Cập nhật last message thành công");
+        }
+      } else {
+        console.error("Không tìm thấy thông tin chủ sở hữu");
+        return;
+      }
+    } catch (error) {
+      console.error("Lỗi khi lưu tin nhắn vào chat session:", error);
+    }
+  
+    const myMsg = {
+      ...msg,
+      sendBy: user.id,
+      sendTo: ownerId,
+      createdAt: msg.createdAt,
+      isSeen: false
     };
+  
+    try {
+      await addDoc(collection(firestore, "chats", chatId, "messages"), myMsg);
+    } catch (error) {
+      console.error("Lỗi khi thêm tin nhắn vào chats:", error);
+    }
+  }, [owner]);
 
-    setMessages([...messages, newMessage]);
-    setInputText('');
+  const renderBubble = (props) => {
+    return (
+      <Bubble
+        {...props}
+        textStyle={{
+          right: {
+            color: 'white', // Màu văn bản khi tin nhắn được gửi
+          },
+          left: {
+            color: 'black', // Màu văn bản khi tin nhắn được nhận
+          },
+        }}
+        wrapperStyle={{
+          left: {
+            backgroundColor: COLOR.bg_color1, // Màu nền khi tin nhắn được nhận
+          },
+          right: {
+            backgroundColor: COLOR.PRIMARY, // Màu nền khi tin nhắn được gửi
+          },
+        }}
+      />
+    );
+  };
+
+  const exitChat = () => {
+    navigation.goBack();
   };
 
   return (
     <View style={{ flex: 1 }}>
-      <FlatList
-        data={messages}
-        renderItem={({ item }) => (
-          <View style={[styles.messageContainer, item.isMyMessage && styles.myMessageContainer]}>
-            <View style={styles.avatarContainer}>
-              <Image source={item.sender.avatar} style={styles.avatar} />
-            </View>
-            <View style={styles.messageContent}>
-              <Text style={styles.senderName}>{item.sender.name}</Text>
-              <Text style={styles.messageText}>{item.text}</Text>
-            </View>
-          </View>
+      <View style={[HomeStyles.tab, { position: "relative" }]}>
+        <TouchableWithoutFeedback onPress={exitChat}>
+          <Ionicons name="arrow-back-outline" size={24} color={COLOR.PRIMARY} style={{ position: "absolute", top: -8, left: -150 }} />
+        </TouchableWithoutFeedback>
+
+        <Entypo name="chat" size={24} color={COLOR.PRIMARY} style={[HomeStyles.bellIcon]} />
+        {owner && (
+          <Text style={HomeStyles.textHead}>{owner.username}</Text>
         )}
-        keyExtractor={(item) => item.id.toString()}
-        inverted // Hiển thị tin nhắn từ phía dưới lên
-      />
-      <View style={styles.inputContainer}>
-        <TextInput
-          style={styles.input}
-          placeholder="Type your message..."
-          value={inputText}
-          onChangeText={setInputText}
-        />
-        <TouchableOpacity style={styles.sendButton} onPress={handleSendMessage}>
-          <Ionicons name="send" size={24} color="#fff" />
-        </TouchableOpacity>
       </View>
+      {loading ? <LoadingPage /> : (
+        <GiftedChat
+          messages={messages}
+          onSend={onSend}
+          user={{ _id: user.id }}
+          renderAvatar={(props) => (
+            <Avatar.Image {...props} source={{ uri: owner.avatar }} size={32} />
+          )}
+          renderBubble={renderBubble}
+        />
+      )}
     </View>
   );
 };
-
-const styles = StyleSheet.create({
-  messageContainer: {
-    flexDirection: 'row',
-    alignItems: 'flex-start',
-    marginVertical: 5,
-    paddingHorizontal: 10,
-  },
-  myMessageContainer: {
-    justifyContent: 'flex-end', // Hiển thị tin nhắn của bạn ở bên phải
-  },
-  avatarContainer: {
-    marginRight: 10,
-  },
-  avatar: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-  },
-  messageContent: {
-    flex: 1,
-    backgroundColor: '#E0E0E0',
-    borderRadius: 10,
-    padding: 10,
-    maxWidth: '80%',
-  },
-  senderName: {
-    fontWeight: 'bold',
-    marginBottom: 5,
-  },
-  messageText: {
-    fontSize: 16,
-  },
-  inputContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingHorizontal: 10,
-    paddingVertical: 5,
-    borderTopWidth: 1,
-    borderTopColor: '#CCCCCC',
-  },
-  input: {
-    flex: 1,
-    marginRight: 10,
-    borderWidth: 1,
-    borderColor: '#CCCCCC',
-    borderRadius: 20,
-    paddingHorizontal: 10,
-  },
-  sendButton: {
-    backgroundColor: '#007AFF',
-    borderRadius: 20,
-    padding: 10,
-  },
-});
 
 export default ChatDetail;

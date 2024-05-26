@@ -1,85 +1,104 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { View, Text, TextInput, FlatList, TouchableOpacity, Image, StyleSheet } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { COLOR, SHADOWS } from '../common/color';
 import HomeStyles from '../../Styles/HomeStyles';
 import { Searchbar } from 'react-native-paper';
 import { useNavigation } from '@react-navigation/native';
+import { firestore } from '../../configs/firebase';
+import { addDoc, collection, orderBy, query, onSnapshot, getDocs } from "firebase/firestore";
+import ChatDetail from './ChatDetail';
 
 const ChatSc = () => {
   const [searchText, setSearchText] = useState('');
-  const [searchQuery, setSearchQuery] = React.useState('');
+  const [searchQuery, setSearchQuery] = useState('');
+  const [chatSessions, setChatSessions] = useState([]);
+  const [owner, setOwner] = useState();
   const navigation = useNavigation(); // Sử dụng hook useNavigation
-  const [users, setUsers] = useState([
-    { id: 1, name: 'John', avatar: require('../../assets/images/3.png') },
-    { id: 2, name: 'Alice', avatar: require('../../assets/images/3.png') },
-    { id: 3, name: 'Bob', avatar: require('../../assets/images/3.png') },
-    { id: 4, name: 'Emma', avatar: require('../../assets/images/3.png') },
-    { id: 5, name: 'Mike', avatar: require('../../assets/images/3.png') },
-  ]);
 
-  const handleSearch = (text) => {
-    setSearchText(text);
-    // Thực hiện tìm kiếm người dùng dựa trên text tìm kiếm ở đây
-  };
+  useEffect(() => {
+    const fetchChatSessions = async () => {
+      const chatSessionsRef = collection(firestore, 'chatSessions');
+      const chatSessionsQuery = query(chatSessionsRef, orderBy('lastMessageTime', 'desc'));
 
-  const navigateToChatDetail = (user) => {
+      const unsubscribe = onSnapshot(chatSessionsQuery, (querySnapshot) => {
+        const sessionsData = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        setChatSessions(sessionsData);
+      });
+
+      return () => unsubscribe();
+    };
+  
+    fetchChatSessions();
+  }, []);
+
+  
+
+  const navigateToChatDetail = (item) => {
     // Thực hiện chuyển đến trang chat detail với thông tin người dùng
-    console.log('Navigate to chat detail for:', user);
-
+    console.log('Navigate to chat detail for:', item);
+    // Ví dụ:
+    // navigation.navigate('ChatDetail', { chatSession: item });
   };
 
-  const renderUserItem = ({ item }) => (
-    <TouchableOpacity style={styles.userContainer} onPress={() => navigation.navigate("ChatDetail")}>
-      <Image source={item.avatar} style={styles.avatar} />
-      <Text style={styles.userName}>{item.name}</Text>
+  const renderChatSessionItem = ({ item }) => (
+    <TouchableOpacity style={styles.userContainer} onPress={() => navigation.navigate('ChatDetail', { ownerId: item.ownerId })} >
+
+     
+      <Image source={{ uri: item.ownerAvatar }} style={styles.avatar} />
+      <View style={styles.lastMessageContainer}>
+        <View style={{ flex: 1 }}>
+          <Text style={styles.userName}>{item.ownerName}</Text>
+          <Text style={styles.lastMessage}>{item.lastMessage}</Text>
+        </View>
+        <Text>{owner}</Text>
+        <Text style={styles.lastMessageTime}>{formatTime(item.lastMessageTime)}</Text>
+      </View>
     </TouchableOpacity>
   );
+  
+  // Hàm định dạng thời gian
+  const formatTime = (time) => {
+    // Kiểm tra nếu thời gian là một object
+    if (typeof time === 'object' && time.seconds && time.nanoseconds) {
+      // Chuyển đổi thời gian thành dạng địa phương có thể hiển thị
+      const date = new Date(time.seconds * 1000 + time.nanoseconds / 1000000);
+      return date.toLocaleString(); // Chuyển đổi thời gian thành chuỗi địa phương
+    }
+    return ''; // Trả về chuỗi trống nếu không thành công
+  };
+  
+    const Test = () => {
+      console.log(owner);
+    }
 
   return (
     <View style={{ flex: 1 }}>
       <View style={HomeStyles.tab}>
         <MaterialCommunityIcons name="wechat" size={30} color={COLOR.PRIMARY} style={HomeStyles.bellIcon} />
         <Text style={HomeStyles.textHead}>Tin nhắn của bạn</Text>
-
       </View>
-      <TouchableOpacity onPress={()=> navigation.navigate("LoadingPage")}> 
-        <Text>lOADING PAGE</Text>
-      </TouchableOpacity>
-      <TouchableOpacity onPress={()=> navigation.navigate("Search")}> 
-        <Text>lOADING PAGE</Text>
-      </TouchableOpacity>
+
       <Searchbar
         placeholder="Search"
-        onChangeText={setSearchQuery}
         value={searchQuery}
         iconColor={COLOR.PRIMARY} // Màu của biểu tượng tìm kiếm
         style={styles.searchBar}
       />
 
-
       <FlatList
-        data={users}
-        renderItem={renderUserItem}
-        keyExtractor={(item) => item.id.toString()}
+        data={chatSessions}
+        renderItem={renderChatSessionItem}
+        keyExtractor={(item) => item.id}
       />
     </View>
   );
 };
 
+
+
+
 const styles = StyleSheet.create({
-  searchContainer: {
-    padding: 10,
-    borderBottomWidth: 1,
-    borderBottomColor: '#CCCCCC',
-  },
-  searchInput: {
-    borderWidth: 1,
-    borderColor: '#CCCCCC',
-    borderRadius: 10,
-    paddingHorizontal: 10,
-    paddingVertical: 5,
-  },
   userContainer: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -95,21 +114,24 @@ const styles = StyleSheet.create({
   },
   userName: {
     fontSize: 16,
+    fontWeight: 'bold',
   },
-  searchBar: {
-    backgroundColor: 'transparent', // Màu nền của thanh tìm kiếm
-    borderTopWidth: 0, // Xóa viền trên của thanh tìm kiếm
-    borderBottomWidth: 3, // Viền dưới của thanh tìm kiếm
-    borderBottomColor: COLOR.PRIMARY, // Màu của viền dưới
-    paddingHorizontal: 10, // Khoảng cách giữa nội dung và biên của thanh tìm kiếm
-    // marginTop: 20, // Khoảng cách từ đỉnh màn hình đến thanh tìm kiếm
-    elevation: 0, // Xóa bóng đổ của thanh tìm kiếm
-    backgroundColor: "#fff",
-    color: "#fff",
-    marginBottom: 20,
-    ...SHADOWS.small,
-    marginTop:3
+  lastMessageContainer: {
+    flex: 1,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  lastMessage: {
+    fontSize: 14,
+    color: '#666666',
+    flex: 1,
+  },
+  lastMessageTime: {
+    fontSize: 12,
+    color: '#999999',
   },
 });
+
 
 export default ChatSc;
