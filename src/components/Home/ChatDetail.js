@@ -66,9 +66,12 @@ const ChatDetail = ({ route }) => {
         const chatSessionDoc = await getDoc(chatSessionDocRef);
         if (!chatSessionDoc.exists()) {
           await setDoc(chatSessionDocRef, {
-            ownerId: ownerId,
-            ownerName: owner.username,
-            ownerAvatar: owner.avatar,
+            ownerIdReceive: ownerId,
+            ownerNameReceive : owner.username,
+            ownerAvatarReceive: owner.avatar,
+            userIdSend:user.id,
+            usernameSend:user.username,
+            userAvatarSend: user.avatar,
             lastMessage: msg.text,
             lastMessageTime: timestamp
           });
@@ -98,6 +101,7 @@ const ChatDetail = ({ route }) => {
   
     try {
       await addDoc(collection(firestore, "chats", chatId, "messages"), myMsg);
+      console.log("gửi tin thành công")
     } catch (error) {
       console.error("Lỗi khi thêm tin nhắn vào chats:", error);
     }
