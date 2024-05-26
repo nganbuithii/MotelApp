@@ -33,6 +33,8 @@ const HomeIndex = ({ route }) => {
   const [loadData, setLoadData] = useState(true);
 
   const [fetchPage, setFetchPage] = useState(false);
+  const [hasNextPage, setHasNextPage] = useState(false);
+  let newPage = 1;
 
 
   // const [showHouseList, setShowHouseList] = useState(true);
@@ -85,6 +87,9 @@ const HomeIndex = ({ route }) => {
         }
       });
       setLikedState(newLikedState);
+      if (res.data.next != null) {
+        setHasNextPage(true);
+      }
       // setLoadData(false);
     } catch (ex) {
       console.error("lỗi fetch data get motel all post", ex);
@@ -92,7 +97,7 @@ const HomeIndex = ({ route }) => {
   };
   useEffect(() => {
     fetchDataGetAllPost();
-    setLoading(false); 
+    setLoading(false);
     // getAllPostForRent();
 
 
@@ -283,42 +288,50 @@ const HomeIndex = ({ route }) => {
   }
   const handleCreatePost = async () => {
     user.user_role == "MOTEL_OWNER" ? navigation.navigate("CreatePost") : navigation.navigate("CreatePostRent");
-  }
-  const fetchNextPagePost = async () => {
-    try {
-      setLoading(true); // Đánh dấu loading khi bắt đầu fetch dữ liệu
-      const nextPage = page + 1;
-      setPage(nextPage);
-      console.log("PAGE:", nextPage);
-      console.log("fetchNextPagePost được gọi khi cuộn đến cuối view");
-      const token = await AsyncStorage.getItem("access-token");
-      let res = await authApi(token).get(endpoints["getAllPostForOwner"], {
-        params: { page: nextPage }
-      });
-      const newData = res.data.results;
-      console.log("Data mới được fetch", res.data.results);
-      console.log("NEW", newData);
-      // Kiểm tra nếu newData không rỗng thì cập nhật danh sách bài đăng
-      if (newData && newData.length > 0) {
-        setPosts(prevPosts => [...prevPosts, ...newData]);
+    navigation.addListener('focus', async () => {
+      if (tinTimNhaActive == true) {
+        getAllPostForRent();
+      } else if (tinChoThueActive == true) {
+        setRender(!render);
       }
-      setFetchPage(true);
-    } catch (ex) {
-      console.error("lỗi fetchNextPagePost", ex);
-    }
+
+    });
   }
-  const handleScroll = (event) => {
-    // console.log("Hàm đc gọi");
-    const { layoutMeasurement, contentOffset, contentSize } = event.nativeEvent;
-    // console.log(layoutMeasurement);
-    // console.log(contentOffset);
-    // console.log("CONTENT SIZE",contentSize);
-    // Kiểm tra nếu nội dung đã cuộn đến cuối và không đang loading thì fetch dữ liệu mới
-    if (layoutMeasurement.height + contentOffset.y >= contentSize.height - 1000 && !loading) {
-      console.log("ok");
-      fetchNextPagePost();
-    }
-  };
+  // const fetchNextPagePost = async () => {
+  //   try {
+  //     setLoading(true); // Đánh dấu loading khi bắt đầu fetch dữ liệu
+  //     const nextPage = page + 1;
+  //     setPage(nextPage);
+  //     console.log("PAGE:", nextPage);
+  //     console.log("fetchNextPagePost được gọi khi cuộn đến cuối view");
+  //     const token = await AsyncStorage.getItem("access-token");
+  //     let res = await authApi(token).get(endpoints["getAllPostForOwner"], {
+  //       params: { page: nextPage }
+  //     });
+  //     const newData = res.data.results;
+  //     console.log("Data mới được fetch", res.data.results);
+  //     console.log("NEW", newData);
+  //     // Kiểm tra nếu newData không rỗng thì cập nhật danh sách bài đăng
+  //     if (newData && newData.length > 0) {
+  //       setPosts(prevPosts => [...prevPosts, ...newData]);
+  //     }
+  //     setFetchPage(true);
+  //   } catch (ex) {
+  //     console.error("lỗi fetchNextPagePost", ex);
+  //   }
+  // }
+  // const handleScroll = (event) => {
+  //   // console.log("Hàm đc gọi");
+  //   const { layoutMeasurement, contentOffset, contentSize } = event.nativeEvent;
+  //   // console.log(layoutMeasurement);
+  //   // console.log(contentOffset);
+  //   // console.log("CONTENT SIZE",contentSize);
+  //   // Kiểm tra nếu nội dung đã cuộn đến cuối và không đang loading thì fetch dữ liệu mới
+  //   if (layoutMeasurement.height + contentOffset.y >= contentSize.height - 1000 && !loading) {
+  //     console.log("ok");
+  //     fetchNextPagePost();
+  //   }
+  // };
   const handleDetail = (idMotel) => {
     console.log(idMotel);
     navigation.navigate("PostDetail", { idMotel: idMotel })
@@ -396,16 +409,39 @@ const HomeIndex = ({ route }) => {
     getAllMotel();
     console.log("DATAAAAA3J23IO23:", dataMotel);
   }, [])
-  const handelDetailKP = () => {
-
-  }
+  const fetchNextPagePost = async () => {
+    try {
+      newPage = newPage + 1;
+      setLoading(true); // Đặt loading state thành true để hiển thị loading indicator
+      const token = await AsyncStorage.getItem("access-token");
+      // Fetch dữ liệu của trang tiếp theo
+      let res = await authApi(token).get(`https://motel.pythonanywhere.com/post/for_lease/?page=${newPage}`);
+      const newData = res.data.results;
+      console.log("DATTTTTTTTTTAAA PAGE MỚI", newData);
+      if(res.data.next==null){
+        setHasNextPage(false);
+      }
+      // Kiểm tra nếu có dữ liệu trang tiếp theo, cập nhật state của posts
+      if (newData && newData.length > 0) {
+        setPosts(prevPosts => [...prevPosts, ...newData]);
+      }
+      console.log("Lấy page mới thành công");
+      // // Đặt loading state thành false khi fetch hoàn thành
+      // setLoading(false);
+    } catch (ex) {
+      console.error("Lỗi fetchNextPagePost", ex);
+      // Xử lý lỗi nếu có
+      // setLoading(false);
+    }
+  };
+  
   return (
     <View style={MyStyles.container}>
       {loadData ? <LoadingPage /> : (
         <ScrollView style={HomeStyles.flex}
 
-          onScroll={handleScroll}
-          scrollEventThrottle={16} // Tần số gọi hàm khi cuộn (16ms = 60fps)
+        // onScroll={handleScroll}
+        // scrollEventThrottle={16} // Tần số gọi hàm khi cuộn (16ms = 60fps)
         >
           {/* Thanh đăng bài nằm ngang */}
           <View style={HomeStyles.postBar}>
@@ -422,11 +458,11 @@ const HomeIndex = ({ route }) => {
               </View>
             </TouchableOpacity>
           </View>
-          <View style={{flex:1}}>
-    <AdsSlider />
-</View>
+          <View style={{ flex: 1 }}>
+            <AdsSlider />
+          </View>
 
-          
+
           <View style={{
             backgroundColor: COLOR.offWhite,
             paddingVertical: 10,
@@ -445,7 +481,7 @@ const HomeIndex = ({ route }) => {
                       style={{ width: 150, height: 180, borderRadius: 10, overflow: 'hidden' }}
                       blurRadius={7} // Đặt độ mờ ở đây
                     >
-                      <Text style={{ color: 'white', fontSize: 16, position: 'absolute', bottom: 10, left: 10 }}>{item.id}</Text>
+                      {/* <Text style={{ color: 'white', fontSize: 16, position: 'absolute', bottom: 10, left: 10 }}>{item.id}</Text> */}
                       <View style={HomeStyles.kpContainer}>
                         {/* <FontAwesome6 name="location-dot" size={15} color="orange" style={HomeStyles.iconPost} /> */}
                         <Text style={HomeStyles.kpText}>{item.city}</Text>
@@ -665,9 +701,14 @@ const HomeIndex = ({ route }) => {
                 </View>
                 {/* <Feather name="bookmark" size={24} color="black" /> */}
               </View>
+
             </View>
           ))}
-
+          {hasNextPage && (
+            <TouchableOpacity onPress={fetchNextPagePost} style={{ padding: 20, backgroundColor: COLOR.PRIMARY, justifyContent: "center", marginHorizontal: 120,borderRadius:30, ...SHADOWS.small, marginVertical:8 }}>
+              <Text style={{ color: "#fff", textAlign: "center" }}>Xem thêm</Text>
+            </TouchableOpacity>
+          )}
 
 
         </ScrollView>)}

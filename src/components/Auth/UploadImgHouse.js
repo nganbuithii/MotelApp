@@ -250,12 +250,13 @@ const styles = StyleSheet.create({
         ...SHADOWS.medium
     },
     removeButton:{
-        padding:5,
+        padding:7,
         backgroundColor:"#fff",
         width:30,
         top:10,
         zIndex:9000,
-        right:0
+        right:0,
+        borderRadius:20
     }
 });
 

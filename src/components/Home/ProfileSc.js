@@ -127,13 +127,13 @@ const ProfileScreen = () => {
 
       <Text style={HomeStyles.txtSmall}>Về tài khoản</Text>
       <TouchableOpacity style={HomeStyles.profileContainer}>
-        <View style={HomeStyles.flexInput}>
+        {/* <View style={HomeStyles.flexInput}>
           <MaterialCommunityIcons name="key-change" size={24} color="black" />
           <Text> Đổi mật khẩu</Text>
           <View style={HomeStyles.iconContainer}>
             <MaterialIcons name="navigate-next" size={30} color="black" />
           </View>
-        </View>
+        </View> */}
 
       </TouchableOpacity>
       <TouchableOpacity style={HomeStyles.profileContainer} onPress={deleteUser}>

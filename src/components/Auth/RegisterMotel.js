@@ -5,7 +5,7 @@ import {
 } from "react-native";
 import { COLOR, SHADOWS } from "../common/color";
 import RNPickerSelect from "react-native-picker-select";
-import { FontAwesome5 } from "@expo/vector-icons";
+import { FontAwesome, FontAwesome5 } from "@expo/vector-icons";
 import { MaterialIcons } from "@expo/vector-icons";
 import { Entypo } from "@expo/vector-icons";
 import { Ionicons } from "@expo/vector-icons";
@@ -17,12 +17,14 @@ import MyContext from '../../configs/MyContext';
 import axios from 'axios';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import SearchStyle from "../../Styles/SearchStyle";
+import Modal from "react-native-modalbox";
+import { Button, Checkbox } from "react-native-paper";
 
 const RegisterMotel = ({ navigation, route }) => {
     const [cities, setCities] = useState([]); // State để lưu trữ danh sách các tỉnh/thành phố
     const [districts, setDistricts] = useState([]); // State để lưu trữ danh sách các quận/huyện
     const [wards, setWards] = useState([]);
-
+    const [showModal, setShowModal] = useState(false);
     const [user, dispatch] = useContext(MyContext);
     const [loading, setLoading] = useState(false);
     const [price, setPrice] = useState('');
@@ -34,6 +36,8 @@ const RegisterMotel = ({ navigation, route }) => {
     const [area, setArea] = useState(null);
     const [other, setOther] = useState(null);
     const [cabinet, setCabinet] = useState(null);
+    const [furniture, setFurniture] = useState(null);
+    const [modalsEdit, setModalsEdit] = useState({});
     // const { latitude, longitude, locationName } = route.params;
     const lon = route.params?.lon;
     const lat = route.params?.lat;
@@ -54,7 +58,22 @@ const RegisterMotel = ({ navigation, route }) => {
     const [cityErr, setCityErr] = useState("");
     const [areaErr, setAreaErr] = useState("");
     const [cabinetErr, setCabinetErr] = useState("");
+    const [isModalVisible, setIsModalVisible] = useState(false);
+    const [selectedFurniture, setSelectedFurniture] = useState([]);
+    // const [furniture, setFurniture] = useState("");
 
+    // Hàm để mở modal:
+    const openModal = () => {
+        setIsModalVisible(true);
+    };
+
+    // Hàm để đóng modal:
+    const closeModal = () => {
+        setIsModalVisible(false);
+    };
+    const handleFurnitureChange = (text) => {
+        setFurniture(text);
+    };
     // Hàm để lấy danh sách quận/huyện dựa trên tỉnh/thành phố được chọn
     const fetchDistricts = async (cityId) => {
         try {
@@ -133,20 +152,20 @@ const RegisterMotel = ({ navigation, route }) => {
     };
     const handleSubmit = async () => {
         try {
-    
-            if (!price) { setPriceErr( "Vui lòng nhập giá phòng");}
-            else if (price && price <= 0) { setPriceErr( "Vui lòng nhập giá lớn hơn 0"); }
+
+            if (!price) { setPriceErr("Vui lòng nhập giá phòng"); }
+            else if (price && price <= 0) { setPriceErr("Vui lòng nhập giá lớn hơn 0"); }
             if (!people) { setPeopleErr("Vui lòng nhập số lượng người ở"); }
-            else if (people && people <= 0) { setPeopleErr ("Vui lòng nhập số lượng lớn hơn 0"); }
-            if (!area) { setAreaErr( "Vui lòng nhập diện tích nhà"); }
+            else if (people && people <= 0) { setPeopleErr("Vui lòng nhập số lượng lớn hơn 0"); }
+            if (!area) { setAreaErr("Vui lòng nhập diện tích nhà"); }
             else if (area && area < 100) { setAreaErr("Vui lòng nhập diện tích lớn hơn 100 m2"); }
             if (!desc) { setDescErr("Vui lòng nhập xã/phường"); }
-            if (!district) {setDistrictErr( "Vui lòng chọn quận/huyện"); }
-            if (!ward) {setWardErr( "Vui lòng chọn xã/phường"); }
+            if (!district) { setDistrictErr("Vui lòng chọn quận/huyện"); }
+            if (!ward) { setWardErr("Vui lòng chọn xã/phường"); }
             if (!city) { setCityErr("Vui lòng chọn tỉnh/thành phố"); }
-            if (!cabinet) { setCabinetErr( "Vui lòng nhập thông tin nội thất" );}
-            
-            if (price && people && area && desc && district && cabinet && city && ward && other) {
+            if (!furniture) { setCabinetErr("Vui lòng nhập thông tin nội thất"); }
+
+            if (price && people && area && desc && district && furniture && city && ward && other) {
                 try {
                     let token = await AsyncStorage.getItem("access-token");
                     console.log(user.id);
@@ -161,7 +180,7 @@ const RegisterMotel = ({ navigation, route }) => {
                     formData.append('other_address', other);
                     formData.append('lat', lat);
                     formData.append('lon', lon);
-                    formData.append('furniture', cabinet);
+                    formData.append('furniture', furniture);
                     console.log("form data:", formData);
                     // console.log(token);
                     // console.log("FORM DATA TRO", formData);
@@ -201,7 +220,7 @@ const RegisterMotel = ({ navigation, route }) => {
 
 
 
-                
+
             }
 
 
@@ -220,6 +239,32 @@ const RegisterMotel = ({ navigation, route }) => {
 
 
     };
+    const furnitureOptions = ["Tủ lạnh", "Máy giặt", "Máy lạnh", "Bàn ăn", "Bàn làm việc", "Ghế sofa", "Ghế ăn", "Giường ngủ", "Tủ quần áo", "Bàn trà","Không có nội thất"];
+
+    const handleCheckboxChange = (option) => {
+        let updatedFurniture = [...selectedFurniture];
+        if (updatedFurniture.includes(option)) {
+            // Nếu tùy chọn đã được chọn, loại bỏ nó khỏi mảng
+            updatedFurniture = updatedFurniture.filter(item => item !== option);
+        } else {
+            // Nếu tùy chọn chưa được chọn, thêm nó vào mảng
+            updatedFurniture.push(option);
+        }
+        setSelectedFurniture(updatedFurniture); // Cập nhật trạng thái của selectedFurniture
+        setFurniture(updatedFurniture.join(", ")); // Cập nhật giá trị của furniture
+    };
+
+
+    const handleModalClose = () => {
+        // Đặt modalsEdit thành một đối tượng rỗng khi đóng modal box
+        setIsModalVisible(false);
+    };
+    const handleOkPress = () => {
+        setFurniture(selectedFurniture.join(", "));
+        setIsModalVisible(false);
+    };
+
+
 
     return (
         <View style={styles.container}>
@@ -240,7 +285,7 @@ const RegisterMotel = ({ navigation, route }) => {
                 <Text> He4k4</Text>
             </TouchableOpacity> */}
             <ScrollView contentContainerStyle={styles.scrollView}>
-            {!!priceErr && <Text style={styles.errorText}><Ionicons name="warning" size={12} color="red" />{priceErr}</Text>}
+                {!!priceErr && <Text style={styles.errorText}><Ionicons name="warning" size={12} color="red" />{priceErr}</Text>}
                 <View style={styles.inputContainer}>
                     <MaterialIcons
                         style={styles.icon}
@@ -248,9 +293,9 @@ const RegisterMotel = ({ navigation, route }) => {
                         size={24}
                         color="black"
                     />
-                    <TextInput style={styles.input} value={price} onChangeText={setPrice} 
-                    onFocus={()=> setPriceErr("")}
-                    placeholder="Giá phòng" />
+                    <TextInput style={styles.input} value={price} onChangeText={setPrice}
+                        onFocus={() => setPriceErr("")}
+                        placeholder="Giá phòng" />
                 </View>
 
                 {!!areaErr && <Text style={styles.errorText}><Ionicons name="warning" size={12} color="red" />{areaErr}</Text>}
@@ -261,22 +306,56 @@ const RegisterMotel = ({ navigation, route }) => {
                         size={24}
                         color="black"
                     />
-                    <TextInput style={styles.input} onFocus={()=> setAreaErr("")} value={area} onChangeText={setArea} placeholder="Diện tích" />
+                    <TextInput style={styles.input} onFocus={() => setAreaErr("")} value={area} onChangeText={setArea} placeholder="Diện tích" />
                 </View>
 
                 {!!peopleErr && <Text style={styles.errorText}><Ionicons name="warning" size={12} color="red" />{peopleErr}</Text>}
                 <View style={styles.inputContainer}>
                     <FontAwesome5 style={styles.icon} name="user-friends" size={24} color="black" />
-                    <TextInput style={styles.input} onFocus={()=> setPeopleErr("")}  value={people} onChangeText={setPeople} placeholder="Số lượng người " />
+                    <TextInput style={styles.input} onFocus={() => setPeopleErr("")} value={people} onChangeText={setPeople} placeholder="Số lượng người " />
                 </View>
 
                 {!!cabinetErr && <Text style={styles.errorText}><Ionicons name="warning" size={12} color="red" />{cabinetErr}</Text>}
                 <View style={styles.inputContainer}>
-                    <MaterialCommunityIcons style={styles.icon} name="file-cabinet" size={24} color="black" />
-                    <TextInput style={styles.input} onFocus={()=> setCabinetErr("")}  value={cabinet} onChangeText={setCabinet} placeholder="Nội thất " />
+                    <MaterialCommunityIcons
+                        style={styles.icon}
+                        name="file-cabinet"
+                        size={24}
+                        color="black"
+                    />
+                    <TouchableOpacity onPress={openModal}>
+                        <Text style={{ marginRight: 40 }}>{furniture ? furniture : 'Chọn nội thất'}</Text>
+                    </TouchableOpacity>
                 </View>
-
-
+                <Modal
+                    isOpen={isModalVisible} // Sử dụng giá trị của state isModalVisible
+                    onClosed={handleModalClose}
+                    style={styles.modal}
+                >
+                    <View>
+                        <Text style={{ color: COLOR.PRIMARY }}>Chọn nội thất</Text>
+                        <View style={styles.container}>
+                            {furnitureOptions.map((option, index) => (
+                                <View key={index} style={{ flexDirection: "row", alignItems: "center" }}>
+                                    <Checkbox
+                                    color={COLOR.PRIMARY}
+                                        status={selectedFurniture.includes(option) ? 'checked' : 'unchecked'}
+                                        onPress={() => handleCheckboxChange(option)}
+                                    />
+                                    <Text style={styles.checkboxLabel}>{option}</Text>
+                                </View>
+                            ))}
+                        </View>
+                        <View style={{ flexDirection: "row" }}>
+                            <Button mode="contained" style={styles.button} buttonColor={COLOR.finally} onPress={handleOkPress}> 
+                                Ok
+                            </Button>
+                            <Button mode="outlined" onPress={handleModalClose}  style={styles.button} >
+                                Hủy
+                            </Button>
+                        </View>
+                    </View>
+                </Modal>
                 {!!descErr && <Text style={styles.errorText}><Ionicons name="warning" size={12} color="red" />{descErr}</Text>}
                 <View style={styles.inputContainer}>
                     <Entypo
@@ -285,7 +364,7 @@ const RegisterMotel = ({ navigation, route }) => {
                         size={24}
                         color="black"
                     />
-                    <TextInput value={desc} style={styles.input} onFocus={()=> setDescErr("")}  onChangeText={setDesc} placeholder="Mô tả" />
+                    <TextInput value={desc} style={styles.input} onFocus={() => setDescErr("")} onChangeText={setDesc} placeholder="Mô tả" />
                 </View>
 
 
@@ -332,7 +411,7 @@ const RegisterMotel = ({ navigation, route }) => {
                             if (value !== '') {
                                 setWardErr(""); // Đặt error thành rỗng nếu có giá trị được chọn
                             }
-        
+
                         }}
                         placeholder={{ label: 'Chọn xã/phường', value: null }}
                         items={wards.map(ward => ({ label: ward.full_name, value: ward.id }))}
@@ -434,7 +513,7 @@ const styles = StyleSheet.create({
         fontSize: 10,
         textAlign: "left",
         fontWeight: "500",
-        marginLeft:"auto"
+        marginLeft: "auto"
     },
     formContainer: {
         paddingHorizontal: 30,
@@ -445,6 +524,27 @@ const styles = StyleSheet.create({
         flexGrow: 1,
         paddingHorizontal: 30,
         paddingBottom: 30
+    },
+    modalContent: {
+        backgroundColor: '#fff',
+        borderRadius: 10,
+        padding: 20,
+        alignItems: 'center',
+        justifyContent: 'center',
+    },
+    modal: {
+        flex: 0.65,
+        justifyContent: "center",
+        alignItems: "center",
+        backgroundColor: COLOR.color3,
+        padding: 20, // Thêm padding để tạo khoảng cách với mép của Modal
+        width: "90%",
+        borderRadius: 20,
+    },
+    button: {
+        width: "48%",
+        marginTop: 10,
+        marginRight: 10
     },
 });
 

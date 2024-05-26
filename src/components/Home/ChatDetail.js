@@ -13,6 +13,7 @@ import { Ionicons, Octicons } from "@expo/vector-icons";
 import { Entypo } from '@expo/vector-icons';
 import { TouchableWithoutFeedback } from "react-native-gesture-handler";
 import { useNavigation } from "@react-navigation/native";
+
 import LoadingPage from "../Loading/LoadingPage";
 
 const ChatDetail = ({ route }) => {
@@ -59,7 +60,7 @@ const ChatDetail = ({ route }) => {
     const msg = messages[0];
     const timestamp = new Date();
     const chatSessionDocRef = doc(firestore, "chatSessions", chatId);
-  
+
     try {
       // Kiểm tra xem owner đã được gán dữ liệu hay chưa
       if (owner != null) {
@@ -67,13 +68,14 @@ const ChatDetail = ({ route }) => {
         if (!chatSessionDoc.exists()) {
           await setDoc(chatSessionDocRef, {
             ownerIdReceive: ownerId,
-            ownerNameReceive : owner.username,
+            ownerNameReceive: owner.username,
             ownerAvatarReceive: owner.avatar,
-            userIdSend:user.id,
-            usernameSend:user.username,
+            userIdSend: user.id,
+            usernameSend: user.username,
             userAvatarSend: user.avatar,
             lastMessage: msg.text,
-            lastMessageTime: timestamp
+            lastMessageTime: timestamp,
+            isSeen: false,
           });
           console.log("Lưu vào chat session thành công");
         } else {
@@ -90,7 +92,7 @@ const ChatDetail = ({ route }) => {
     } catch (error) {
       console.error("Lỗi khi lưu tin nhắn vào chat session:", error);
     }
-  
+
     const myMsg = {
       ...msg,
       sendBy: user.id,
@@ -98,7 +100,7 @@ const ChatDetail = ({ route }) => {
       createdAt: msg.createdAt,
       isSeen: false
     };
-  
+
     try {
       await addDoc(collection(firestore, "chats", chatId, "messages"), myMsg);
       console.log("gửi tin thành công")
@@ -156,6 +158,11 @@ const ChatDetail = ({ route }) => {
             <Avatar.Image {...props} source={{ uri: owner.avatar }} size={32} />
           )}
           renderBubble={renderBubble}
+          placeholder="Nhập tin nhắn..."
+          alwaysShowSend={true}
+          // showUserAvatar={user.avatar}
+          multiline
+          
         />
       )}
     </View>

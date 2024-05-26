@@ -238,14 +238,14 @@ const styles = StyleSheet.create({
         paddingVertical: 15
     },
     confirmButtonText: {
-        color: COLOR.PRIMARY,
+        color:"#fff",
         textAlign:"center",
         fontWeight:"bold",
         fontSize:16
     },
     confirmButton: {
         padding: 20,
-        backgroundColor:"lightgreen",
+        backgroundColor:COLOR.PRIMARY,
         borderRadius: 30,
         marginHorizontal: 90,
         marginTop:10

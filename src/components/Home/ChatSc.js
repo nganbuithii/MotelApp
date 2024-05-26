@@ -52,7 +52,7 @@ const ChatSc = () => {
       <View style={styles.chatSessionInfo}>
         <Text style={styles.userName}>{user.id === item.ownerIdReceive ? item.usernameSend : item.ownerNameReceive}</Text>
         <Text style={styles.lastMessage}>
-          {/* {user.id === item.ownerIdReceive ? item.ownerNameReceive + ": " : "Bạn: "} */}
+          {user.id === item.ownerIdReceive ? item.ownerNameReceive + "" : "Bạn: "}
           {item.lastMessage}</Text>
       </View>
       <Text style={styles.lastMessageTime}>{caculatorTimeAgo(item.lastMessageTime)}</Text>
@@ -128,6 +128,11 @@ const styles = StyleSheet.create({
     padding: 10,
     borderBottomWidth: 1,
     borderBottomColor: '#CCCCCC',
+    backgroundColor:"#FFF",
+    borderRadius:10,
+    ...SHADOWS.small,
+    marginBottom:5,
+    marginHorizontal:5,
   },
   avatar: {
     width: 50,

@@ -7,6 +7,7 @@ import MyStyles from "../../Styles/MyStyles";
 import { COLOR } from "../common/color";
 import API, { endpoints } from "../../configs/API";
 import { ActivityIndicator } from "react-native-paper";
+import LoadingPage from "../Loading/LoadingPage";
 
 
 const UploadImg = ({ navigation, route }) => {
@@ -21,8 +22,8 @@ const UploadImg = ({ navigation, route }) => {
     const checkForCameraRollPermission = async () => {
         const { status } = await ImagePicker.getMediaLibraryPermissionsAsync();
         if (status !== "granted") {
-            alert(
-                "Please grant camera roll permissions inside your system's settings"
+            Alert.alert("Thông báo",
+                "Cho phép chúng tôi truy cập vào thư viện của bạn"
             );
         } else {
             console.log("Media Permissions are granted");
@@ -151,7 +152,7 @@ const UploadImg = ({ navigation, route }) => {
                     </TouchableOpacity>
                 </View>
             </View>
-            {loading ? (<ActivityIndicator />) : (
+            {loading ? (<LoadingPage/>) : (
                 <ButtonAuth onPress={handleSave} title="Lưu" />)}
         </View>
     );

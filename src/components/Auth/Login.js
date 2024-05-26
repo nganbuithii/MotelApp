@@ -31,8 +31,10 @@ const Login = ({ navigation }) => {
             let data = {
                 // username: username,
                 // password: password,
-                username:"ngan",
-                password:"123456",
+                username: "Nganbui",
+                password: "Meomeo@123",
+                // username:"ngan",
+                // password:"123456",
                 // username:"M",
                 // password:"Meomeo@123",
                 client_id: "8OdjuOvhjzLFCigIbuw3mbDAlhWTirzeM7s1W1g2",
