@@ -10,6 +10,8 @@ import showToast from '../common/ToastMessage';
 import Modal from 'react-native-modalbox';
 import { ScrollView } from 'react-native-gesture-handler';
 import LoadingPage from '../Loading/LoadingPage';
+import { firestore } from "../../configs/firebase";
+import { addDoc, collection } from "firebase/firestore";
 
 
 const Comment = ({ route }) => {
@@ -25,6 +27,7 @@ const Comment = ({ route }) => {
     const [replyForComment, setReplyForComment] = useState({ id: null, username: '' });
 
     const { postId } = route.params;
+    const { ownerPostId } = route.params;
     const inputRef = useRef(null);
     const getAllCommentByIdPost = async () => {
         try {
@@ -73,7 +76,28 @@ const Comment = ({ route }) => {
     }
 
 
+    const saveNotificationToFirestore = async (postId, ownerId, content) => {
+        const timestamp = new Date();
+        const notificationsCollectionRef = collection(firestore, "Notifications");
 
+        try {
+            await addDoc(notificationsCollectionRef, {
+                userLike: user.id,
+                userAvatar: user.avatar,
+                username: user.username,
+                postId: postId,
+                ownerPostId: ownerId,
+                time: timestamp,
+                title: user.username,
+                content: content
+            });
+
+            console.log("Thông báo đã được lưu vào Firestore");
+
+        } catch (error) {
+            console.error("Lỗi khi lưu thông báo vào Firestore:", error);
+        }
+    };
 
     const handleSend = async () => {
         try {
@@ -81,6 +105,8 @@ const Comment = ({ route }) => {
             const formData = new FormData();
             formData.append("content", content);
             console.log(formData);
+            console.log("OWNER",ownerPostId);
+            console.log("USER ID", user.id);
             // Kiểm tra xem có phải là phản hồi bình luận không
             if (replyForComment.id !== null) {
                 formData.append("reply_for", replyForComment.id);
@@ -94,6 +120,12 @@ const Comment = ({ route }) => {
             setRender(!render);
             setContent("");
             setReplyForComment({ id: null, username: '' });
+            // Lưu thông báo vào Firestore
+            if (user.id != ownerPostId) {
+                await saveNotificationToFirestore(postId, ownerPostId, "đã bình luận bài viết của bạn");
+                console.log("Luuw ok");
+            }
+            console.log("Bình luận thành công")
         } catch (ex) {
             console.error(ex);
             console.log("comment thất bại");
@@ -232,7 +264,7 @@ const Comment = ({ route }) => {
                                                         <View style={styles.replyDetails}>
                                                             <Text style={{ fontWeight: "500", fontSize: 16 }}>{reply.user.username}</Text>
                                                             <Text>{reply.content}</Text>
-                                                            <Text style={{color:"gray", fontSize:12}}>{calculateTimeAgo(reply.created_date)}</Text>
+                                                            <Text style={{ color: "gray", fontSize: 12 }}>{calculateTimeAgo(reply.created_date)}</Text>
                                                         </View>
                                                     </View>
                                                 ))}

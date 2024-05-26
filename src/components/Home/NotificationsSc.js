@@ -1,187 +1,110 @@
-import React, { useContext } from 'react';
-import { View, Text, StyleSheet, Image } from 'react-native';
+import React, { useContext, useEffect, useState } from 'react';
+import { View, Text, StyleSheet, Image, ScrollView } from 'react-native';
 import { COLOR, SHADOWS } from '../common/color';
 import { Octicons } from '@expo/vector-icons';
 import MyContext from '../../configs/MyContext';
-import { ScrollView } from 'react-native-gesture-handler';
+import { collection, query, onSnapshot, orderBy, where } from "firebase/firestore";
 import HomeStyles from '../../Styles/HomeStyles';
+import { firestore } from "../../configs/firebase";
+import caculatorTimeAgo from '../common/CaculatorTime';
+
 const NotificationsSc = () => {
   const [user] = useContext(MyContext);
+  const [notifications, setNotifications] = useState([]);
+
+  useEffect(() => {
+    const notificationsCollectionRef = collection(firestore, "Notifications");
+    const q = query(
+      notificationsCollectionRef,
+      where("ownerPostId", "==", user.id), // Thêm điều kiện lọc
+      orderBy("time", "desc")
+    );
+
+    const unsubscribe = onSnapshot(q, (querySnapshot) => {
+      const allNotifications = querySnapshot.docs.map(doc => doc.data());
+      setNotifications(allNotifications);
+    });
+
+    return () => unsubscribe();
+  }, []);
 
   return (
     <View style={styles.container}>
-    
-
       <View style={HomeStyles.tab}>
         <Octicons name="bell-fill" size={24} color={COLOR.PRIMARY} style={HomeStyles.bellIcon} />
         <Text style={HomeStyles.textHead}>Thông báo</Text>
-        {/* <Image
-        source={require('../../assets/images/bell.gif')}
-        style={styles.avatar}
-      /> */}
       </View>
 
-      {/* Thông báo 1 */}
       <ScrollView style={styles.scroll} showsVerticalScrollIndicator={false}>
-        <View style={styles.notification}>
-          <Image
-            source={{ uri: user.avatar }}
-            style={styles.avatar}
-          />
-          <View style={styles.notificationContent}>
-            <Text style={[styles.notificationText, styles.bold]}>
-              {user.username}
-            </Text>
-            <Text style={styles.notificationText}> đã theo dõi bạn</Text>
+        {notifications.map((notification, index) => (
+          <View key={index} style={styles.notification}>
+            <Image
+              source={{ uri: notification.userAvatar }}
+              style={styles.avatar}
+            />
+            <View style={styles.notificationContent}>
+              <Text style={[styles.notificationText, styles.bold]}>
+                {notification.username}
+              </Text>
+              <Text style={styles.notificationText}>{notification.content}</Text>
+            </View>
+            <Text style={styles.dateText}>{caculatorTimeAgo(notification.time)}</Text>
           </View>
-          <Text style={styles.dateText}>Hôm nay</Text>
-        </View>
-
-        {/* Thông báo 2 */}
-        <View style={styles.notification}>
-          <Image
-            source={{ uri: user.avatar }}
-            style={styles.avatar}
-          />
-          <View style={styles.notificationContent}>
-            <Text style={[styles.notificationText, styles.bold]}>
-              {user.username}
-            </Text>
-            <Text style={styles.notificationText}> đã thích bài đăng của bạn nhà trọ fioifhuguiwfh</Text>
-          </View>
-          <Text style={styles.dateText}>Hôm nay</Text>
-        </View>
-
-        {/* Thông báo 3 */}
-        <View style={styles.notification}>
-          <Image
-            source={{ uri: user.avatar }}
-            style={styles.avatar}
-          />
-          <View style={styles.notificationContent}>
-            <Text style={[styles.notificationText, styles.bold]}>
-              {user.username}
-            </Text>
-            <Text style={[styles.notificationText, styles.txt]}> đã theo dõi bạn</Text>
-          </View>
-        </View>
-        <View style={styles.notification}>
-          <Image
-            source={{ uri: user.avatar }}
-            style={styles.avatar}
-          />
-          <View style={styles.notificationContent}>
-            <Text style={[styles.notificationText, styles.bold]}>
-              {user.username}
-            </Text>
-            <Text style={[styles.notificationText, styles.txt]}> đã theo dõi bạn</Text>
-          </View>
-        </View>
-        <View style={styles.notification}>
-          <Image
-            source={{ uri: user.avatar }}
-            style={styles.avatar}
-          />
-          <View style={styles.notificationContent}>
-            <Text style={[styles.notificationText, styles.bold]}>
-              {user.username}
-            </Text>
-            <Text style={[styles.notificationText, styles.txt]}> đã theo dõi bạn</Text>
-          </View>
-        </View>
-        <View style={styles.notification}>
-          <Image
-            source={{ uri: user.avatar }}
-            style={styles.avatar}
-          />
-          <View style={styles.notificationContent}>
-            <Text style={[styles.notificationText, styles.bold]}>
-              {user.username}
-            </Text>
-            <Text style={[styles.notificationText, styles.txt]}> đã theo dõi bạn</Text>
-          </View>
-        </View>
-
-
-
+        ))}
       </ScrollView>
     </View>
   );
 };
 
 const styles = StyleSheet.create({
-  scroll: {
-    flex: 1,
-
-    marginHorizontal: 2
-  },
   container: {
     flex: 1,
-    justifyContent: 'flex-start',
-    alignItems: 'center',
+    backgroundColor: COLOR.white,
   },
-  // tab: {
-  //   flexDirection: "row",
-  //   alignItems: "center",
-  //   justifyContent:"center",
-  //   width: "100%",
-  //   backgroundColor: COLOR.color11,
-  //   paddingVertical: 25,
-  //   paddingLeft: 10,
-  //   ...SHADOWS.medium,
-  // },
-  // textHead: {
-  //   fontSize: 18,
-  //   color: COLOR.PRIMARY,
-  //   fontWeight: "500",
-  //   textAlign: "center",
-  //   marginTop: 10,
-  //   marginLeft: 10
-  // },
-  // bellIcon: {
-  //   marginRight: 3,
-  //   marginTop:10
-  // },
+  scroll: {
+    flex: 1,
+    width: '100%',
+  },
   notification: {
     flexDirection: 'row',
     alignItems: 'center',
     marginVertical: 5,
-    padding: 10,
+    padding: 15,
     backgroundColor: COLOR.offWhite,
-    borderRadius: 5,
-    width: '96%',
+    borderRadius: 10,
+    width: '95%',
+    alignSelf: 'center',
     ...SHADOWS.medium,
     borderLeftColor: COLOR.PRIMARY,
-    borderLeftWidth: 7,
-    marginTop: 5
+    borderLeftWidth: 5,
+    marginBottom: 10,
   },
   avatar: {
-    width: 50,
-    height: 50,
-    borderRadius: 25,
-    marginRight: 10,
-    borderWidth: 3,
-    borderColor: COLOR.color11
+    width: 45,
+    height: 45,
+    borderRadius: 22.5,
+    marginRight: 15,
+    borderWidth: 2,
+    borderColor: COLOR.color11,
   },
   notificationContent: {
     flex: 1,
     flexDirection: 'row',
-    alignItems: 'flex-start',
-    marginRight: 25
+    flexWrap: 'wrap',
+    alignItems: 'center',
   },
   notificationText: {
     fontSize: 16,
-  },
-  txt: {
-    marginRight: 50
+    color: COLOR.black,
   },
   bold: {
     fontWeight: 'bold',
+    marginRight: 5,
   },
   dateText: {
-    marginLeft: 'auto',
     fontSize: 14,
     color: '#777',
+    marginLeft: 'auto',
   },
 });
 

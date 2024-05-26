@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from "react";
+import React, { useCallback, useContext, useEffect, useState } from "react";
 import { View, Text, Image, StyleSheet, TextInput, Dimensions, TouchableWithoutFeedback, Alert, ImageBackground, } from "react-native";
 import { FontAwesome5 } from '@expo/vector-icons';
 import MyStyles from "../../Styles/MyStyles";
@@ -19,6 +19,8 @@ import { FontAwesome } from '@expo/vector-icons';
 import PostCreateStyle from "../../Styles/PostCreateStyle";
 import LoadingPage from "../Loading/LoadingPage";
 import AdsSlider from "../../components/Home/AdsSlider"
+import { firestore } from "../../configs/firebase";
+import { addDoc, collection } from "firebase/firestore";
 
 const HomeIndex = ({ route }) => {
   const [postContent, setPostContent] = useState("");
@@ -104,7 +106,7 @@ const HomeIndex = ({ route }) => {
 
   }, [render]);
 
-  const handleLike = async (postId) => {
+  const handleLike = async (postId, ownerPostId) => {
     try {
       const token = await AsyncStorage.getItem("access-token");
       await authApi(token).post(endpoints['likePost'](postId));
@@ -119,6 +121,13 @@ const HomeIndex = ({ route }) => {
         }
         return post;
       }));
+      console.log(ownerPostId);
+      // Lưu thông báo vào Firestore
+      if (user.id !== ownerPostId) {
+        await saveNotificationToFirestore(postId, ownerPostId, " đã thích bài viết của bạn");
+      }
+
+
       if (tinTimNhaActive == true) {
         getAllPostForRent();
       } else if (tinChoThueActive == true) {
@@ -129,9 +138,32 @@ const HomeIndex = ({ route }) => {
       console.log("Lỗi like bài");
     }
   }
-  const handleComment = (postId) => {
+  const saveNotificationToFirestore = async (postId, ownerId, content) => {
+    const timestamp = new Date();
+    const notificationsCollectionRef = collection(firestore, "Notifications");
+  
+    try {
+      await addDoc(notificationsCollectionRef, {
+        userLike: user.id,
+        userAvatar: user.avatar,
+        username: user.username,
+        postId: postId,
+        ownerPostId: ownerId,
+        time: timestamp,
+        title: user.username,
+        content: content
+      });
+  
+      console.log("Thông báo đã được lưu vào Firestore");
+  
+    } catch (error) {
+      console.error("Lỗi khi lưu thông báo vào Firestore:", error);
+    }
+  };
+  const handleComment = (postId,ownerPostId) => {
     console.log(postId);
-    navigation.navigate("Comment", { postId: postId });
+    console.log(ownerPostId);
+    navigation.navigate("Comment", { postId: postId , ownerPostId:ownerPostId});
 
     navigation.addListener('focus', async () => {
       if (tinTimNhaActive == true) {
@@ -418,7 +450,7 @@ const HomeIndex = ({ route }) => {
       let res = await authApi(token).get(`https://motel.pythonanywhere.com/post/for_lease/?page=${newPage}`);
       const newData = res.data.results;
       console.log("DATTTTTTTTTTAAA PAGE MỚI", newData);
-      if(res.data.next==null){
+      if (res.data.next == null) {
         setHasNextPage(false);
       }
       // Kiểm tra nếu có dữ liệu trang tiếp theo, cập nhật state của posts
@@ -434,7 +466,7 @@ const HomeIndex = ({ route }) => {
       // setLoading(false);
     }
   };
-  
+
   return (
     <View style={MyStyles.container}>
       {loadData ? <LoadingPage /> : (
@@ -638,6 +670,7 @@ const HomeIndex = ({ route }) => {
                     <Entypo name="location-pin" size={20} color="orange" />
                     <View style={{ flex: 1 }}>
                       <Text>ID : {post.id}</Text>
+                      <Text>USERID :{post.user.id}</Text>
                       <Text style={{ color: "gray" }}>
                         {post.motel ? `${post.motel.ward}, ${post.motel.district}, ${post.motel.city}` : `${post.ward}, ${post.district}, ${post.city}`}
                       </Text>
@@ -680,13 +713,13 @@ const HomeIndex = ({ route }) => {
               <View style={styles.iconContainer}>
                 <View style={MyStyles.flex}>
                   <Text style={{ fontWeight: "bold" }}>{post.like_count} </Text>
-                  <TouchableWithoutFeedback onPress={() => handleLike(post.id)}>
+                  <TouchableWithoutFeedback onPress={() => handleLike(post.id, post.user.id)}>
                     {likedState[post.id] ? <AntDesign style={HomeStyles.iconPost} name="heart" size={24} color="red" /> :
                       <Feather style={HomeStyles.iconPost} name="heart" size={24} color="black" />}
                   </TouchableWithoutFeedback>
                   <Text style={{ fontWeight: "bold" }}>{post.comment_count} </Text>
 
-                  <TouchableWithoutFeedback onPress={() => handleComment(post.id)}>
+                  <TouchableWithoutFeedback onPress={() => handleComment(post.id,post.user.id)}>
                     <Feather
                       style={HomeStyles.iconPost}
                       name="message-circle"
@@ -705,7 +738,7 @@ const HomeIndex = ({ route }) => {
             </View>
           ))}
           {hasNextPage && (
-            <TouchableOpacity onPress={fetchNextPagePost} style={{ padding: 20, backgroundColor: COLOR.PRIMARY, justifyContent: "center", marginHorizontal: 120,borderRadius:30, ...SHADOWS.small, marginVertical:8 }}>
+            <TouchableOpacity onPress={fetchNextPagePost} style={{ padding: 20, backgroundColor: COLOR.PRIMARY, justifyContent: "center", marginHorizontal: 120, borderRadius: 30, ...SHADOWS.small, marginVertical: 8 }}>
               <Text style={{ color: "#fff", textAlign: "center" }}>Xem thêm</Text>
             </TouchableOpacity>
           )}
