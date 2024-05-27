@@ -25,16 +25,23 @@ const MapSearch = ({ navigation, route }) => {
     const [suggestions, setSuggestions] = useState([]);
     const [searching, setsearching] = useState(false);
     const [showConfirmButton, setShowConfirmButton] = useState(false);
-    const {selectedCity, selectedDistrict,selectedWard, other} = route.params;
+    const {selectedCity, selectedDistrict,selectedWard, other, idMotel} = route.params;
+    
 
     useEffect(() => {
-
-        if (selectedCity || selectedDistrict || selectedWard || other) {
-            const query = `${other ? other + ", " : ""}${selectedWard ? selectedWard + ", " : ""}${selectedDistrict ? selectedDistrict + ", " : ""}${selectedCity ? selectedCity : ""}`;
-            setsearchQuery(query);
+        const queryParts = [];
+        if (other) queryParts.push(other);
+        if (selectedWard) queryParts.push(selectedWard);
+        if (selectedDistrict) queryParts.push(selectedDistrict);
+        if (selectedCity) queryParts.push(selectedCity);
+    
+        const query = queryParts.join(', ');
+        setsearchQuery(query);
+        if (query) {
             handleFind(query);
         }
-    }, [selectedCity, selectedDistrict, selectedWard]);
+    }, [selectedCity, selectedDistrict, selectedWard, other]);
+    
     const handleFocus = () => {
         setsearching(true);
     };
@@ -123,6 +130,9 @@ const MapSearch = ({ navigation, route }) => {
                     break;
                 case 'Editpost':
                     navigation.navigate('Editpost', { lat: latitude, lon: longitude, nameLoc: locationName });
+                    break;
+                case 'EditMotel':
+                    navigation.navigate('EditMotel', { lat: latitude, lon: longitude, nameLoc: locationName, idMotel:idMotel });
                     break;
                 default:
                     navigation.goBack(); // Trường hợp mặc định, quay lại màn hình trước

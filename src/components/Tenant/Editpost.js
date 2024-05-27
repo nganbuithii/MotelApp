@@ -41,15 +41,6 @@ const Editpost = ({ navigation, route }) => {
     const [otherErr, setOtherErr] = useState("");
 
 
-    useEffect(() => {
-        console.log(post);
-        console.log(district);
-        console.log(city);
-        console.log(ward);
-    }, []);
-
-
-
     const checkForCameraRollPermission = async () => {
         const { status } = await ImagePicker.getMediaLibraryPermissionsAsync();
         if (status !== "granted") {

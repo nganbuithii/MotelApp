@@ -1,5 +1,5 @@
 import React, { useContext, useEffect, useState } from 'react';
-import { View, Text, StyleSheet, Image, ScrollView } from 'react-native';
+import { View, Text, StyleSheet, Image, ScrollView, ActivityIndicator, TouchableOpacity } from 'react-native';
 import { COLOR, SHADOWS } from '../common/color';
 import { Octicons } from '@expo/vector-icons';
 import MyContext from '../../configs/MyContext';
@@ -7,26 +7,42 @@ import { collection, query, onSnapshot, orderBy, where } from "firebase/firestor
 import HomeStyles from '../../Styles/HomeStyles';
 import { firestore } from "../../configs/firebase";
 import caculatorTimeAgo from '../common/CaculatorTime';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useNavigation } from '@react-navigation/native';
 
 const NotificationsSc = () => {
   const [user] = useContext(MyContext);
   const [notifications, setNotifications] = useState([]);
+  const [loading, setLoading] = useState(true);
+  
+  // Sử dụng useNavigation để lấy đối tượng navigation
+  const navigation = useNavigation();
 
   useEffect(() => {
     const notificationsCollectionRef = collection(firestore, "Notifications");
     const q = query(
       notificationsCollectionRef,
-      where("ownerPostId", "==", user.id), // Thêm điều kiện lọc
+      where("ownerPostId", "==", user.id),
       orderBy("time", "desc")
     );
 
     const unsubscribe = onSnapshot(q, (querySnapshot) => {
       const allNotifications = querySnapshot.docs.map(doc => doc.data());
       setNotifications(allNotifications);
+      setLoading(false);
     });
 
     return () => unsubscribe();
   }, []);
+  
+  const handleNotificationPress = (notification) => {
+    // Kiểm tra nếu nội dung thông báo là "đã bình luận bài viết của bạn" thì mới chuyển hướng
+    if (notification.content === "đã bình luận bài viết của bạn") {
+      console.log("Thông báo đã được nhấp vào:", notification);
+      // Sử dụng navigation.navigate để điều hướng đến màn hình Comment và truyền props
+      navigation.navigate("Comment", { postId: notification.postId });
+    }
+  }
 
   return (
     <View style={styles.container}>
@@ -35,30 +51,40 @@ const NotificationsSc = () => {
         <Text style={HomeStyles.textHead}>Thông báo</Text>
       </View>
 
-      <ScrollView style={styles.scroll} showsVerticalScrollIndicator={false}>
-        {notifications.length === 0 ? (
-          <View style={styles.emptyContainer}>
-            <Image source={require('../../assets/images/noNotification.jpg')} style={{}} />
-            <Text style={{textAlign:"center", fontSize:20,}}>Bạn chưa có thông báo mới!</Text>
-          </View>
-        ) : (
-          notifications.map((notification, index) => (
-            <View key={index} style={styles.notification}>
-              <Image
-                source={{ uri: notification.userAvatar }}
-                style={styles.avatar}
-              />
-              <View style={styles.notificationContent}>
-                <Text style={[styles.notificationText, styles.bold]}>
-                  {notification.username}
-                </Text>
-                <Text style={styles.notificationText}>{notification.content}</Text>
-              </View>
-              <Text style={styles.dateText}>{caculatorTimeAgo(notification.time)}</Text>
+      {loading ? (
+        <View style={styles.loadingContainer}>
+          <ActivityIndicator size="large" color={COLOR.PRIMARY} />
+        </View>
+      ) : (
+        <ScrollView style={styles.scroll} showsVerticalScrollIndicator={false}>
+          {notifications.length === 0 ? (
+            <View style={styles.emptyContainer}>
+              <Image source={require('../../assets/images/noNotification.jpg')} style={{}} />
+              <Text style={{ textAlign: "center", fontSize: 20 }}>Bạn chưa có thông báo mới!</Text>
             </View>
-          ))
-        )}
-      </ScrollView>
+          ) : (
+            notifications.map((notification, index) => (
+              <TouchableOpacity 
+                key={index} 
+                style={styles.notification} 
+                onPress={() => handleNotificationPress(notification)}
+              >
+                <Image
+                  source={{ uri: notification.userAvatar }}
+                  style={styles.avatar}
+                />
+                <View style={styles.notificationContent}>
+                  <Text style={styles.notificationText}>
+                    <Text style={styles.bold}>{notification.username} </Text>
+                    {notification.content}
+                  </Text>
+                  <Text style={styles.dateText}>{caculatorTimeAgo(notification.time)}</Text>
+                </View>
+              </TouchableOpacity>
+            ))
+          )}
+        </ScrollView>
+      )}
     </View>
   );
 };
@@ -72,9 +98,14 @@ const styles = StyleSheet.create({
     flex: 1,
     width: '100%',
   },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
   notification: {
     flexDirection: 'row',
-    alignItems: 'center',
+    alignItems: 'flex-start',
     marginVertical: 5,
     padding: 15,
     backgroundColor: COLOR.offWhite,
@@ -96,9 +127,9 @@ const styles = StyleSheet.create({
   },
   notificationContent: {
     flex: 1,
-    flexDirection: 'row',
+    flexDirection: 'column',
     flexWrap: 'wrap',
-    alignItems: 'center',
+
   },
   notificationText: {
     fontSize: 16,
@@ -106,12 +137,17 @@ const styles = StyleSheet.create({
   },
   bold: {
     fontWeight: 'bold',
-    marginRight: 5,
   },
   dateText: {
     fontSize: 14,
     color: '#777',
-    marginLeft: 'auto',
+    paddingBottom: 10,
+
+  },
+  emptyContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
 });
 

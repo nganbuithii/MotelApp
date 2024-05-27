@@ -1,6 +1,6 @@
 import { View, Text, StyleSheet, TextInput, FlatList, TouchableOpacity, Image, ScrollView, Alert, ActivityIndicator, Modal, } from "react-native";
 import HomeStyles from "../../Styles/HomeStyles";
-import { Entypo, Foundation, MaterialIcons } from "@expo/vector-icons";
+import { Entypo, Foundation, Ionicons, MaterialIcons } from "@expo/vector-icons";
 import { COLOR, SHADOWS } from "../common/color";
 import { AntDesign } from "@expo/vector-icons";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
@@ -10,8 +10,13 @@ import { useEffect, useState } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { authApi, endpoints } from "../../configs/API";
 import showToast from "../common/ToastMessage";
+import RNPickerSelect from "react-native-picker-select";
+import PostStyle from "../Tenant/PostStyle";
+import axios from 'axios';
+import SearchStyle from "../../Styles/SearchStyle";
 
 const EditMotel = ({ navigation, route }) => {
+
 
     const { idMotel } = route.params;
     const [price, setPrice] = useState("");
@@ -29,9 +34,18 @@ const EditMotel = ({ navigation, route }) => {
     const [cities, setCities] = useState([]); // State để lưu trữ danh sách các tỉnh/thành phố
     const [districts, setDistricts] = useState([]); // State để lưu trữ danh sách các quận/huyện
     const [wards, setWards] = useState([]);
-    // const lon = route.params?.lon;
-    // const lat = route.params?.lat;
-    // const nameLoc = route.params?.nameLoc;
+    let lon = route.params?.lon;
+    let lat = route.params?.lat;
+    let nameLoc = route.params?.nameLoc;
+    useEffect(() => {
+        console.log("Route params:", route.params);
+        console.log("Lon", lon);
+        console.log("lat", lat);
+        if (route.params?.nameLoc) {
+            console.log("Here", route.params.nameLoc);
+            setOther(route.params.nameLoc);
+        }
+    }, [route.params?.nameLoc]);
     const [loading, setLoading] = useState(true);
     const [initialState, setInitialState] = useState({
         ward: "",
@@ -44,13 +58,107 @@ const EditMotel = ({ navigation, route }) => {
         desc: ""
     });
 
-    // useEffect(() => {
-    //     console.log("Route params:", route.params);
-    //     if (route.params?.nameLoc) {
-    //         console.log("Here", route.params.nameLoc);
-    //         setOther(route.params.nameLoc);
-    //     }
-    // }, [route.params?.nameLoc]);
+    // Hàm để lấy danh sách quận/huyện dựa trên tỉnh/thành phố được chọn
+    const fetchDistricts = async (cityId) => {
+        try {
+            const response = await axios.get(`https://esgoo.net/api-tinhthanh/2/${cityId}.htm`);
+            if (response.data.error === 0) {
+                setDistricts(response.data.data); // Cập nhật state với danh sách quận/huyện
+            }
+        } catch (error) {
+            console.error('Error fetching districts:', error);
+        }
+    };
+
+    // Hàm để lấy danh sách xã/phường dựa trên quận/huyện được chọn
+    const fetchWards = async (districtId) => {
+        try {
+            const response = await axios.get(`https://esgoo.net/api-tinhthanh/3/${districtId}.htm`);
+            if (response.data.error === 0) {
+                setWards(response.data.data); // Cập nhật state với danh sách xã/phường
+            }
+        } catch (error) {
+            console.error('Error fetching wards:', error);
+        }
+    };
+    // Hàm xử lý khi tỉnh/thành phố được chọn
+    const handleCityChange = (cityId) => {
+        fetchDistricts(cityId); // Gọi hàm để lấy danh sách quận/huyện dựa trên tỉnh/thành phố được chọn
+    };
+
+    // Hàm xử lý khi quận/huyện được chọn
+    const handleDistrictChange = (districtId) => {
+        fetchWards(districtId); // Gọi hàm để lấy danh sách xã/phường dựa trên quận/huyện được chọn
+    };
+
+    // Lấy danh sách tỉnh/thành phố khi component được render
+    useEffect(() => {
+        const fetchCities = async () => {
+            try {
+                const response = await axios.get('https://esgoo.net/api-tinhthanh/1/0.htm');
+                if (response.data.error === 0) {
+                    setCities(response.data.data); // Cập nhật state với danh sách tỉnh/thành phố
+                }
+                // console.log(response.data.data);
+            } catch (error) {
+                console.error('Error fetching cities:', error);
+            }
+        };
+        fetchCities();
+    }, []);
+    // Tạo bảng dữ liệu ánh xạ ID và tên của tỉnh/thành phố, quận/huyện
+    const cityMapping = {};
+    cities.forEach(city => {
+        cityMapping[city.id] = city.full_name;
+    });
+    const cityIdMapping = {};
+    cities.forEach(city => {
+        cityIdMapping[city.full_name] = city.id;
+    });
+    const districtIdMapping = {};
+    districts.forEach(district => {
+        districtIdMapping[district.full_name] = district.id;
+    });
+    const wardIdMapping = {};
+    wards.forEach(ward => {
+        wardIdMapping[ward.full_name] = ward.id;
+    });
+
+    const districtMapping = {};
+    districts.forEach(district => {
+        districtMapping[district.id] = district.full_name;
+    });
+
+    // Hàm để chuyển đổi ID thành tên tỉnh/thành phố, quận/huyện
+    const getCityNameById = (cityId) => {
+        return cityMapping[cityId] || '';
+    };
+
+    const getDistrictNameById = (districtId) => {
+        return districtMapping[districtId] || '';
+    };
+    // Tạo bảng dữ liệu ánh xạ ID và tên của xã/phường
+    const wardMapping = {};
+    wards.forEach(ward => {
+        wardMapping[ward.id] = ward.full_name;
+    });
+
+    const getWardIdByName = (wardName) => {
+        const foundWard = wards.find(ward => ward.full_name === wardName);
+        return foundWard ? foundWard.id : null;
+    };
+    const getCityIdByName = (cityName) => {
+        const foundCity = cities.find(city => city.full_name === cityName);
+        return foundCity ? foundCity.id : null;
+    };
+
+
+    // Hàm để lấy ID của quận/huyện dựa trên tên của nó
+    const getDistrictIdByName = (districtName) => {
+        const foundDistrict = districts.find(district => district.full_name === districtName);
+        return foundDistrict ? foundDistrict.id : null;
+    };
+
     const exitModal = () => {
         setEditingService("");
     }
@@ -62,8 +170,6 @@ const EditMotel = ({ navigation, route }) => {
         try {
             const token = await AsyncStorage.getItem("access-token");
             console.log("token", token);
-            //const imageId = images[index].id; // Lấy ID của ảnh từ mảng images
-            //console.log("ID ẢNH", idImage);
             const formData = new FormData();
             formData.append("id", idImage); // Thêm ID của ảnh vào formData
             console.log(idMotel);
@@ -71,10 +177,8 @@ const EditMotel = ({ navigation, route }) => {
 
             await authApi(token).delete(endpoints["deleteImgMotel"](idImage));
             setRender(!render);
-            // showToast1();
             showToast({ type: "success", text1: "Thành công", text2: "Xóa ảnh thành công" });
             console.log("Xóa ảnh thành công");
-            //setRender(!render);
         } catch (ex) {
             console.log("xóa ảnh thất bại");
             console.error(ex);
@@ -370,9 +474,19 @@ const EditMotel = ({ navigation, route }) => {
 
     }
     const nextMap = () => {
+        const selectedCityName = getCityNameById(city);
+        const selectedDistrictName = getDistrictNameById(district);
+        const selectedWardName = wardMapping[ward];
 
-        navigation.navigate('MapSearch', { previousScreen: 'EditMotel' });
 
+        navigation.navigate('MapSearch', {
+            previousScreen: 'EditMotel',
+            selectedCity: selectedCityName,
+            selectedDistrict: selectedDistrictName,
+            selectedWard: selectedWardName,
+            other: other,
+            idMotel: idMotel
+        });
     }
     return (
         <View style={EditMotelStyle.container}>
@@ -397,34 +511,62 @@ const EditMotel = ({ navigation, route }) => {
                     showsVerticalScrollIndicator={false}
                 >
                     <View style={EditMotelStyle.infoContainer}>
-                        {/* <Text>Thông tin phòng</Text> */}
-
                         <Text style={EditMotelStyle.labelService}> Thông tin phòng</Text>
                         {/* <Text> {idMotel}</Text> */}
-                        <Text style={EditMotelStyle.label}>Xã/Phường</Text>
 
-                        <View style={styles.inputContainer}>
-                            <MaterialIcons style={styles.icon} name="edit-location" size={24} color="black" />
-                            <TextInput style={styles.input} value={ward} onChangeText={setWard}
-                                placeholder="Xã/phường" />
+
+                        <Text style={EditMotelStyle.label}>Tỉnh/Thành phố</Text>
+                        <View style={[PostStyle.selectContainer, { marginHorizontal: 20, borderRadius: 20, }]}>
+                            {/* <Text>Chọn tỉnh/thành phố:</Text> */}
+                            <RNPickerSelect
+                                value={getCityIdByName(city)}
+                                onValueChange={(value) => {
+                                    setCity(value);
+                                    handleCityChange(value);
+                                }}
+                                placeholder={{ label: 'Chọn tỉnh/thành phố', value: city }}
+                                items={cities.map(city => ({ label: city.full_name, value: city.id }))}
+                            />
                         </View>
                         <Text style={EditMotelStyle.label}> Quận/Huyện</Text>
-                        <View style={styles.inputContainer}>
-                            <MaterialIcons style={styles.icon} name="edit-location" size={24} color="black" />
-                            <TextInput style={styles.input} value={district} onChangeText={setDistrict}
-                                placeholder="Quận/ Huyện" />
+                        <View style={[PostStyle.selectContainer, { marginHorizontal: 20, borderRadius: 20, }]}>
+                            <RNPickerSelect
+                                value={getDistrictIdByName(district)}
+                                onValueChange={(value) => {
+                                    setDistrict(value);
+                                    handleDistrictChange(value);
+                                }}
+                                placeholder={{ label: 'Chọn quận/huyện', value: district }}
+                                items={districts.map(district => ({ label: district.full_name, value: district.id }))}
+                            />
                         </View>
-                        <Text style={EditMotelStyle.label}>Tỉnh/Thành phố</Text>
-                        <View style={styles.inputContainer}>
-                            <MaterialIcons style={styles.icon} name="edit-location" size={24} color="black" />
-                            <TextInput style={styles.input} value={city} onChangeText={setCity}
-                                placeholder="Tỉnh/ Thành phố" />
+                        <Text style={EditMotelStyle.label}>Xã/Phường</Text>
+                        <View style={[PostStyle.selectContainer, { marginHorizontal: 20, borderRadius: 20, }]}>
+                            <RNPickerSelect
+                                value={getWardIdByName(ward)}
+                                onValueChange={(value) => setWard(value)}
+                                placeholder={{ label: 'Chọn xã/phường', value: ward, placeholderTextColor: 'black' }}
+                                items={wards.map(ward => ({ label: ward.full_name, value: ward.id }))}
+                            />
                         </View>
                         <Text style={EditMotelStyle.label}> Địa chỉ khác</Text>
                         <View style={styles.inputContainer}>
-                            <MaterialIcons style={styles.icon} name="edit-location" size={24} color="black" />
-                            <TextInput style={styles.input} value={ward} onChangeText={setWard}
-                                placeholder="Địa chỉ khác" />
+                            <Ionicons
+                                style={SearchStyle.icon}
+                                name="location-sharp"
+                                size={24}
+                                color="black"
+                            />
+                            <TextInput
+                                style={SearchStyle.input}
+                                value={other}
+                                onChangeText={setOther}
+                                placeholder="Địa chỉ khác"
+                            />
+                            <TouchableOpacity style={{ marginLeft: "auto" }} onPress={nextMap} >
+                                <Entypo style={{ backgroundColor: COLOR.PRIMARY, padding: 10, borderRadius: 10, }} name="map" size={24} color="#fff" />
+                            </TouchableOpacity>
+
                         </View>
 
                         <Text style={EditMotelStyle.label}> Tiền phòng</Text>

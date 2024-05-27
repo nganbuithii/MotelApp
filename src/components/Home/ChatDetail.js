@@ -1,7 +1,7 @@
 import React, { useCallback, useContext, useEffect, useState } from "react";
-import { Text, View } from "react-native";
+import { Image, StyleSheet, Text, View } from "react-native";
 import { Avatar } from "react-native-paper";
-import { GiftedChat, Bubble } from "react-native-gifted-chat";
+import { GiftedChat, Bubble, Send } from "react-native-gifted-chat";
 import { firestore } from "../../configs/firebase";
 import { addDoc, collection, orderBy, query, onSnapshot, updateDoc, doc, setDoc, getDoc } from "firebase/firestore";
 import MyContext from "../../configs/MyContext";
@@ -21,7 +21,7 @@ const ChatDetail = ({ route }) => {
   const [user, dispatch] = useContext(MyContext);
   const chatId = [user.id.toString(), (ownerId || '').toString()].sort().join('_') + '_message';
   const navigation = useNavigation();
-  const [owner, setOwner] = useState();
+  const [owner, setOwner] = useState(null);  // Initialize with null
   const [messages, setMessages] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -36,6 +36,7 @@ const ChatDetail = ({ route }) => {
       setLoading(false);
     } catch (ex) {
       console.error(ex);
+      setLoading(false);  // Ensure loading is set to false even if there's an error
     }
   };
 
@@ -140,33 +141,58 @@ const ChatDetail = ({ route }) => {
   return (
     <View style={{ flex: 1 }}>
       <View style={[HomeStyles.tab, { position: "relative" }]}>
-        <TouchableWithoutFeedback onPress={exitChat}>
-          <Ionicons name="arrow-back-outline" size={24} color={COLOR.PRIMARY} style={{ position: "absolute", top: -8, left: -150 }} />
+        <TouchableWithoutFeedback onPress={exitChat} style={{ position: "absolute", top: -8, left: -130 }}>
+          <Ionicons name="arrow-back-outline" size={24} color={COLOR.PRIMARY}  />
         </TouchableWithoutFeedback>
-
-        <Entypo name="chat" size={24} color={COLOR.PRIMARY} style={[HomeStyles.bellIcon]} />
+        <View style={{flexDirection:"row"}}>
+          <Entypo name="chat" size={24} color={COLOR.PRIMARY} style={[HomeStyles.bellIcon]} />
         {owner && (
           <Text style={HomeStyles.textHead}>{owner.username}</Text>
         )}
+        </View>
       </View>
       {loading ? <LoadingPage /> : (
-        <GiftedChat
-          messages={messages}
-          onSend={onSend}
-          user={{ _id: user.id }}
-          renderAvatar={(props) => (
-            <Avatar.Image {...props} source={{ uri: owner.avatar }} size={32} />
-          )}
-          renderBubble={renderBubble}
-          placeholder="Nhập tin nhắn..."
-          alwaysShowSend={true}
-          // showUserAvatar={user.avatar}
-          multiline
-          
-        />
+        owner ? (
+          <GiftedChat
+            messages={messages}
+            onSend={onSend}
+            user={{ _id: user.id }}
+            renderAvatar={(props) => (
+              <Avatar.Image {...props} source={{ uri: owner.avatar }} size={38} />
+            )}
+            renderBubble={renderBubble}
+            placeholder="Nhập tin nhắn..."
+            alwaysShowSend={true}
+            multiline
+            renderSend={props => {
+              return (
+                <Send {...props}>
+                  <Ionicons name="send" size={30} color={COLOR.PRIMARY} style={{ marginRight: 14, marginBottom: 8 }} />
+                </Send>
+              )
+            }}
+          />
+        ) : (
+          <View style={styles.emptyContainer}>
+            <Text style={styles.emptyText}>Không tìm thấy thông tin chủ sở hữu</Text>
+          </View>
+        )
       )}
     </View>
   );
 };
+
+const styles = StyleSheet.create({
+  emptyContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  emptyText: {
+    fontSize: 18,
+    color: '#666666',
+    textAlign: 'center',
+  },
+});
 
 export default ChatDetail;
