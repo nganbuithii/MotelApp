@@ -5,7 +5,7 @@ import {
 } from "react-native";
 import { COLOR, SHADOWS } from "../common/color";
 import RNPickerSelect from "react-native-picker-select";
-import { Ionicons } from "@expo/vector-icons";
+import { Entypo, Ionicons } from "@expo/vector-icons";
 import ButtonAuth from "../common/ButtonAuth";
 import MyContext from '../../configs/MyContext';
 import axios from 'axios';
@@ -15,6 +15,7 @@ import { authApi, endpoints } from "../../configs/API";
 import showToast from "../common/ToastMessage";
 import * as ImagePicker from "expo-image-picker";
 import PostStyle from "./PostStyle";
+import SearchStyle from "../../Styles/SearchStyle";
 
 const Editpost = ({ navigation, route }) => {
     const { postId, post } = route.params;
@@ -25,9 +26,9 @@ const Editpost = ({ navigation, route }) => {
 
     const [user, dispatch] = useContext(MyContext);
     const [loading, setLoading] = useState(false);
-    const [ward, setWard] = useState();
-    const [district, setDistrict] = useState();
-    const [city, setCity] = useState();
+    const [ward, setWard] = useState(post.ward);
+    const [district, setDistrict] = useState(post.district);
+    const [city, setCity] = useState(post.city);
     const [other, setOther] = useState(post.other_address);
     const [content, setContent] = useState(post.content);
     const [image, setImage] = useState(post.image);
@@ -41,19 +42,12 @@ const Editpost = ({ navigation, route }) => {
 
 
     useEffect(() => {
-        const cityId = cityIdMapping[post.city];
-        const districtId = districtIdMapping[post.district];
-        const wardId = wardIdMapping[post.ward];
-        setCity(cityId);
-        setWard(wardId);
-        setDistrict(districtId);
-        setOther(post.other_address);
-        setContent(post.content);
-        setImage(post.image);
+        console.log(post);
+        console.log(district);
         console.log(city);
         console.log(ward);
-    }, []); 
-    
+    }, []);
+
 
 
     const checkForCameraRollPermission = async () => {
@@ -206,7 +200,7 @@ const Editpost = ({ navigation, route }) => {
                 if (image != post.image) {
                     formData.append('image', img);
                 }
-                console.log("id post",postId);
+                console.log("id post", postId);
 
                 let res = await authApi(token).patch(endpoints["updatePostRent"](postId), formData, {
                     headers: {
@@ -215,20 +209,42 @@ const Editpost = ({ navigation, route }) => {
                 });
                 console.log("Cập nhật thành công");
                 // setLoading(true);
-                navigation.navigate("HomeIndex", { myPost: res.data })
+                navigation.goBack();
             }
 
         } catch (ex) {
             console.error(ex);
         }
     };
-    const test = () => {
-        console.log("Post data:", post);
 
-        console.log("City:", city);
-        console.log("District:", district);
-        console.log("Ward:", ward);
+    const getCityIdByName = (cityName) => {
+        const foundCity = cities.find(city => city.full_name === cityName);
+        return foundCity ? foundCity.id : null;
+    };
+    // Hàm để lấy ID của xã/phường dựa trên tên của nó
+    const getWardIdByName = (wardName) => {
+        const foundWard = wards.find(ward => ward.full_name === wardName);
+        return foundWard ? foundWard.id : null;
+    };
 
+    // Hàm để lấy ID của quận/huyện dựa trên tên của nó
+    const getDistrictIdByName = (districtName) => {
+        const foundDistrict = districts.find(district => district.full_name === districtName);
+        return foundDistrict ? foundDistrict.id : null;
+    };
+    const nextMap = () => {
+        const selectedCityName = getCityNameById(city);
+        const selectedDistrictName = getDistrictNameById(district);
+        const selectedWardName = wardMapping[ward];
+
+
+        navigation.navigate('MapSearch', {
+            previousScreen: 'Editpost',
+            selectedCity: selectedCityName,
+            selectedDistrict: selectedDistrictName,
+            selectedWard: selectedWardName,
+            other:post.other_address
+        });
     }
     return (
         <View style={PostStyle.container}>
@@ -273,47 +289,47 @@ const Editpost = ({ navigation, route }) => {
                     )}
 
                     <Text style={PostStyle.sectionTitle}>Vị trí muốn tìm trọ</Text>
-                    <TouchableOpacity style={PostStyle.uploadButton}>
+                    {/* <TouchableOpacity style={PostStyle.uploadButton}>
                         <Feather name="map-pin" size={24} color="lightgreen" />
                         <Text style={PostStyle.uploadText}>Thêm vị trí</Text>
-                    </TouchableOpacity>
+                    </TouchableOpacity> */}
                 </View>
                 {!!wardErr && <Text style={PostStyle.errorText}><Ionicons name="warning" size={12} color="red" />{wardErr}</Text>}
                 <View style={PostStyle.selectContainer}>
                     {/* <Text>Chọn tỉnh/thành phố:</Text> */}
                     <RNPickerSelect
-                        value={city}
+                        value={getCityIdByName(city)}
                         onValueChange={(value) => {
                             setCity(value);
                             handleCityChange(value); // Gọi hàm xử lý khi tỉnh/thành phố được chọn
                         }}
-                        placeholder={{ label: 'Chọn tỉnh/thành phố', value: null }}
+                        placeholder={{ label: 'Chọn tỉnh/thành phố', value: city }}
                         items={cities.map(city => ({ label: city.full_name, value: city.id }))}
                     />
                 </View>
                 {!!districtErr && <Text style={PostStyle.errorText}><Ionicons name="warning" size={12} color="red" />{districtErr}</Text>}
                 <View style={PostStyle.selectContainer}>
                     <RNPickerSelect
-                        value={district}
+                        value={getDistrictIdByName(district)}
                         onValueChange={(value) => {
                             setDistrict(value);
                             handleDistrictChange(value); // Gọi hàm xử lý khi quận/huyện được chọn
                         }}
-                        placeholder={{ label: 'Chọn quận/huyện', value: null }}
+                        placeholder={{ label: 'Chọn quận/huyện', value: district }}
                         items={districts.map(district => ({ label: district.full_name, value: district.id }))}
                     />
                 </View>
                 {!!cityErr && <Text style={PostStyle.errorText}><Ionicons name="warning" size={12} color="red" />{cityErr}</Text>}
                 <View style={PostStyle.selectContainer}>
                     <RNPickerSelect
-                        value={ward}
+                        value={getWardIdByName(ward)}
                         onValueChange={(value) => setWard(value)}
-                        placeholder={{ label: 'Chọn xã/phường', value: null }}
+                        placeholder={{ label: 'Chọn xã/phường', value: ward, placeholderTextColor: 'black' }}
                         items={wards.map(ward => ({ label: ward.full_name, value: ward.id }))}
                     />
                 </View>
                 {!!otherErr && <Text style={PostStyle.errorText}><Ionicons name="warning" size={12} color="red" />{otherErr}</Text>}
-                <View style={PostStyle.inputContainer}>
+                {/* <View style={PostStyle.inputContainer}>
 
                     <TextInput
                         style={PostStyle.input}
@@ -321,8 +337,25 @@ const Editpost = ({ navigation, route }) => {
                         onChangeText={setOther}
                         placeholder="Địa chỉ khác (Nếu có)"
                     />
-                </View>
+                </View> */}
+                <View style={SearchStyle.inputContainer}>
+                    <Ionicons
+                        style={SearchStyle.icon}
+                        name="location-sharp"
+                        size={24}
+                        color="black"
+                    />
+                    <TextInput
+                        style={SearchStyle.input}
+                        value={other}
+                        onChangeText={setOther}
+                        placeholder="Địa chỉ khác"
+                    />
+                    <TouchableOpacity style={{ marginLeft: "auto" }} onPress={nextMap} >
+                        <Entypo style={{ backgroundColor: COLOR.PRIMARY, padding: 10, borderRadius: 10, }} name="map" size={24} color="#fff" />
+                    </TouchableOpacity>
 
+                </View>
                 <View style={PostStyle.buttonContainer}>
                     {loading ? (<ActivityIndicator />) : (
                         <ButtonAuth title="Cập nhật bài viết" onPress={handleSubmit} />)}

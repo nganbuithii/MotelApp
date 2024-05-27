@@ -1,7 +1,7 @@
 import {
     StyleSheet, Text, View, TextInput, Dimensions, TouchableOpacity, Alert, Animated,
 } from "react-native";
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { Octicons } from '@expo/vector-icons';
 import { Feather } from '@expo/vector-icons';
 import MapView, { BingMapsProvider, Marker, Circle, } from "react-native-maps";
@@ -14,7 +14,6 @@ import SearchSc from "../Home/SearchSc";
 
 const MapSearch = ({ navigation, route }) => {
     const [animation] = useState(new Animated.Value(400));
-    // const [searchQuery, setSearchQuery] = React.useState('');
     const textInputRef = useRef(null);
     const API_key =
         "ArvHYzlNC_zl-qapSPj9KUSjb17DNAmCTHf0Lv-_sWiptCT-R26Ss9wvW5n9ytMr ";
@@ -26,8 +25,16 @@ const MapSearch = ({ navigation, route }) => {
     const [suggestions, setSuggestions] = useState([]);
     const [searching, setsearching] = useState(false);
     const [showConfirmButton, setShowConfirmButton] = useState(false);
+    const {selectedCity, selectedDistrict,selectedWard, other} = route.params;
 
+    useEffect(() => {
 
+        if (selectedCity || selectedDistrict || selectedWard || other) {
+            const query = `${other ? other + ", " : ""}${selectedWard ? selectedWard + ", " : ""}${selectedDistrict ? selectedDistrict + ", " : ""}${selectedCity ? selectedCity : ""}`;
+            setsearchQuery(query);
+            handleFind(query);
+        }
+    }, [selectedCity, selectedDistrict, selectedWard]);
     const handleFocus = () => {
         setsearching(true);
     };
@@ -113,6 +120,9 @@ const MapSearch = ({ navigation, route }) => {
                     break;
                 case 'CreatePostRent':
                     navigation.navigate('CreatePostRent', { lat: latitude, lon: longitude, nameLoc: locationName });
+                    break;
+                case 'Editpost':
+                    navigation.navigate('Editpost', { lat: latitude, lon: longitude, nameLoc: locationName });
                     break;
                 default:
                     navigation.goBack(); // Trường hợp mặc định, quay lại màn hình trước

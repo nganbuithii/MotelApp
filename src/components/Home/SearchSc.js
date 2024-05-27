@@ -36,18 +36,18 @@ const SearchSc = ({ route }) => {
   const [areaFilter, setAreaFilter] = useState();
   const [searchStarted, setSearchStarted] = useState(false);
 
-  const lon = route.params?.lon;
-  const lat = route.params?.lat;
-  const nameLoc = route.params?.nameLoc;
+  let lon = route.params?.lon;
+  let lat = route.params?.lat;
+  let nameLoc = route.params?.nameLoc;
   useEffect(() => {
     console.log("Route params:", route.params);
     console.log("Lon", lon);
     console.log("lat", lat);
     if (route.params?.nameLoc) {
-        console.log("Here", route.params.nameLoc);
-        setOther(route.params.nameLoc);
+      console.log("Here", route.params.nameLoc);
+      setOther(route.params.nameLoc);
     }
-}, [route.params?.nameLoc]);
+  }, [route.params?.nameLoc]);
 
 
 
@@ -114,13 +114,13 @@ const SearchSc = ({ route }) => {
   });
 
   // Hàm để chuyển đổi ID thành tên tỉnh/thành phố, quận/huyện
-  // const getCityNameById = (cityId) => {
-  //   return cityMapping[cityId] || '';
-  // };
+  const getCityNameById = (cityId) => {
+    return cityMapping[cityId] || '';
+  };
 
-  // const getDistrictNameById = (districtId) => {
-  //   return districtMapping[districtId] || '';
-  // };
+  const getDistrictNameById = (districtId) => {
+    return districtMapping[districtId] || '';
+  };
   // Tạo bảng dữ liệu ánh xạ ID và tên của xã/phường
   const wardMapping = {};
   wards.forEach(ward => {
@@ -142,12 +142,17 @@ const SearchSc = ({ route }) => {
       setSearchStarted(true); // Đánh dấu việc bắt đầu tìm kiếm
       const token = await AsyncStorage.getItem("access-token");
       const params = {};
-  
-      if (ward) { params['ward'] = ward; }
-      if (district) { params['district'] = district; }
-      if (city) { params['city'] = city; }
-      if (other) { params['other_address'] = other; }
-  
+      const selectedCityName = getCityNameById(city);
+      const selectedDistrictName = getDistrictNameById(district);
+      const selectedWardName = wardMapping[ward];
+
+      if (ward) { params['ward'] = selectedWardName; }
+      if (district) { params['district'] = selectedDistrictName; }
+      if (city) { params['city'] = selectedCityName; }
+      // if (other) { params['other_address'] = other; }
+      if (lon) { params['lon'] = lon; }
+      if (lat) { params['lat'] = lat; }
+
       // Set min_price and max_price based on the selected price filter
       if (priceFilter) {
         switch (priceFilter) {
@@ -173,7 +178,7 @@ const SearchSc = ({ route }) => {
             break;
         }
       }
-  
+
       // Set ordering based on the selected area filter
       if (areaFilter) {
         switch (areaFilter) {
@@ -196,21 +201,21 @@ const SearchSc = ({ route }) => {
             break;
         }
       }
-  
+
       console.log("PARAMS:", params);
-  
+
       let res = await authApi(token).get(endpoints["getMotelFilter"], {
         params: params
       });
       console.log("ok");
       console.log(res.data);
       setData(res.data.results);
-  
+
     } catch (ex) {
       console.error(ex);
     }
   };
-  
+
   const handleClearFilter = () => {
     setCity(null);
     setDistrict(null);
@@ -220,29 +225,42 @@ const SearchSc = ({ route }) => {
     setAreaFilter(null);
     // Sau khi cập nhật state, gọi hàm handleSubmit để tải lại dữ liệu theo các giá trị mặc định
     setData([]);
+    // Đặt lại giá trị lon và lat
+    // lon = null;
+    // lat = null;
   };
-  const renderItem = ({ item }) => (
-    <TouchableWithoutFeedback onPress={() => handleDetail(item.id)}>
-    <View style={SearchStyle.itemContainer} key={item.id}>
-      <Image source={require('../../assets/images/1.jpg')} style={SearchStyle.image} />
-      <View style={SearchStyle.infoContainer}>
-        <Text>{item.id}</Text>
-        <Text style={SearchStyle.title}><Octicons name="location" size={15} color={COLOR.PRIMARY} />ㅤ{item.city}</Text>
-        <Text><Octicons name="location" size={15} color={COLOR.PRIMARY} />ㅤ{item.district}</Text>
-        <Text><Octicons name="location" size={15} color={COLOR.PRIMARY} />ㅤ{item.other_address}</Text>
-        <Text style={{fontWeight:"bold"}}>Giá: {item.price} VNĐ</Text>
-        <Text style={{fontWeight:"bold"}}>Diện tích: {item.area} m2</Text>
-        <TouchableOpacity>
-          <Text style={{ textAlign: "right", color: "lightgreen" }}> Xem chi tiết <AntDesign name="caretright" size={15} color="lightgreen" /> </Text>
-        </TouchableOpacity>
+  const renderItem = ({ item, key }) => (
+    <TouchableWithoutFeedback onPress={() => handleDetail(item.id)} key={key}>
+      <View style={SearchStyle.itemContainer} >
+        <Image source={require('../../assets/images/1.jpg')} style={SearchStyle.image} />
+        <View style={SearchStyle.infoContainer}>
+          {/* <Text>{item.id}</Text> */}
+          <Text style={SearchStyle.title}><Octicons name="location" size={15} color={COLOR.PRIMARY} />ㅤ{item.city}</Text>
+          <Text><Octicons name="location" size={15} color={COLOR.PRIMARY} />ㅤ{item.district}</Text>
+          <Text><Octicons name="location" size={15} color={COLOR.PRIMARY} />ㅤ{item.other_address}</Text>
+          <Text style={{ fontWeight: "bold" }}>Giá: {item.price} VNĐ</Text>
+          <Text style={{ fontWeight: "bold" }}>Diện tích: {item.area} m2</Text>
+          <TouchableOpacity>
+            <Text style={{ textAlign: "right", color: "lightgreen" }}> Xem chi tiết <AntDesign name="caretright" size={15} color="lightgreen" /> </Text>
+          </TouchableOpacity>
 
-      </View>
-    </View></TouchableWithoutFeedback>
+        </View>
+      </View></TouchableWithoutFeedback>
   );
   const nextMap = () => {
-    navigation.navigate('MapSearch', { previousScreen: 'SearchSc' });
+    const selectedCityName = getCityNameById(city);
+    const selectedDistrictName = getDistrictNameById(district);
+    const selectedWardName = wardMapping[ward];
 
+    navigation.navigate('MapSearch', {
+      previousScreen: 'SearchSc',
+      selectedCity: selectedCityName,
+      selectedDistrict: selectedDistrictName,
+      selectedWard: selectedWardName,
+    });
   }
+
+
 
   return (
     <View style={SearchStyle.container}>
@@ -256,7 +274,7 @@ const SearchSc = ({ route }) => {
         <Text style={HomeStyles.textHead}>Lọc tìm kiếm </Text>
 
       </View>
-      
+
       <TouchableOpacity style={SearchStyle.xoaLoc} onPress={handleClearFilter}>
         <MaterialIcons name="filter-alt-off" size={24} color="black" />
         <Text> Xóa lọc</Text>
@@ -271,7 +289,7 @@ const SearchSc = ({ route }) => {
               handleCityChange(value);
             }}
             placeholder={{ label: 'Chọn tỉnh/thành phố', value: null }}
-            items={cities.map(city => ({ label: city.full_name, value: city.full_name }))}
+            items={cities.map(city => ({ label: city.full_name, value: city.id }))}
           />
         </View>
         <View style={SearchStyle.selectContainer}>
@@ -282,7 +300,7 @@ const SearchSc = ({ route }) => {
               handleDistrictChange(value); // Gọi hàm xử lý khi quận/huyện được chọn
             }}
             placeholder={{ label: 'Chọn quận/huyện', value: null }}
-            items={districts.map(district => ({ label: district.full_name, value: district.full_name }))}
+            items={districts.map(district => ({ label: district.full_name, value: district.id }))}
           />
         </View>
 
@@ -359,7 +377,7 @@ const SearchSc = ({ route }) => {
         {searchStarted ? (
           <View>
             {data.length > 0 ? (
-              data.map((item, index) => renderItem({ item }))
+              data.map((item, index) => renderItem({ item, key: index }))
 
             ) : (
               <Text style={SearchStyle.noResultText} key="no-result">Không tìm thấy kết quả phù hợp.</Text>

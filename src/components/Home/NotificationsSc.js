@@ -36,21 +36,28 @@ const NotificationsSc = () => {
       </View>
 
       <ScrollView style={styles.scroll} showsVerticalScrollIndicator={false}>
-        {notifications.map((notification, index) => (
-          <View key={index} style={styles.notification}>
-            <Image
-              source={{ uri: notification.userAvatar }}
-              style={styles.avatar}
-            />
-            <View style={styles.notificationContent}>
-              <Text style={[styles.notificationText, styles.bold]}>
-                {notification.username}
-              </Text>
-              <Text style={styles.notificationText}>{notification.content}</Text>
-            </View>
-            <Text style={styles.dateText}>{caculatorTimeAgo(notification.time)}</Text>
+        {notifications.length === 0 ? (
+          <View style={styles.emptyContainer}>
+            <Image source={require('../../assets/images/noNotification.jpg')} style={{}} />
+            <Text style={{textAlign:"center", fontSize:20,}}>Bạn chưa có thông báo mới!</Text>
           </View>
-        ))}
+        ) : (
+          notifications.map((notification, index) => (
+            <View key={index} style={styles.notification}>
+              <Image
+                source={{ uri: notification.userAvatar }}
+                style={styles.avatar}
+              />
+              <View style={styles.notificationContent}>
+                <Text style={[styles.notificationText, styles.bold]}>
+                  {notification.username}
+                </Text>
+                <Text style={styles.notificationText}>{notification.content}</Text>
+              </View>
+              <Text style={styles.dateText}>{caculatorTimeAgo(notification.time)}</Text>
+            </View>
+          ))
+        )}
       </ScrollView>
     </View>
   );

@@ -111,6 +111,12 @@ const DetailOwner = ({ route, navigation }) => {
     }
     const handleEditPost = (postId, post) => {
         navigation.navigate("Editpost", { postId: postId, post: post });
+        navigation.addListener('focus', async () => {
+
+            setRenderPost(!renderPost);
+
+
+        });
     }
     const handleDeletePost = async (idPost) => {
         try {
@@ -151,7 +157,7 @@ const DetailOwner = ({ route, navigation }) => {
                     postData.map((post, index) => (
                         <View style={DetailOwnerStyle.postContainer} key={index}>
                             {/* <Text style={DetailOwnerStyle.postTitle}>Bài đăng {index + 1}</Text> */}
-                            <Text>{post.id}</Text>
+                            {/* <Text>{post.id}</Text> */}
                             <View style={DetailOwnerStyle.userInfoContainer}>
                                 <Image
                                     source={{ uri: post.user.avatar }}
@@ -237,10 +243,10 @@ const DetailOwner = ({ route, navigation }) => {
         );
     };
     const chatUser = (id) => {
-        navigation.navigate("ChatDetail", { ownerId:id });
+        navigation.navigate("ChatDetail", { ownerId: id });
     }
-    
-    
+
+
     return (
         <ScrollView contentContainerStyle={DetailOwnerStyle.scrollViewContent}>
             {loading ? <ActivityIndicator color={COLOR.PRIMARY} /> : (
