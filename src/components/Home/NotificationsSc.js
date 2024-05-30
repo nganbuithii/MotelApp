@@ -106,7 +106,7 @@ const styles = StyleSheet.create({
   notification: {
     flexDirection: 'row',
     alignItems: 'flex-start',
-    marginVertical: 5,
+    marginTop: 5,
     padding: 15,
     backgroundColor: COLOR.offWhite,
     borderRadius: 10,
@@ -115,7 +115,7 @@ const styles = StyleSheet.create({
     ...SHADOWS.medium,
     borderLeftColor: COLOR.PRIMARY,
     borderLeftWidth: 5,
-    marginBottom: 10,
+    marginBottom: 5,
   },
   avatar: {
     width: 45,
@@ -130,10 +130,12 @@ const styles = StyleSheet.create({
     flexDirection: 'column',
     flexWrap: 'wrap',
 
+
   },
   notificationText: {
     fontSize: 16,
     color: COLOR.black,
+    width:"98%"
   },
   bold: {
     fontWeight: 'bold',

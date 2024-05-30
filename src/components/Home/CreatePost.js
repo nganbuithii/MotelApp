@@ -1,5 +1,5 @@
-import { View, Text, Image, StyleSheet, TextInput, TouchableOpacity, ScrollView } from "react-native";
-import React, { useContext, useState } from "react";
+import { View, Text, Image, StyleSheet, TextInput, TouchableOpacity, ScrollView, Alert } from "react-native";
+import React, { useContext, useEffect, useState } from "react";
 import ButtonAuth from "../common/ButtonAuth";
 import { COLOR, SHADOWS } from "../common/color";
 import MyContext from "../../configs/MyContext";
@@ -9,6 +9,8 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { authApi, endpoints } from "../../configs/API";
 import { Ionicons } from '@expo/vector-icons';
 import PostCreateStyle from "../../Styles/PostCreateStyle";
+import { firestore } from "../../configs/firebase";
+import { addDoc, collection, getDocs, getDoc } from "firebase/firestore";
 
 const CreatePost = ({ navigation }) => {
     const [motels, setMotels] = useState([]);
@@ -20,6 +22,8 @@ const CreatePost = ({ navigation }) => {
     const [contentError, setContentError] = useState("");
     const [houseError, setHouseError] = useState("");
 
+    const [follower, setFollower] = useState([]);
+
 
     const getMotel = async () => {
         try {
@@ -27,15 +31,64 @@ const CreatePost = ({ navigation }) => {
             let response = await authApi(token).get(endpoints['detailMotelOwner'](user.id));
             let motelData = response.data;
             // Lọc ra các bài đăng có cờ approved là true
-        const approvedMotels = motelData.filter(motel => motel.approved === true);
-        
-        setMotels(approvedMotels);
-        console.log("Get data nhà trọ của user:", approvedMotels);
-        return approvedMotels;
+            const approvedMotels = motelData.filter(motel => motel.approved === true);
+
+            setMotels(approvedMotels);
+            console.log("Get data nhà trọ của user:", approvedMotels);
+            return approvedMotels;
         } catch (ex) {
             console.error(ex);
         }
     }
+    const getUserFollow = async () => {
+        try {
+            const token = await AsyncStorage.getItem("access-token");
+            let res = await authApi(token).get(endpoints["getFollowing"](user.id));
+            // Lấy chỉ các ID từ mảng người dùng và đưa vào mảng follower
+            const followerIds = res.data.map(user => user.id);
+            setFollower(followerIds);
+            console.log(followerIds);
+
+        } catch (ex) {
+            Alert.alert("Lỗi", ex);
+        }
+    }
+    useEffect(() => {
+        getUserFollow();
+
+
+    }, [])
+    const sendNotificationToFollowers = async (postId) => {
+        const timestamp = new Date();
+        const followersCollectionRef = collection(firestore, "Followers");
+
+        try {
+
+
+            // Với mỗi ID người theo dõi, gửi thông báo
+            follower.forEach(async (followerId) => {
+                // Gửi thông báo cho người theo dõi
+                if (followerId != user.id) {
+                    await addDoc(collection(firestore, "Notifications"), {
+                        userLike: user.id,
+                        userAvatar: user.avatar,
+                        username: user.username,
+                        postId: postId,
+                        ownerPostId: followerId,
+                        time: timestamp,
+                        title: user.username,
+                        content: " đã đăng bài viết mới."
+                    });
+
+                    console.log("Thông báo đã được gửi cho người theo dõi:", followerId);
+                }
+
+            });
+
+        } catch (error) {
+            console.error("Lỗi khi gửi thông báo cho người theo dõi:", error);
+        }
+    };
 
     const selectHouse = (house) => {
         setSelectedHouse(house);
@@ -63,6 +116,8 @@ const CreatePost = ({ navigation }) => {
                         'Content-Type': 'multipart/form-data',
                     },
                 });
+                // Gửi thông báo cho người theo dõi
+                await sendNotificationToFollowers(res.data.id, content);
                 console.log("Đăng bài thành công");
                 console.log("res daata post:", res.data);
                 navigation.goBack();
