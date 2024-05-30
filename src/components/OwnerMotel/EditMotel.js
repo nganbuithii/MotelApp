@@ -129,14 +129,18 @@ const EditMotel = ({ navigation, route }) => {
         districtMapping[district.id] = district.full_name;
     });
 
-    // Hàm để chuyển đổi ID thành tên tỉnh/thành phố, quận/huyện
     const getCityNameById = (cityId) => {
         return cityMapping[cityId] || '';
     };
-
+    
     const getDistrictNameById = (districtId) => {
         return districtMapping[districtId] || '';
     };
+    
+    const getWardNameById = (wardId) => {
+        return wardMapping[wardId] || '';
+    };
+    
     // Tạo bảng dữ liệu ánh xạ ID và tên của xã/phường
     const wardMapping = {};
     wards.forEach(ward => {
@@ -433,9 +437,9 @@ const EditMotel = ({ navigation, route }) => {
             console.log("ID MOTEL", idMotel)
 
             // So sánh giá trị hiện tại với giá trị ban đầu
-            if (ward !== initialState.ward) { formData.append("ward", ward); }
-            if (district !== initialState.district) { formData.append("district", district); }
-            if (city !== initialState.city) { formData.append("city", city); }
+            if (ward !== initialState.ward) { formData.append("ward", getWardNameById(ward)); }
+            if (district !== initialState.district) { formData.append("district", getDistrictNameById(district)); }
+            if (city !== initialState.city) { formData.append("city", getCityNameById(city)); }
             if (other !== initialState.other) { formData.append("other_address", other); }
             if (price !== initialState.price) { formData.append("price", price); }
             if (area !== initialState.area) { formData.append("area", area); }
@@ -455,6 +459,7 @@ const EditMotel = ({ navigation, route }) => {
                 );
                 return;
             }
+            console.log(formData)
             const response = await authApi(token).patch(endpoints["updateMotel"](idMotel), formData, {
                 headers: {
                     'Content-Type': 'multipart/form-data',

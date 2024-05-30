@@ -13,9 +13,9 @@ import MyContext from "../../configs/MyContext";
 import { authApi } from "../../configs/API";
 import { endpoints } from "../../configs/API";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import Toast from 'react-native-toast-message';
 import PlusOwnerStyle from "../../Styles/PlusOwnerStyle";
-
+import showToast from "../common/ToastMessage";
+import { MaterialCommunityIcons } from '@expo/vector-icons';
 
 const PlusOwner = () => {
     const [currentImageIndex, setCurrentImageIndex] = useState(0);
@@ -35,7 +35,7 @@ const PlusOwner = () => {
             let response = await authApi(token).get(endpoints['detailMotelOwner'](user.id));
             let motelData = response.data;
             setMotels(response.data); // Cập nhật state với dữ liệu từ response.data
-            console.log("FETCH API motel", response.data);
+            // console.log("FETCH API motel", response.data);
             return motelData;
 
         } catch (ex) {
@@ -52,26 +52,7 @@ const PlusOwner = () => {
 
                 let token = await AsyncStorage.getItem("access-token");
                 console.log("token", token);
-                console.log("motel data:", motelData);
-                // await Promise.all(motelData.map(async (motel) => {
-                //     try {
-                //         const idMotel = motel.id;
-                //         const res = await authApi(token).get(endpoints['getImageMotel'](idMotel));
-                //         console.log("IMAGES", res.data);
-                //         const motelImages = res.data.motel_images;
-                //         const motelPrices = res.data.prices;
-                //         setStoredMotels(prevMotels => prevMotels.map(prevMotel => {
-                //             if (prevMotel.id === idMotel) {
-                //                 return { ...prevMotel, images: motelImages, prices: motelPrices };
-                //             }
-                //             return prevMotel;
-                //         }));
-                //     } catch (error) {
-                //         console.error("Error fetching images for motel", motel.id, error);
-                //         // Xử lý lỗi ở đây nếu cần thiết
-                //     }
-                // }));
-
+                // console.log("motel data:", motelData);
                 setIsLoading(false);
                 setMotels(motelData);
             }
@@ -95,25 +76,8 @@ const PlusOwner = () => {
 
         // Xóa interval khi component bị unmount để tránh memory leak
         return () => clearInterval(interval);
-    }, []); // Dùng mảng rỗng để chỉ chạy useEffect một lần sau khi component được render
+    }, []); 
 
-    // const renderHouseItem = ({ item }) => (
-    //     <View style={styles.imageContainer}>
-    //         <Image
-    //             source={{ uri: item.url }}
-    //             style={styles.imgMotel}
-    //         />
-    //     </View>
-    // );
-    const showToast = () => {
-        Toast.show({
-            type: 'success',
-            text1: 'Thành công',
-            text2: 'Xóa nhà trọ thành công.',
-            visibilityTime: 3000, // Thời gian tồn tại của toast (milliseconds)
-            autoHide: true, // Tự động ẩn toast sau khi hết thời gian tồn tại
-        });
-    }
     const handlePress = () => {
         navigation.navigate("Home"); // Quay lại trang trước đó
 
@@ -121,8 +85,8 @@ const PlusOwner = () => {
     const handleEdit = (motel) => {
         // Xử lý khi nút "Sửa" được nhấn
         navigation.navigate("EditMotel", { idMotel: motel.id });
-        console.log("ID Motel KHI EDIT", motel.id)
-        console.log("Motel khi giá cả", motel.prices)
+        // console.log("ID Motel KHI EDIT", motel.id)
+        // console.log("Motel khi giá cả", motel.prices)
         setTriggerRender(!triggerRender);
         navigation.addListener('focus', async () => {
             await fetchMotels(); // Cập nhật lại danh sách nhà trọ sau khi thêm mới
@@ -133,8 +97,7 @@ const PlusOwner = () => {
         // Xử lý khi nút "Xóa" được nhấn
         try {
             let token = await AsyncStorage.getItem("access-token");
-            console.log("TOKEN", token);
-            console.log("ID", idMotel);
+
 
             // Hiển thị cửa sổ cảnh báo
             Alert.alert(
@@ -159,9 +122,9 @@ const PlusOwner = () => {
                             // Cập nhật AsyncStorage với danh sách nhà trọ mới
                             await AsyncStorage.setItem("motels", JSON.stringify(updatedMotels));
                             const motelsauxoa = await AsyncStorage.getItem("motels");
-                            console.log("Motel sau xóa:", motelsauxoa);
+                            // console.log("Motel sau xóa:", motelsauxoa);
                             setIsLoading(false);
-                            showToast();
+                            showToast({ type: "success", text1: "Thành công", text2: "Xóa nhà trọ thành công" });
                         },
                     },
                 ],
@@ -227,6 +190,7 @@ const PlusOwner = () => {
                                 <FontAwesome6 name="location-dot" style={PlusOwnerStyle.icon} size={20} color={COLOR.PRIMARY} />
                                 <Text style={PlusOwnerStyle.locationText}>{item.ward}- {item.district}- {item.city}</Text>
                             </View>
+                            
                             <FlatList
                                 data={item.images || []}
                                 renderItem={({ item }) => (

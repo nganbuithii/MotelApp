@@ -80,7 +80,7 @@ const HomeIndex = ({ route }) => {
       let res = await authApi(token).get(endpoints["getAllPostForOwner"]);
       // console.log(res.data);
       setPosts(res.data.results);
-      console.log(res.data.results);
+      // console.log(res.data.results);
       // Cập nhật likedState dựa trên dữ liệu bài đăng
       const newLikedState = {};
       res.data.results.forEach(post => {
@@ -121,7 +121,7 @@ const HomeIndex = ({ route }) => {
         }
         return post;
       }));
-      console.log(ownerPostId);
+      // console.log(ownerPostId);
       // Lưu thông báo vào Firestore
       if (user.id !== ownerPostId) {
         await saveNotificationToFirestore(postId, ownerPostId, " đã thích bài viết của bạn");
@@ -161,8 +161,8 @@ const HomeIndex = ({ route }) => {
     }
   };
   const handleComment = (postId,ownerPostId) => {
-    console.log(postId);
-    console.log(ownerPostId);
+    // console.log(postId);
+    // console.log(ownerPostId);
     navigation.navigate("Comment", { postId: postId , ownerPostId:ownerPostId});
 
     navigation.addListener('focus', async () => {
@@ -235,8 +235,8 @@ const HomeIndex = ({ route }) => {
   const handleUpdatePost = async (postId) => {
     try {
       const token = await AsyncStorage.getItem("access-token");
-      console.log(token);
-      console.log(postId);
+      // console.log(token);
+      // console.log(postId);
       // Kiểm tra xem có sự thay đổi nào không
       const currentPost = posts.find(post => post.id === postId);
       const formData = new FormData();
@@ -264,7 +264,7 @@ const HomeIndex = ({ route }) => {
 
 
       showToast({ type: "success", text1: "Thành công", text2: "Cập nhật thành công" });
-      console.log("Cập nhật bài đăng:", postId);
+      // console.log("Cập nhật bài đăng:", postId);
       setRender(!render);
       handleModalClose();
 
@@ -280,8 +280,7 @@ const HomeIndex = ({ route }) => {
       let response = await authApi(token).get(endpoints['detailMotelOwner'](user.id));
       let motelData = response.data;
       setMotels(response.data);
-      console.log("Get data nhà trọ của user:", response.data);
-      setMotels(response.data);
+      // console.log("Get data nhà trọ của user:", response.data);
       return motelData;
     } catch (ex) {
       console.error("Lỗi get motel", ex);
@@ -291,9 +290,9 @@ const HomeIndex = ({ route }) => {
     try {
       const token = await AsyncStorage.getItem("access-token");
       let res = await authApi(token).get(endpoints["getAllPostForRent"]);
-      console.log("Bài đăng forr rent", res.data);
+      // console.log("Bài đăng forr rent", res.data);
       setPosts(res.data.results);
-      console.log(res.data.results);
+      // console.log(res.data.results);
       // Cập nhật likedState dựa trên dữ liệu bài đăng
       const newLikedState = {};
       res.data.results.forEach(post => {
@@ -329,43 +328,8 @@ const HomeIndex = ({ route }) => {
 
     });
   }
-  // const fetchNextPagePost = async () => {
-  //   try {
-  //     setLoading(true); // Đánh dấu loading khi bắt đầu fetch dữ liệu
-  //     const nextPage = page + 1;
-  //     setPage(nextPage);
-  //     console.log("PAGE:", nextPage);
-  //     console.log("fetchNextPagePost được gọi khi cuộn đến cuối view");
-  //     const token = await AsyncStorage.getItem("access-token");
-  //     let res = await authApi(token).get(endpoints["getAllPostForOwner"], {
-  //       params: { page: nextPage }
-  //     });
-  //     const newData = res.data.results;
-  //     console.log("Data mới được fetch", res.data.results);
-  //     console.log("NEW", newData);
-  //     // Kiểm tra nếu newData không rỗng thì cập nhật danh sách bài đăng
-  //     if (newData && newData.length > 0) {
-  //       setPosts(prevPosts => [...prevPosts, ...newData]);
-  //     }
-  //     setFetchPage(true);
-  //   } catch (ex) {
-  //     console.error("lỗi fetchNextPagePost", ex);
-  //   }
-  // }
-  // const handleScroll = (event) => {
-  //   // console.log("Hàm đc gọi");
-  //   const { layoutMeasurement, contentOffset, contentSize } = event.nativeEvent;
-  //   // console.log(layoutMeasurement);
-  //   // console.log(contentOffset);
-  //   // console.log("CONTENT SIZE",contentSize);
-  //   // Kiểm tra nếu nội dung đã cuộn đến cuối và không đang loading thì fetch dữ liệu mới
-  //   if (layoutMeasurement.height + contentOffset.y >= contentSize.height - 1000 && !loading) {
-  //     console.log("ok");
-  //     fetchNextPagePost();
-  //   }
-  // };
   const handleDetail = (idMotel) => {
-    console.log(idMotel);
+    // console.log(idMotel);
     navigation.navigate("PostDetail", { idMotel: idMotel })
   }
   const handleShare = (id) => {
@@ -378,8 +342,8 @@ const HomeIndex = ({ route }) => {
   const handleFollow = async (idUser) => {
     try {
       const token = await AsyncStorage.getItem("access-token");
-      console.log(token);
-      console.log("í user", idUser);
+      // console.log(token);
+      // console.log("í user", idUser);
       let res = await authApi(token).post(endpoints["follow"](idUser));
       // setOwnerFollowed(true);
       console.log("follow họ thành công");
@@ -398,7 +362,7 @@ const HomeIndex = ({ route }) => {
     try {
       const token = await AsyncStorage.getItem("access-token");
       let res = await authApi(token).get(endpoints["getMotelFilter"]);
-      console.log("DATAAAAAAAA NHÀ TRỌ ALL:", res.data);
+      // console.log("DATAAAAAAAA NHÀ TRỌ ALL:", res.data);
 
       const updatedResults = [];
       for (const motel of res.data.results) {
@@ -407,7 +371,7 @@ const HomeIndex = ({ route }) => {
       }
 
       setDataMotel(updatedResults);
-      console.log("DATA UPDATED RESULTS:", updatedResults);
+      // console.log("DATA UPDATED RESULTS:", updatedResults);
       setLoadData(false);
     } catch (ex) {
       console.error("lỗi get all motel", ex);
@@ -418,7 +382,7 @@ const HomeIndex = ({ route }) => {
     try {
       const token = await AsyncStorage.getItem("access-token");
       const res = await authApi(token).get(endpoints["detailMotel"](id));
-      console.log(res.data);
+      // console.log(res.data);
 
       // Kiểm tra xem có hình ảnh được trả về hay không
       if (res.data.images && res.data.images.length > 0) {
@@ -439,7 +403,7 @@ const HomeIndex = ({ route }) => {
 
   useEffect(() => {
     getAllMotel();
-    console.log("DATAAAAA3J23IO23:", dataMotel);
+    // console.log("DATAAAAA3J23IO23:", dataMotel);
   }, [])
   const fetchNextPagePost = async () => {
     try {
@@ -449,7 +413,7 @@ const HomeIndex = ({ route }) => {
       // Fetch dữ liệu của trang tiếp theo
       let res = await authApi(token).get(`https://motel.pythonanywhere.com/post/for_lease/?page=${newPage}`);
       const newData = res.data.results;
-      console.log("DATTTTTTTTTTAAA PAGE MỚI", newData);
+      // console.log("DATTTTTTTTTTAAA PAGE MỚI", newData);
       if (res.data.next == null) {
         setHasNextPage(false);
       }

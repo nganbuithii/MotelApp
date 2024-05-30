@@ -13,6 +13,8 @@ import { endpoints, authApi } from "../../configs/API";
 import { ActivityIndicator } from "react-native-paper";
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { COLOR } from "../common/color";
+import PostStyle from "../Tenant/PostStyle";
+import { Ionicons } from "@expo/vector-icons";
 
 const Login = ({ navigation }) => {
     const [username, setUsername] = useState('');
@@ -20,74 +22,81 @@ const Login = ({ navigation }) => {
     const [user, dispatch] = React.useContext(MyContext);
     const [loading, setLoading] = useState(false);
     const [hasMotel, setHasMotel] = useState(false);
+    const [nameErr, setNameErr] = useState("");
+    const [passErr, setPassErr] = useState("");
+    const checkPassword = (password) => {
+        const regex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+        return regex.test(password);
+    };
+
     const loginApp = async () => {
-        setLoading(true);
 
+        // if (!username) { setNameErr("Vui lòng nhập username"); } else { setNameErr(""); }
+        // if (!password) { setPassErr("Vui lòng nhập password"); return; } else { setPassErr(""); }
+        // if (password.length < 8) { setPassErr("Mật khẩu phải có ít nhất 8 ký tự"); return; } else { setPassErr(""); }
 
-        try {
-            let header = {
-                'Content-Type': 'application/x-www-form-urlencoded' // Change Content-Type
-            };
-            let data = {
-                // username: username,
-                // password: password,
-                // username: "Nganbui",
-                // password: "Meomeo@123",
-                // username:"ngan",
-                // password:"123456",
-                // username:"M",
-                // password:"Meomeo@123",
-                client_id: "8OdjuOvhjzLFCigIbuw3mbDAlhWTirzeM7s1W1g2",
-                client_secret:
-                    "8pj5yZzwnH0vN3hflMrJJ7QBENDCsMKfIUlGQ15Gyg9GPTRCFXsIxm7iiF7xmcPf2IOz5uIXmfD9TjXJI3mKWHIQQ1HStaY3duHkIrSc4GWJGcyg1ZQgKtYIOxRksXia",
-                grant_type: "password",
-            };
-            let res = await API.post(endpoints["login"], data, { headers: header });
-            console.log(res.data);
+        // // Kiểm tra mật khẩu theo regex
+        // if (!checkPassword(password)) { setPassErr("Mật khẩu không phù hợp yêu cầu "); return; }
+        // else { setPassErr(""); }
+        // if (username && password) {
+            try {
+                setLoading(true);
+                let header = {
+                    'Content-Type': 'application/x-www-form-urlencoded' // Change Content-Type
+                };
+                let data = {
+                    // username: username,
+                    // password: password,
+                    username: "Nganbui",
+                    password: "Meomeo@123",
+                    // username:"ngan",
+                    // password:"123456",
+                    // username:"M",
+                    // password:"Meomeo@123",
+                    client_id: "8OdjuOvhjzLFCigIbuw3mbDAlhWTirzeM7s1W1g2",
+                    client_secret:
+                        "8pj5yZzwnH0vN3hflMrJJ7QBENDCsMKfIUlGQ15Gyg9GPTRCFXsIxm7iiF7xmcPf2IOz5uIXmfD9TjXJI3mKWHIQQ1HStaY3duHkIrSc4GWJGcyg1ZQgKtYIOxRksXia",
+                    grant_type: "password",
+                };
+                let res = await API.post(endpoints["login"], data, { headers: header });
+                console.log(res.data);
+                await AsyncStorage.setItem("access-token", res.data.access_token);
+                let userRes = await authApi(res.data.access_token).get(endpoints["current_user"]);
+                let userData = userRes.data;
 
-            // Lưu access token vào AsyncStorage
-            await AsyncStorage.setItem("access-token", res.data.access_token);
+                // Lưu thông tin người dùng vào Context hoặc State
+                dispatch({
+                    type: "login",
+                    payload: userData,
+                });
 
-            // Gửi yêu cầu GET để lấy thông tin người dùng
-            let userRes = await authApi(res.data.access_token).get(endpoints["current_user"]);
-            let userData = userRes.data;
+                // Gọi hàm kiểm tra nhà trọ của người dùng và chờ đợi kết quả
+                const hasMotelData = await checkMotel(userData.id);
+                console.log("hasmotel:", hasMotelData);
+                console.log("role", userData.user_role);
 
-            // Lưu thông tin người dùng vào Context hoặc State
-            dispatch({
-                type: "login",
-                payload: userData,
-            });
+                if (userData.user_role === "TENANT") {
+                    navigation.navigate("Home");
+                } else {
+                    let targetScreen = hasMotelData ? 'Home' : 'RegisterMotel';
+                    navigation.navigate(targetScreen);
+                }
 
-            // Gọi hàm kiểm tra nhà trọ của người dùng và chờ đợi kết quả
-            const hasMotelData = await checkMotel(userData.id);
-            console.log("hasmotel:", hasMotelData);
-            console.log("role", userData.user_role);
-            // Xác định màn hình chuyển hướng
-            if (userData.user_role === "TENANT") {
-                navigation.navigate("Home");
-            } else {
-                let targetScreen = hasMotelData ? 'Home' : 'RegisterMotel';
+                console.log(userData);
+                setUsername("");
+                setPassword("");
+            } catch (error) {
+                setLoading(false);
 
-                // Chuyển hướng đến màn hình tương ứng
-                navigation.navigate(targetScreen);
+                if (error.response) {
+                    let errorMessage = error.response.data.error_description || 'Lỗi đăng nhập. Vui lòng thử lại sau.';
+                    Alert.alert('Lỗi', errorMessage);
+                }
+            } finally {
+                setLoading(false);
             }
+        // }
 
-            console.log(userData); // Log thông tin người dùng
-            setUsername("");
-            setPassword("");
-        } catch (error) {
-            setLoading(false);
-
-            if (error.response) {
-                // Trích xuất thông báo lỗi từ phản hồi
-                let errorMessage = error.response.data.error_description || 'Có lỗi xảy ra. Vui lòng thử lại sau.';
-
-                // Hiển thị thông báo lỗi
-                Alert.alert('Lỗi', errorMessage);
-            }
-        } finally {
-            setLoading(false);
-        }
     };
 
     // Hàm kiểm tra xem người dùng có nhà trọ hay không
@@ -133,13 +142,15 @@ const Login = ({ navigation }) => {
             >
                 <View style={[AuthStyles.formContainer, AuthStyles.mt15, AuthStyles.flex]}>
                     <Text style={MyStyles.textHead}>ĐĂNG NHẬP TÀI KHOẢN</Text>
+                    {!!nameErr && <Text style={PostStyle.errorText}><Ionicons name="warning" size={12} color="red" />{nameErr}</Text>}
                     <InputField value={username} onChangeText={text => setUsername(text)} label="Tên đăng nhập" />
+                    {!!passErr && <Text style={PostStyle.errorText}><Ionicons name="warning" size={12} color="red" />{passErr}</Text>}
                     <InputPassword value={password} onChangeText={text => setPassword(text)} />
 
 
-                    <Text style={AuthStyles.txtLeft}>Quên mật khẩu?</Text>
+                    {/* <Text style={AuthStyles.txtLeft}>Quên mật khẩu?</Text> */}
 
-                    {loading ? (<ActivityIndicator color={COLOR.PRIMARY}/>) : (
+                    {loading ? (<ActivityIndicator color={COLOR.PRIMARY} />) : (
                         <ButtonAuth title="Đăng nhập" onPress={loginApp} />)}
 
 
