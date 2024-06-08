@@ -36,13 +36,15 @@ const NotificationsSc = () => {
   }, []);
   
   const handleNotificationPress = (notification) => {
-    // Kiểm tra nếu nội dung thông báo là "đã bình luận bài viết của bạn" thì mới chuyển hướng
-    if (notification.content === "đã bình luận bài viết của bạn") {
+    if (notification.content.includes("thích")) {
       console.log("Thông báo đã được nhấp vào:", notification);
-      // Sử dụng navigation.navigate để điều hướng đến màn hình Comment và truyền props
-      navigation.navigate("Comment", { postId: notification.postId });
+      navigation.navigate("DetailPost");
+    } else if (notification.content.includes("bình luận")) {
+      console.log("Thông báo đã được nhấp vào:", notification);
+      navigation.navigate("Comment", { postId: notification.postId, ownerPostId:notification.ownerPostId });
     }
   }
+  
 
   return (
     <View style={styles.container}>

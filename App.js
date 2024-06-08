@@ -34,6 +34,7 @@ import Editpost from './src/components/Tenant/Editpost';
 import MapSearch from './src/components/common/MapSearch';
 import { MaterialIcons } from '@expo/vector-icons';
 import { TouchableOpacity } from 'react-native-gesture-handler';
+import DetailPost from './src/components/Home/DetailPost';
 
 //Điều hướng kiểu stack
 const Stack = createStackNavigator();
@@ -77,6 +78,9 @@ export default function App() {
             options={{ headerShown: false }} />
           <Stack.Screen name="Editpost" component={Editpost}
             options={{ headerTitle: 'Chỉnh sửa bài viết' }}
+          />
+          <Stack.Screen name="DetailPost" component={DetailPost}
+            options={{ headerTitle: 'abc' }}
           />
           <Stack.Screen name="ChatDetail" component={ChatDetail}
             options={{ headerShown: false }} />
