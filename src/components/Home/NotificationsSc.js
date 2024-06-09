@@ -42,6 +42,10 @@ const NotificationsSc = () => {
     } else if (notification.content.includes("bình luận")) {
       console.log("Thông báo đã được nhấp vào:", notification);
       navigation.navigate("Comment", { postId: notification.postId, ownerPostId:notification.ownerPostId });
+    } else if (notification.content.includes("theo dõi")) {
+      console.log("Thông báo đã được nhấp vào:", notification);
+      // navigation.navigate("Comment", { postId: notification.postId, ownerPostId:notification.ownerPostId });
+      navigation.navigate("DetailOwner", { ownerId: notification.userLike});
     }
   }
   

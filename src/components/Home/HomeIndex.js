@@ -1,4 +1,4 @@
-import React, { useCallback, useContext, useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { View, Text, Image, StyleSheet, TextInput, Dimensions, TouchableWithoutFeedback, Alert, ImageBackground, } from "react-native";
 import { FontAwesome5 } from '@expo/vector-icons';
 import MyStyles from "../../Styles/MyStyles";
@@ -9,7 +9,7 @@ import { Entypo } from "@expo/vector-icons";
 import { Feather } from "@expo/vector-icons";
 import { COLOR, SHADOWS } from "../common/color";
 import { useNavigation } from "@react-navigation/native";
-import API, { authApi, endpoints } from "../../configs/API";
+import { authApi, endpoints } from "../../configs/API";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import Modal from 'react-native-modalbox';
 import { Button } from "react-native-paper";
@@ -24,7 +24,7 @@ import { addDoc, collection } from "firebase/firestore";
 
 const HomeIndex = ({ route }) => {
   const [postContent, setPostContent] = useState("");
-  const [user, dispatch] = useContext(MyContext);
+  const [user] = useContext(MyContext);
   const navigation = useNavigation();
   const [posts, setPosts] = useState([]);
   const [likedState, setLikedState] = useState({});
@@ -33,27 +33,19 @@ const HomeIndex = ({ route }) => {
   const [selectedHouse, setSelectedHouse] = useState(null);
   const [loading, setLoading] = useState(false);
   const [loadData, setLoadData] = useState(true);
-
-  const [fetchPage, setFetchPage] = useState(false);
   const [hasNextPage, setHasNextPage] = useState(false);
   let newPage = 1;
-
-
-  // const [showHouseList, setShowHouseList] = useState(true);
   const [modalsEdit, setModalsEdit] = useState({});
   const [content, setContent] = useState();
-
   const [tinTimNhaActive, setTinTimNhaActive] = useState(false);
   const [tinChoThueActive, setTinChoThueActive] = useState(true);
-  const [page, setPage] = useState(1); // Trang hiện tại
   const [dataMotel, setDataMotel] = useState([]);
-
   const [motels, setMotels] = useState([]);
-  // const [liked, setLiked] = useState(false);
-  const [displayRentPosts, setDisplayRentPosts] = useState(false); // State để kiểm soát việc hiển thị bài đăng thuê
+  const [setDisplayRentPosts] = useState(false);
+  const [followed, setFollow] = useState(false);
   const selectHouse = (house) => {
     setSelectedHouse(house);
-    console.log("Selected House:", house); // Log house thay vì selectedHouse
+    console.log("Selected House:", house);
   };
 
   const handlePostChange = (text) => {
@@ -141,7 +133,7 @@ const HomeIndex = ({ route }) => {
   const saveNotificationToFirestore = async (postId, ownerId, content) => {
     const timestamp = new Date();
     const notificationsCollectionRef = collection(firestore, "Notifications");
-  
+
     try {
       await addDoc(notificationsCollectionRef, {
         userLike: user.id,
@@ -153,17 +145,17 @@ const HomeIndex = ({ route }) => {
         title: user.username,
         content: content
       });
-  
+
       console.log("Thông báo đã được lưu vào Firestore");
-  
+
     } catch (error) {
       console.error("Lỗi khi lưu thông báo vào Firestore:", error);
     }
   };
-  const handleComment = (postId,ownerPostId) => {
+  const handleComment = (postId, ownerPostId) => {
     // console.log(postId);
     // console.log(ownerPostId);
-    navigation.navigate("Comment", { postId: postId , ownerPostId:ownerPostId});
+    navigation.navigate("Comment", { postId: postId, ownerPostId: ownerPostId });
 
     navigation.addListener('focus', async () => {
       if (tinTimNhaActive == true) {
@@ -342,21 +334,28 @@ const HomeIndex = ({ route }) => {
   const handleFollow = async (idUser) => {
     try {
       const token = await AsyncStorage.getItem("access-token");
-      // console.log(token);
-      // console.log("í user", idUser);
+      console.log(followed);
       let res = await authApi(token).post(endpoints["follow"](idUser));
-      // setOwnerFollowed(true);
-      console.log("follow họ thành công");
-      if (tinTimNhaActive == true) {
+      const newFollowState = !followed;
+      console.log(newFollowState);
+      setFollow(newFollowState);
+      if (newFollowState) {
+        await saveNotificationToFirestore(null, idUser, " đã theo dõi bạn");
+        console.log("Theo dõi họ thành công");
+      } 
+  
+      // Xử lý các trạng thái tin tức
+      if (tinTimNhaActive) {
         getAllPostForRent();
-      } else if (tinChoThueActive == true) {
+      } else if (tinChoThueActive) {
         setRender(!render);
       }
-
+  
     } catch (ex) {
-      console.error("Lỗi folloe", ex);
+      console.error("Lỗi follow", ex);
     }
-  }
+  };
+  
 
   const getAllMotel = async () => {
     try {
@@ -683,7 +682,7 @@ const HomeIndex = ({ route }) => {
                   </TouchableWithoutFeedback>
                   <Text style={{ fontWeight: "bold" }}>{post.comment_count} </Text>
 
-                  <TouchableWithoutFeedback onPress={() => handleComment(post.id,post.user.id)}>
+                  <TouchableWithoutFeedback onPress={() => handleComment(post.id, post.user.id)}>
                     <Feather
                       style={HomeStyles.iconPost}
                       name="message-circle"
