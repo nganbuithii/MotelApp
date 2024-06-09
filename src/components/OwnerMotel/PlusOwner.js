@@ -16,6 +16,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import PlusOwnerStyle from "../../Styles/PlusOwnerStyle";
 import showToast from "../common/ToastMessage";
 import { MaterialCommunityIcons } from '@expo/vector-icons';
+import LoadingPage from "../Loading/LoadingPage";
 
 const PlusOwner = () => {
     const [currentImageIndex, setCurrentImageIndex] = useState(0);
@@ -165,7 +166,7 @@ const PlusOwner = () => {
                 </View>
             </TouchableWithoutFeedback>
             {isLoading ? ( // Kiểm tra nếu đang tải dữ liệu
-                <ActivityIndicator size="large" color={COLOR.PRIMARY} /> // Hiển thị biểu tượng loading
+                <LoadingPage/>
             ) : (
                 <ScrollView style={{ flex: 1 }} showsVerticalScrollIndicator={false}>
                     {storedMotels.map((item, index) => (

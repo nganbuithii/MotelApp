@@ -109,7 +109,17 @@ export default StyleSheet.create({
         padding: 10,
         ...SHADOWS.small,
         borderRadius: 10,
-
+        
+    },
+    itemContainer2: {
+        flexDirection: 'row',
+        marginBottom: 10,
+        marginTop: 15,
+        backgroundColor: "#fff",
+        padding: 10,
+        ...SHADOWS.small,
+        borderRadius: 10,
+        width:"90%"
     },
     image: {
         width: 100,

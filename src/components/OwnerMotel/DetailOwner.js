@@ -17,6 +17,7 @@ import { ActivityIndicator } from "react-native-paper";
 const now = new Date();
 import DetailOwnerStyle from "../../Styles/DetailOwnerStyle";
 import showToast from "../common/ToastMessage";
+import LoadingPage from "../Loading/LoadingPage";
 
 
 
@@ -249,7 +250,7 @@ const DetailOwner = ({ route, navigation }) => {
 
     return (
         <ScrollView contentContainerStyle={DetailOwnerStyle.scrollViewContent}>
-            {loading ? <ActivityIndicator color={COLOR.PRIMARY} /> : (
+            {loading ? <LoadingPage/> : (
                 <View style={DetailOwnerStyle.container}>
                     <Image
                         source={{ uri: owner.avatar }}
