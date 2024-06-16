@@ -38,6 +38,7 @@ export const endpoints = {
     getFollowing:(idUser) => `/user/${idUser}/following/`, // lẤY Ds người đang theo dõi   mk
     updatePostRent:(idPost) => `/post/for_rent/${idPost}/`,
     getPostOfUser:(idUser) => `/user/${idUser}/post/`, // lấy các bài đăng của user id
+    vnpay:`/vnpay/payment_url/`,
     
     
 };

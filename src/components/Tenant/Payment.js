@@ -5,10 +5,12 @@ import ButtonAuth from "../common/ButtonAuth";
 import SearchStyle from "../../Styles/SearchStyle";
 import { COLOR } from "../common/color";
 import MyContext from "../../configs/MyContext";
-import * as Location from 'expo-location';
-import axios from 'axios';
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { authApi, endpoints } from "../../configs/API";
+import { Linking } from "react-native";
 
-const Payment = () => {
+
+const Payment = ({navigation}) => {
     const [user] = useContext(MyContext);
     const [fullName, setFullName] = useState(user.first_name + " " + user.last_name);
     const [amount, setAmount] = useState("1000000");
@@ -16,8 +18,26 @@ const Payment = () => {
     const [paymentMethod, setPaymentMethod] = useState("");
 
 
-    const handlePayment = () => {
+    const handlePayment = async() => {
         // Xử lý thanh toán ở đây
+        try{
+            const token = await AsyncStorage.getItem("access-token");
+            const formData = new FormData();
+            formData.append("amount",amount);
+            let res = await authApi(token).post(endpoints["vnpay"], formData, {
+                headers: {
+                    'Content-Type': 'multipart/form-data',
+                },
+            });
+            console.log("thanh cong");
+            console.log(res);
+            if (res.data && res.data.payment_url) {
+                Linking.openURL(res.data.payment_url);
+            }
+            navigation.navigate("Home");
+        }catch(ex){
+            console.error(ex);
+        }
         console.log("Họ tên:", fullName);
         console.log("Số tiền:", amount);
         console.log("Số điện thoại:", phoneNumber);
