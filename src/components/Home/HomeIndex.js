@@ -300,7 +300,7 @@ const HomeIndex = ({ route }) => {
   }
   const handleTinTimNha = async () => {
     await getAllPostForRent();
-    setDisplayRentPosts(false);
+    // setDisplayRentPosts(false);
     setTinTimNhaActive(true);
     setTinChoThueActive(false);
 

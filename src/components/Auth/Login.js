@@ -33,11 +33,11 @@ const Login = ({ navigation }) => {
 
         if (!username) { setNameErr("Vui lòng nhập username"); } else { setNameErr(""); }
         if (!password) { setPassErr("Vui lòng nhập password"); return; } else { setPassErr(""); }
-        if (password.length < 8) { setPassErr("Mật khẩu phải có ít nhất 8 ký tự"); return; } else { setPassErr(""); }
+        // if (password.length < 8) { setPassErr("Mật khẩu phải có ít nhất 8 ký tự"); return; } else { setPassErr(""); }
 
         // Kiểm tra mật khẩu theo regex
-        if (!checkPassword(password)) { setPassErr("Mật khẩu không phù hợp yêu cầu "); return; }
-        else { setPassErr(""); }
+        // if (!checkPassword(password)) { setPassErr("Mật khẩu không phù hợp yêu cầu "); return; }
+        // else { setPassErr(""); }
         if (username && password) {
             try {
                 setLoading(true);
@@ -49,10 +49,10 @@ const Login = ({ navigation }) => {
                     password: password,
                     // username: "Nganbui",
                     // password: "Meomeo@123",
-                    // username:"ngan",
-                    // password:"123456",
-                    username:"M",
-                    password:"Meomeo@123",
+                    username:"ngan",
+                    password:"123456",
+                    // username:"M",
+                    // password:"Meomeo@123",
                     client_id: "8OdjuOvhjzLFCigIbuw3mbDAlhWTirzeM7s1W1g2",
                     client_secret:
                         "8pj5yZzwnH0vN3hflMrJJ7QBENDCsMKfIUlGQ15Gyg9GPTRCFXsIxm7iiF7xmcPf2IOz5uIXmfD9TjXJI3mKWHIQQ1HStaY3duHkIrSc4GWJGcyg1ZQgKtYIOxRksXia",

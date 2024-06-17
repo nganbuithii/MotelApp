@@ -15,6 +15,7 @@ const DetailPost = ({ route }) => {
     const [data, setData] = useState();
     const [motel, setMotel] = useState();
     const [loading, setLoading] = useState(true);
+    console.log(user.id);
 
     const fetchApiDetailPost = async (postId) => {
         try {
@@ -43,12 +44,126 @@ const DetailPost = ({ route }) => {
         }
     };
 
+    const fetchApiDetailPostTenant = async (postId) => {
+        try {
+            const token = await AsyncStorage.getItem("access-token");
+            console.log("vô đây");
+            const res = await authApi(token).get(endpoints["updatePostRent"](postId));
+            console.log("Thành công");
+            console.log(res.data);
+            setData(res.data);
+            console.log(token);
+            setLoading(false);
+        } catch (ex) {
+            Alert.alert("Lỗi", "Hãy thử lại sau!");
+            console.error(ex);
+        }
+    };
+
     useEffect(() => {
-        fetchApiDetailPost(postId);
+        if (user.user_role === "MOTEL_OWNER") {
+            fetchApiDetailPost(postId);
+        } else {
+            fetchApiDetailPostTenant(postId);
+        }
     }, []);
 
     const renderImageItem = ({ item }) => (
         <Image source={{ uri: item.url }} style={styles.image} />
+    );
+
+    const renderPostForOwner = () => (
+        <View style={styles.myPost}>
+            <View style={HomeStyles.postContainer}>
+                <View style={HomeStyles.userInfoContainer}>
+                    <TouchableOpacity style={HomeStyles.avatarContainer}>
+                        <Image source={{ uri: user.avatar }} style={HomeStyles.userAvatar} />
+                    </TouchableOpacity>
+                    <Text style={HomeStyles.userName}>{user.username}</Text>
+                </View>
+            </View>
+            <View>
+                <View style={{ flexDirection: "row", width: "100%", paddingHorizontal: 10 }}>
+                    <Entypo name="location-pin" size={20} color="orange" />
+                    <View style={{ flex: 1 }}>
+                        <Text style={{ color: "gray" }}>{motel ? motel.other_address : "Đang tải..."}</Text>
+                    </View>
+                </View>
+                <View>
+                    <Text style={HomeStyles.desc}>{data ? data.content : "Đang tải..."}</Text>
+                    {motel && motel.images && motel.images.length > 0 ? (
+                        <FlatList
+                            data={motel.images}
+                            renderItem={renderImageItem}
+                            keyExtractor={(item) => item.id.toString()}
+                            horizontal
+                            showsHorizontalScrollIndicator={false}
+                        />
+                    ) : (
+                        <Text>Không có hình ảnh</Text>
+                    )}
+                </View>
+            </View>
+            <View style={styles.iconContainer}>
+                <View style={MyStyles.flex}>
+                    <Text style={{ fontWeight: "bold" }}>{data ? data.like_count : 0} </Text>
+                    <TouchableWithoutFeedback>
+                        <Feather style={HomeStyles.iconPost} name="heart" size={24} color="black" />
+                    </TouchableWithoutFeedback>
+                    <Text style={{ fontWeight: "bold" }}>{data ? data.comment_count : 0} </Text>
+                    <TouchableWithoutFeedback>
+                        <Feather style={HomeStyles.iconPost} name="message-circle" size={24} color="black" />
+                    </TouchableWithoutFeedback>
+                    <TouchableOpacity onPress={() => handleShare(postId)}>
+                        <Feather name="send" size={24} color="black" />
+                    </TouchableOpacity>
+                </View>
+            </View>
+        </View>
+    );
+
+    const renderPostForTenant = () => (
+        <View style={styles.myPost}>
+            <View style={HomeStyles.postContainer}>
+                <View style={HomeStyles.userInfoContainer}>
+                    <TouchableOpacity style={HomeStyles.avatarContainer}>
+                        <Image source={{ uri: user.avatar }} style={HomeStyles.userAvatar} />
+                    </TouchableOpacity>
+                    <Text style={HomeStyles.userName}>{user.username}</Text>
+                </View>
+            </View>
+            <View>
+                <View style={{ flexDirection: "row", width: "100%", paddingHorizontal: 10 }}>
+                    <Entypo name="location-pin" size={20} color="orange" />
+                    <View style={{ flex: 1 }}>
+                        <Text style={{ color: "gray" }}>{data ? data.other_address : "Đang tải..."}</Text>
+                    </View>
+                </View>
+                <View>
+                    <Text style={HomeStyles.desc}>{data ? data.content : "Đang tải..."}</Text>
+                    {data && data.image ? (
+                        <Image source={{ uri: data.image }} style={styles.image} />
+                    ) : (
+                        <Text>Không có hình ảnh</Text>
+                    )}
+                </View>
+            </View>
+            <View style={styles.iconContainer}>
+                <View style={MyStyles.flex}>
+                    <Text style={{ fontWeight: "bold" }}>{data ? data.like_count : 0} </Text>
+                    <TouchableWithoutFeedback>
+                        <Feather style={HomeStyles.iconPost} name="heart" size={24} color="black" />
+                    </TouchableWithoutFeedback>
+                    <Text style={{ fontWeight: "bold" }}>{data ? data.comment_count : 0} </Text>
+                    <TouchableWithoutFeedback>
+                        <Feather style={HomeStyles.iconPost} name="message-circle" size={24} color="black" />
+                    </TouchableWithoutFeedback>
+                    <TouchableOpacity onPress={() => handleShare(postId)}>
+                        <Feather name="send" size={24} color="black" />
+                    </TouchableOpacity>
+                </View>
+            </View>
+        </View>
     );
 
     return (
@@ -56,55 +171,7 @@ const DetailPost = ({ route }) => {
             {loading ? (
                 <LoadingPage />
             ) : (
-                <View style={styles.myPost}>
-                    <View style={HomeStyles.postContainer}>
-                        <View style={HomeStyles.userInfoContainer}>
-                            <TouchableOpacity style={HomeStyles.avatarContainer}>
-                                <Image source={{ uri: user.avatar }} style={HomeStyles.userAvatar} />
-                            </TouchableOpacity>
-                            <Text style={HomeStyles.userName}>{user.username}</Text>
-                        </View>
-                    </View>
-                    <View>
-                        <View style={{ flexDirection: "row", width: "100%", paddingHorizontal: 10 }}>
-                            <Entypo name="location-pin" size={20} color="orange" />
-                            <View style={{ flex: 1 }}>
-                                <Text style={{ color: "gray" }}>{motel ? motel.other_address : "Đang tải..."}</Text>
-                            </View>
-                        </View>
-                        <View>
-                            <Text style={HomeStyles.desc}>{data ? data.content : "Đang tải..."}</Text>
-                            {motel && motel.images && motel.images.length > 0 ? (
-                                <FlatList
-                                    data={motel.images}
-                                    renderItem={renderImageItem}
-                                    keyExtractor={(item) => item.id.toString()}
-                                    horizontal
-                                    showsHorizontalScrollIndicator={false}
-                                />
-                            ) : (
-                                <Text>Không có hình ảnh</Text>
-                            )}
-                        </View>
-                    </View>
-                    <View style={styles.iconContainer}>
-                        <View style={MyStyles.flex}>
-                            <Text style={{ fontWeight: "bold" }}>{data ? data.like_count : 0} </Text>
-                            <TouchableWithoutFeedback>
-                                <Feather style={HomeStyles.iconPost} name="heart" size={24} color="black" />
-                            </TouchableWithoutFeedback>
-                            <Text style={{ fontWeight: "bold" }}>{data ? data.comment_count : 0} </Text>
-                            <TouchableWithoutFeedback>
-                                <Feather style={HomeStyles.iconPost} name="message-circle" size={24} color="black" />
-                            </TouchableWithoutFeedback>
-                            <TouchableOpacity onPress={() => handleShare(postId)}>
-                                <Feather name="send" size={24} color="black" />
-                            </TouchableOpacity>
-                        </View>
-                    </View>
-                   
-                   
-                </View>
+                user.user_role === "MOTEL_OWNER" ? renderPostForOwner() : renderPostForTenant()
             )}
         </View>
     );
