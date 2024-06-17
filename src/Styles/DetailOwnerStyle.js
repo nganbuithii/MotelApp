@@ -137,7 +137,9 @@ export default StyleSheet.create({
         backgroundColor:COLOR.PRIMARY,
         // marginHorizontal:10,
         padding:20,
-        width:"50%"
+        width:"100%",
+        textAlign:"center",
+
     },
     btnOption2:{
         backgroundColor:COLOR.PRIMARY,

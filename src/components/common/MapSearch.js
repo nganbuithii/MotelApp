@@ -1,6 +1,5 @@
 import {
     StyleSheet, Text, View, Dimensions, TouchableOpacity, Alert, Animated,
-    TextInput,
     TouchableWithoutFeedback,
     Image,
     FlatList,
@@ -10,13 +9,12 @@ import React, { useState, useRef, useEffect } from "react";
 import MapView, { BingMapsProvider, Marker } from "react-native-maps";
 const windowWidth = Dimensions.get("window").width;
 import { Searchbar } from 'react-native-paper';
-import { COLOR, SHADOWS } from '../common/color';
+import { COLOR} from '../common/color';
 import * as Location from 'expo-location';
 import axios from 'axios';
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { authApi, endpoints } from "../../configs/API";
-import SearchStyle from "../../Styles/SearchStyle";
-import { AntDesign, Octicons } from "@expo/vector-icons";
+import { Octicons } from "@expo/vector-icons";
 const MapSearch = ({ navigation, route }) => {
     const [animation] = useState(new Animated.Value(400));
     const textInputRef = useRef(null);
@@ -48,34 +46,38 @@ const MapSearch = ({ navigation, route }) => {
             setsearchQuery(query);
             if (query) {
                 handleFind(query);
+                
             }
         }
+        console.log(other);
+        console.log(selectedCity);
+        console.log(queryParts);
 
-        getCurrentLocation();
+        // getCurrentLocation();
 
 
 
     }, [selectedCity, selectedDistrict, selectedWard, other]);
-    const getCurrentLocation = async () => {
-        try {
-            setLoading(true);
-            let { status } = await Location.requestForegroundPermissionsAsync();
-            if (status !== 'granted') {
-                console.log('Permission to access location was denied');
-                return;
-            }
-            let location = await Location.getCurrentPositionAsync({});
-            setAddress(location.coords.latitude + ", " + location.coords.longitude);
-            setLongitude(location.coords.longitude);
-            setLatitude(location.coords.latitude);
+    // const getCurrentLocation = async () => {
+    //     try {
+    //         setLoading(true);
+    //         let { status } = await Location.requestForegroundPermissionsAsync();
+    //         if (status !== 'granted') {
+    //             console.log('Permission to access location was denied');
+    //             return;
+    //         }
+    //         let location = await Location.getCurrentPositionAsync({});
+    //         setAddress(location.coords.latitude + ", " + location.coords.longitude);
+    //         setLongitude(location.coords.longitude);
+    //         setLatitude(location.coords.latitude);
 
-            getAddressFromCoords(location.coords.latitude, location.coords.longitude);
-        } catch (error) {
-            console.error('Error getting current location:', error);
-        } finally {
-            setLoading(false);
-        }
-    };
+    //         getAddressFromCoords(location.coords.latitude, location.coords.longitude);
+    //     } catch (error) {
+    //         console.error('Error getting current location:', error);
+    //     } finally {
+    //         setLoading(false);
+    //     }
+    // };
 
     const getAddressFromCoords = async (latitude, longitude) => {
         const API_key = "ArvHYzlNC_zl-qapSPj9KUSjb17DNAmCTHf0Lv-_sWiptCT-R26Ss9wvW5n9ytMr";
@@ -284,21 +286,21 @@ const MapSearch = ({ navigation, route }) => {
                     )}
                 </View>
                 {showConfirmButton && (
-                    <>
+                    <View style={{flexDirection:"row"}}>
                         <TouchableOpacity style={styles.confirmButton} onPress={handleConfirmLocation}>
                             <Text style={styles.confirmButtonText}>Xác nhận vị trí</Text>
                         </TouchableOpacity>
                         <TouchableOpacity style={styles.confirmButton} onPress={handleSubmit}>
                             <Text style={styles.confirmButtonText}>Tìm kiếm xung quanh</Text>
                         </TouchableOpacity>
-                    </>
+                    </View>
                 )}
                 <FlatList
                     horizontal
                     data={data}
                     renderItem={renderItem}
                     keyExtractor={(item) => item.id.toString()}
-                    ListEmptyComponent={<Text style={styles.noResultText}>Không tìm thấy kết quả phù hợp.</Text>}
+                    // ListEmptyComponent={<Text style={styles.noResultText}>Không tìm thấy kết quả phù hợp.</Text>}
                     contentContainerStyle={styles.listContent}
                 />
                 <MapView
@@ -386,11 +388,13 @@ const styles = StyleSheet.create({
         fontSize: 16
     },
     confirmButton: {
-        padding: 20,
+        padding: 10,
         backgroundColor: COLOR.PRIMARY,
         borderRadius: 30,
-        marginHorizontal: 90,
-        marginTop: 10
+        // marginHorizontal: 90,
+        marginTop: 10,
+        marginLeft:20,
+        marginRight:10
     },
     //RENDERITEM
     itemContainer: {

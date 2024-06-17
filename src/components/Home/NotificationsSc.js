@@ -7,8 +7,8 @@ import { collection, query, onSnapshot, orderBy, where } from "firebase/firestor
 import HomeStyles from '../../Styles/HomeStyles';
 import { firestore } from "../../configs/firebase";
 import caculatorTimeAgo from '../common/CaculatorTime';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useNavigation } from '@react-navigation/native';
+import LoadingPage from '../Loading/LoadingPage';
 
 const NotificationsSc = () => {
   const [user] = useContext(MyContext);
@@ -38,7 +38,7 @@ const NotificationsSc = () => {
   const handleNotificationPress = (notification) => {
     if (notification.content.includes("thích")) {
       console.log("Thông báo đã được nhấp vào:", notification);
-      navigation.navigate("DetailPost");
+      navigation.navigate("DetailPost",{postId:notification.postId});
     } else if (notification.content.includes("bình luận")) {
       console.log("Thông báo đã được nhấp vào:", notification);
       navigation.navigate("Comment", { postId: notification.postId, ownerPostId:notification.ownerPostId });
@@ -59,7 +59,7 @@ const NotificationsSc = () => {
 
       {loading ? (
         <View style={styles.loadingContainer}>
-          <ActivityIndicator size="large" color={COLOR.PRIMARY} />
+          <LoadingPage/>
         </View>
       ) : (
         <ScrollView style={styles.scroll} showsVerticalScrollIndicator={false}>

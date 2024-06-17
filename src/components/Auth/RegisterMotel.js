@@ -24,8 +24,8 @@ const RegisterMotel = ({ navigation, route }) => {
     const [cities, setCities] = useState([]); // State để lưu trữ danh sách các tỉnh/thành phố
     const [districts, setDistricts] = useState([]); // State để lưu trữ danh sách các quận/huyện
     const [wards, setWards] = useState([]);
-    const [showModal, setShowModal] = useState(false);
-    const [user, dispatch] = useContext(MyContext);
+    // const [showModal, setShowModal] = useState(false);
+    const [user] = useContext(MyContext);
     const [loading, setLoading] = useState(false);
     const [price, setPrice] = useState('');
     const [desc, setDesc] = useState(null);
@@ -35,11 +35,11 @@ const RegisterMotel = ({ navigation, route }) => {
     const [city, setCity] = useState(null);
     const [area, setArea] = useState(null);
     const [other, setOther] = useState(null);
-    const [cabinet, setCabinet] = useState(null);
+    // const [cabinet, setCabinet] = useState(null);
     const [furniture, setFurniture] = useState(null);
-    const [modalsEdit, setModalsEdit] = useState({});
+    // const [modalsEdit, setModalsEdit] = useState({});
     // const { latitude, longitude, locationName } = route.params;
-    const lon = route.params?.lon;
+    const lon= route.params?.lon;
     const lat = route.params?.lat;
     const nameLoc = route.params?.nameLoc;
     useEffect(() => {
@@ -150,16 +150,20 @@ const RegisterMotel = ({ navigation, route }) => {
     const getWardNameById = (wardId) => {
         return wardMapping[wardId] || '';
     };
+   
     const handleSubmit = async () => {
         try {
-
+            if(lon==undefined && lat ==undefined){
+                Alert.alert("Thông báo", " Bạn hãy nhấn vào bản đồ để xác nhận vị trí.")
+                return;
+            }
             if (!price) { setPriceErr("Vui lòng nhập giá phòng"); }
             else if (price && price <= 0) { setPriceErr("Vui lòng nhập giá lớn hơn 0"); }
             if (!people) { setPeopleErr("Vui lòng nhập số lượng người ở"); }
             else if (people && people <= 0) { setPeopleErr("Vui lòng nhập số lượng lớn hơn 0"); }
             if (!area) { setAreaErr("Vui lòng nhập diện tích nhà"); }
             else if (area && area < 100) { setAreaErr("Vui lòng nhập diện tích lớn hơn 100 m2"); }
-            if (!desc) { setDescErr("Vui lòng nhập xã/phường"); }
+            if (!desc) { setDescErr("Vui lòng nhập mô tả"); }
             if (!district) { setDistrictErr("Vui lòng chọn quận/huyện"); }
             if (!ward) { setWardErr("Vui lòng chọn xã/phường"); }
             if (!city) { setCityErr("Vui lòng chọn tỉnh/thành phố"); }
@@ -182,8 +186,7 @@ const RegisterMotel = ({ navigation, route }) => {
                     formData.append('lon', lon);
                     formData.append('furniture', furniture);
                     console.log("form data:", formData);
-                    // console.log(token);
-                    // console.log("FORM DATA TRO", formData);
+        
                     let res = await authApi(token).post(endpoints['postMotel'], formData, {
                         headers: {
                             'Content-Type': 'multipart/form-data',
@@ -192,18 +195,12 @@ const RegisterMotel = ({ navigation, route }) => {
                     // Lưu dữ liệu vào AsyncStorage
                     let currentMotels = await AsyncStorage.getItem("motels");
                     currentMotels = currentMotels ? JSON.parse(currentMotels) : [];
-
                     // Bước 2: Thêm dữ liệu mới từ res.data vào mảng nhà trọ
                     currentMotels.push(res.data);
 
-                    // Bước 3: Cập nhật mảng nhà trọ đã được cập nhật vào AsyncStorage
                     await AsyncStorage.setItem("motels", JSON.stringify(currentMotels));
                     const motels = await AsyncStorage.getItem("motels");
                     console.log("MOTEL Ở ĐK: ", motels);
-                    console.info("TRỌ RES DATA đã được lưu vào AsyncStorage");
-
-                    // const infoMotel = await AsyncStorage.getItem("infoMotel");
-                    // console.log("INFOMOTELS", infoMotel);
 
                     console.info("TRỌ RES DATA", res.data);
                     console.log("Thành công tạo trọ");
@@ -216,29 +213,27 @@ const RegisterMotel = ({ navigation, route }) => {
                 } finally {
                     setLoading(false);
                 }
-
-
-
-
-
             }
-
-
 
         } catch (ex) {
             console.error("Lỗi trong quá trình xử lý form:", ex);
         }
     };
-    // const test = () => {
-    //     console.log(lon);
-    //     console.log(lat);
-    //     console.log(nameLoc);
-    // }
+
     const nextMap = () => {
-        navigation.navigate('MapSearch', { previousScreen: 'RegisterMotel' });
+        const selectedCityName = getCityNameById(city);
+        const selectedDistrictName = getDistrictNameById(district);
+        const selectedWardName = wardMapping[ward];
 
 
-    };
+        navigation.navigate('MapSearch', {
+            previousScreen: 'RegisterMotel',
+            selectedCity: selectedCityName,
+            selectedDistrict: selectedDistrictName,
+            selectedWard: selectedWardName,
+            other:other
+        });
+    }
     const furnitureOptions = ["Tủ lạnh", "Máy giặt", "Máy lạnh", "Bàn ăn", "Bàn làm việc", "Ghế sofa", "Ghế ăn", "Giường ngủ", "Tủ quần áo", "Bàn trà","Không có nội thất"];
 
     const handleCheckboxChange = (option) => {

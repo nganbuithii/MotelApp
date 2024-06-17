@@ -293,14 +293,14 @@ const CreatePostRent = ({ navigation, route }) => {
                         </View>
                     )}
 
-                    <Text style={PostStyle.sectionTitle}>Chọn vị trí hiện tại</Text>
+                    {/* <Text style={PostStyle.sectionTitle}>Chọn vị trí hiện tại</Text>
                     <TouchableOpacity style={PostStyle.uploadButton} onPress={getCurrentLocation}>
                         <Feather name="map-pin" size={24} color="lightgreen" />
                         <Text style={PostStyle.uploadText}>Vị trí hiện tại</Text>
                     </TouchableOpacity>
-                    {address !== null && address !== "" && <Text>{address}</Text>}
+                    {address !== null && address !== "" && <Text>{address}</Text>} */}
                 </View>
-                <Text style={PostStyle.sectionTitle}>hoặc Chọn khu vực</Text>
+                {/* <Text style={PostStyle.sectionTitle}>hoặc Chọn khu vực</Text> */}
                 <TouchableOpacity style={PostStyle.uploadButton} onPress={showwArre}>
                     <Feather name="map-pin" size={24} color="lightgreen" />
                     <Text style={PostStyle.uploadText}>Chọn khu vực</Text>

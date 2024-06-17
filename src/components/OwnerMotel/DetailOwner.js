@@ -315,9 +315,9 @@ const DetailOwner = ({ route, navigation }) => {
                                 <TouchableOpacity style={DetailOwnerStyle.btnOption} onPress={getAllMotelByOwner}>
                                     <Text style={{ color: "#fff" }}>Thông tin nhà trọ</Text>
                                 </TouchableOpacity>
-                                <TouchableOpacity style={DetailOwnerStyle.btnOption} onPress={getAllPostByUser}>
+                                {/* <TouchableOpacity style={DetailOwnerStyle.btnOption} onPress={getAllPostByUser}>
                                     <Text style={{ color: "#fff" }}>Bài đăng của bạn</Text>
-                                </TouchableOpacity>
+                                </TouchableOpacity> */}
                             </View>
                             {role === "Chủ nhà trọ" && renderMotelData()}
 

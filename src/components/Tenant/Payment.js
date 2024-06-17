@@ -1,5 +1,5 @@
 import React, { useContext, useEffect, useState } from "react";
-import { Text, View, TouchableOpacity, StyleSheet, Image } from "react-native";
+import { Text, View, TouchableOpacity, StyleSheet, Image, Alert } from "react-native";
 import InputField from "../common/InputField";
 import ButtonAuth from "../common/ButtonAuth";
 import SearchStyle from "../../Styles/SearchStyle";
@@ -9,42 +9,66 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { authApi, endpoints } from "../../configs/API";
 import { Linking } from "react-native";
 
+const formatNumber = (number) => {
+    return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(number);
+};
 
-const Payment = ({navigation}) => {
+const Payment = ({ navigation, route }) => {
+    const { idMotel, price } = route.params;
     const [user] = useContext(MyContext);
     const [fullName, setFullName] = useState(user.first_name + " " + user.last_name);
-    const [amount, setAmount] = useState("1000000");
+    const [amount, setAmount] = useState(price);
     const [phoneNumber, setPhoneNumber] = useState(user.phone);
-    const [paymentMethod, setPaymentMethod] = useState("");
+    const [paymentMethods, setPaymentMethods] = useState({
+        viDienTu: false,
+        chuyenKhoan: false,
+    });
 
+    const [paymentMethodSelected, setPaymentMethodSelected] = useState(false);
 
-    const handlePayment = async() => {
-        // Xử lý thanh toán ở đây
-        try{
+    const selectPaymentMethod = (method) => {
+        if (method === "viDienTu") {
+            setPaymentMethods({
+                viDienTu: true,
+                chuyenKhoan: false,
+            });
+            setPaymentMethodSelected(true);
+        } else if (method === "chuyenKhoan") {
+            setPaymentMethods({
+                viDienTu: false,
+                chuyenKhoan: true,
+            });
+            setPaymentMethodSelected(true);
+        }
+    };
+
+    const handlePayment = async () => {
+        if (!paymentMethodSelected) {
+            Alert.alert("Thông báo", "Bạn cần chọn phương thức thanh toán!");
+            return;
+        }
+        try {
             const token = await AsyncStorage.getItem("access-token");
             const formData = new FormData();
-            formData.append("amount",amount);
+            formData.append("amount", amount);
             let res = await authApi(token).post(endpoints["vnpay"], formData, {
                 headers: {
                     'Content-Type': 'multipart/form-data',
                 },
             });
-            console.log("thanh cong");
-            console.log(res);
+
+            console.log("API Response:", res.data); // Log toàn bộ response để kiểm tra
+
             if (res.data && res.data.payment_url) {
-                Linking.openURL(res.data.payment_url);
+                console.log("URL:", res.data.payment_url);
+                navigation.navigate("VnpayUI", { url: res.data.payment_url, idMotel: idMotel });
+            } else {
+                console.error("Payment URL not found in the response");
             }
-            navigation.navigate("Home");
-        }catch(ex){
-            console.error(ex);
+        } catch (ex) {
+            console.error("API call failed:", ex);
         }
-        console.log("Họ tên:", fullName);
-        console.log("Số tiền:", amount);
-        console.log("Số điện thoại:", phoneNumber);
-        console.log("Phương thức thanh toán:", paymentMethod);
-
     };
-
 
     return (
         <View style={styles.container}>
@@ -53,26 +77,34 @@ const Payment = ({navigation}) => {
                 style={SearchStyle.backgroundImage}
             />
             <Text style={styles.title}>Thông Tin Thanh Toán</Text>
-            <InputField label="Họ và tên" value={fullName}
-                onChangeText={(text) => setFullName(text)} />
-            <InputField label="Số điện thoại" value={phoneNumber}
-                onChangeText={(text) => setPhoneNumber(text)} />
-            <InputField label="Tiền cọc" value={amount}
-                onChangeText={(text) => setAmount(text)} />
+            <InputField label="Họ và tên" value={fullName} onChangeText={(text) => setFullName(text)} />
+            <InputField label="Số điện thoại" value={phoneNumber} onChangeText={(text) => setPhoneNumber(text)} />
+            <InputField 
+                label="Tiền cọc" 
+                value={formatNumber(amount)} // Định dạng số tiền hiển thị
+                onChangeText={(text) => setAmount(parseFloat(text.replace(/[^\d]/g, '')))} // Chuyển đổi lại giá trị sau khi người dùng nhập
+            />
 
             <Text style={{ fontWeight: "bold", fontSize: 20, color: COLOR.PRIMARY }}> Phương thức thanh toán</Text>
-            <TouchableOpacity style={styles.methodContainer} onPress={() => setPaymentMethod("Ví điện tử")}>
+            <TouchableOpacity 
+                style={[styles.methodContainer, paymentMethods.viDienTu && { backgroundColor: "#c0e57b" }]} 
+                onPress={() => selectPaymentMethod("viDienTu")}
+            >
                 <Image source={require("../../assets/images/momo.png")} style={styles.icon} />
                 <Text style={styles.methodText}>Ví điện tử</Text>
+                {paymentMethods.viDienTu && <Text style={{ marginLeft: 'auto', color: 'green' }}>✓</Text>}
             </TouchableOpacity>
-            <Text> Hoặc</Text>
-            <TouchableOpacity style={styles.methodContainer} onPress={() => setPaymentMethod("Chuyển khoản ngân hàng")}>
+
+            <TouchableOpacity 
+                style={[styles.methodContainer, paymentMethods.chuyenKhoan && { backgroundColor: "#c0e57b" }]} 
+                onPress={() => selectPaymentMethod("chuyenKhoan")}
+            >
                 <Image source={require("../../assets/images/vnpay.png")} style={styles.icon} />
                 <Text style={styles.methodText}>Chuyển khoản ngân hàng</Text>
+                {paymentMethods.chuyenKhoan && <Text style={{ marginLeft: 'auto', color: 'green' }}>✓</Text>}
             </TouchableOpacity>
+
             <ButtonAuth title="Thanh toán" onPress={handlePayment} />
-
-
         </View>
     );
 };
@@ -83,7 +115,6 @@ const styles = StyleSheet.create({
         justifyContent: "center",
         alignItems: "center",
         backgroundColor: "#fff",
-        // paddingHorizontal: 20,
     },
     title: {
         fontSize: 24,
@@ -91,18 +122,6 @@ const styles = StyleSheet.create({
         marginBottom: 30,
         textAlign: "center",
         color: COLOR.PRIMARY
-    },
-    inputContainer: {
-        width: "80%",
-        marginBottom: 20,
-    },
-    input: {
-        borderWidth: 1,
-        borderColor: "#ccc",
-        borderRadius: 10,
-        padding: 12,
-        fontSize: 16,
-        color: "#333",
     },
     methodContainer: {
         flexDirection: "row",
@@ -127,27 +146,6 @@ const styles = StyleSheet.create({
         color: "#333",
         paddingRight: 40,
     },
-    button: {
-        backgroundColor: "#4285F4",
-        paddingHorizontal: 40,
-        paddingVertical: 15,
-        borderRadius: 10,
-    },
-    buttonText: {
-        color: "#fff",
-        fontSize: 18,
-        fontWeight: "bold",
-    },
-    locationText: {
-        marginTop: 20,
-        fontSize: 16,
-        color: "#333",
-    },
-    addressText: {
-        marginTop: 10,
-        fontSize: 16,
-        color: "#333",
-    }
 });
 
 export default Payment;

@@ -183,13 +183,16 @@ const SearchSc = ({ route }) => {
       if (areaFilter) {
         switch (areaFilter) {
           case 'under_20m':
-            params['area'] = 'under_20m';
+            params['min_area'] = 0;
+            params['max_area'] = 20;
             break;
           case '20m_to_50m':
-            params['area'] = '20m_to_50m';
+            params['min_area'] = 20;
+            params['max_area'] = 50;
             break;
           case '50m_to_100m':
-            params['area'] = '50m_to_100m';
+            params['min_area'] = 50;
+            params['max_area'] = 300;
             break;
           case 'desc':
             params['ordering'] = '-area';
@@ -358,7 +361,7 @@ const SearchSc = ({ route }) => {
             items={[
               { label: 'Dưới 20m²', value: 'under_20m' },
               { label: 'Từ 20m² đến 50m²', value: '20m_to_50m' },
-              { label: 'Trên 100m²', value: '50m_to_100m' },
+              { label: 'Trên 50m²', value: '50m_to_100m' },
               { label: 'Diện tích giảm dần', value: 'desc' },
               { label: 'Diện tích tăng dần', value: 'asc' },
             ]}

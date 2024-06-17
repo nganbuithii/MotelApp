@@ -35,6 +35,8 @@ import MapSearch from './src/components/common/MapSearch';
 import { MaterialIcons } from '@expo/vector-icons';
 import { TouchableOpacity } from 'react-native-gesture-handler';
 import DetailPost from './src/components/Home/DetailPost';
+import VnpayUI from './src/components/Tenant/VnpayUI';
+import AdminView from './src/admin/AdminView';
 
 //Điều hướng kiểu stack
 const Stack = createStackNavigator();
@@ -73,6 +75,10 @@ export default function App() {
             options={{ headerTitle: 'Thông báo' }} />
           <Stack.Screen name="MapSearch" component={MapSearch}
             options={{ headerTitle: 'Tìm kiếm' }} />
+          <Stack.Screen name="VnpayUI" component={VnpayUI}
+            options={{ headerShown: false }} />
+          <Stack.Screen name="AdminView" component={AdminView}
+            options={{ headerShown: false }} />
           <Stack.Screen name="PlusOwner" component={PlusOwner}
             // options={{ headerTitle: 'Nhà trọ của tôi' }}
             options={{ headerShown: false }} />
@@ -80,7 +86,7 @@ export default function App() {
             options={{ headerTitle: 'Chỉnh sửa bài viết' }}
           />
           <Stack.Screen name="DetailPost" component={DetailPost}
-            options={{ headerTitle: 'abc' }}
+            options={{ headerTitle: 'Bài đăng của bạn' }}
           />
           <Stack.Screen name="ChatDetail" component={ChatDetail}
             options={{ headerShown: false }} />

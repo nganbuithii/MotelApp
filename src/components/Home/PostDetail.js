@@ -19,24 +19,22 @@ import Carousel, { Pagination } from 'react-native-snap-carousel';
 import { FontAwesome } from '@expo/vector-icons';
 import LoadingPage from "../Loading/LoadingPage";
 
-
-
 const windowWidth = Dimensions.get("window").width;
 
 const PostDetail = ({ navigation, route }) => {
-    // const width = Dimensions.get('window').width;
     const { idMotel } = route.params;
     const [images, setImages] = useState([]);
     const [motel, setMotel] = useState();
     const [loading, setLoading] = useState(true);
     const [activeSlide, setActiveSlide] = useState(0);
     const [owner, setOwner] = useState();
-
+    const [coc, setCoc] = useState();
 
     const handleSubmit = () => {
         console.log(idMotel);
-        navigation.navigate("Payment");
+        navigation.navigate("Payment", { idMotel: idMotel, price:calculateDeposit(motel.price) });
     }
+
     const renderItem = ({ item }) => (
         <Image source={{ uri: item.url }} style={styles.img} resizeMode="cover" />
     );
@@ -51,14 +49,15 @@ const PostDetail = ({ navigation, route }) => {
             setImages(res.data.images);
             setLoading(false);
             fetchDatatUser(res.data.owner);
-
+            setCoc(res.data.is_reserved);
         } catch (ex) {
             console.error(ex);
         }
     }
+
     useEffect(() => {
         detailMotel();
-    }, [])
+    }, []);
 
     const fetchDatatUser = async (id) => {
         try {
@@ -71,16 +70,26 @@ const PostDetail = ({ navigation, route }) => {
             console.error("Lỗi fetch data user", ex);
         }
     }
-    const handleDetail = (ownerId) => {
-        navigation.navigate("DetailOwner", {ownerId: ownerId})
+    const calculateDeposit = (price) => {
+        const depositRatio = 1 / 2;
+        return Math.floor(price * depositRatio);
     }
+
+    // Hàm định dạng số thành chuỗi tiền 
+    const formatNumber = (number) => {
+        return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(number);
+    }
+
+    const handleDetail = (ownerId) => {
+        navigation.navigate("DetailOwner", { ownerId: ownerId })
+    }
+
     return (
         <View style={{ flex: 1, paddingBottom: 30 }}>
             {loading ? (
                 <LoadingPage />
             ) : (
                 <ScrollView contentContainerStyle={{ alignItems: 'center' }}>
-
                     <Carousel
                         data={images}
                         renderItem={renderItem}
@@ -89,13 +98,11 @@ const PostDetail = ({ navigation, route }) => {
                         layout={'stack'} layoutCardOffset={`18`}
                         loop={true}
                         autoplay={false}
-
                     />
                     <View style={styles.infoContainer}>
-                        {owner == null ? <LoadingPage/>: (
+                        {owner == null ? <LoadingPage /> : (
                             <TouchableWithoutFeedback onPress={() => handleDetail(owner.id)}>
                                 <View style={styles.infoRow}>
-                                {/* <Text> {owner.id}</Text> */}
                                     <Image
                                         source={{ uri: owner.avatar }}
                                         style={{ width: 70, height: 70, borderRadius: 40, }}
@@ -116,9 +123,6 @@ const PostDetail = ({ navigation, route }) => {
                                 371 Nguyễn Kiệm, phường 3, quận Bình Tân, Tp Hồ Chí Minh
                             </Text>
                         </View>
-
-
-
                         <View style={styles.infoRow}>
                             <View style={styles.infoItem}>
                                 <AntDesign name="areachart" size={24} color={COLOR.PRIMARY} />
@@ -133,25 +137,22 @@ const PostDetail = ({ navigation, route }) => {
                             <View style={styles.infoItem}>
                                 <FontAwesome6 name="money-bill-alt" size={24} color={COLOR.PRIMARY} />
                                 <Text style={styles.infoLabel}>Giá phòng</Text>
-                                <Text style={styles.infoValue}>{motel.price}VNĐ</Text>
+                                <Text style={styles.infoValue}>{formatNumber(motel.price)}</Text>
                             </View>
-
                         </View>
                         <View style={styles.infoRow}>
-                            <View style={styles.infoItem}>
+                        <View style={styles.infoItem}>
                                 <FontAwesome6 name="money-bill-alt" size={24} color={COLOR.PRIMARY} />
                                 <Text style={styles.infoLabel}>Cọc</Text>
-                                <Text style={styles.infoValue}>1.000.000VNĐ</Text>
+                                <Text style={styles.infoValue}>{formatNumber(calculateDeposit(motel.price))}</Text>
                             </View>
                         </View>
-
                         <View style={styles.infoRow}>
                             {motel.prices && motel.prices.length > 0 ? (
                                 motel.prices.map((price, index) => (
                                     <View style={[styles.infoItem, {
                                         borderColor: "pink", borderWidth: 1, marginLeft: 10, paddingVertical: 15, borderRadius: 10,
                                     }]} key={index}>
-                                        {/* Hiển thị thông tin về từng khoản phí dịch vụ bổ sung */}
                                         <FontAwesome name="dollar" size={20} color={COLOR.PRIMARY} />
                                         <Text style={styles.infoLabel}>{price.label}</Text>
                                         <Text style={styles.infoValue}>{price.name}</Text>
@@ -159,37 +160,32 @@ const PostDetail = ({ navigation, route }) => {
                                     </View>
                                 ))
                             ) : (
-                                // Hiển thị văn bản ghi chú khi không có thông tin về các khoản phí dịch vụ bổ sung
                                 <View style={styles.infoItem}>
                                     <FontAwesome6 name="money-bill-alt" size={24} color={COLOR.PRIMARY} />
                                     <Text style={styles.infoLabel}>Chưa có thông tin về dịch vụ</Text>
                                     <Text style={styles.infoValue}>-</Text>
                                 </View>
                             )}
-
                         </View>
-
                     </View>
-                    <ButtonAuth title="Đặt cọc phòng" onPress={handleSubmit} />
-
+                    {coc == true
+                        ? <ButtonAuth title="Phòng đã được cọc" />
+                        : <ButtonAuth title="Đặt cọc phòng" onPress={handleSubmit} />}
                 </ScrollView>
             )}
         </View>
-
     );
 };
 
 const styles = StyleSheet.create({
-
     img: {
-        width: "100%", // Sử dụng 50% chiều rộng của màn hình
-        aspectRatio: 1, // Giữ tỷ lệ khung hình
+        width: "100%",
+        aspectRatio: 1,
         marginTop: 20,
         borderColor: COLOR.PRIMARY,
         borderWidth: 1,
         borderRadius: 10,
         marginBottom: 10,
-
     },
     infoContainer: {
         marginTop: 10,
@@ -219,9 +215,7 @@ const styles = StyleSheet.create({
     infoValue: {
         marginTop: 2,
         fontWeight: "bold",
-        // color: "#fff"
     },
-
 });
 
 export default PostDetail;

@@ -37,9 +37,10 @@ export const endpoints = {
     getFollower:(idUser) => `/user/${idUser}/followers/`, // lẤY Ds người mình theo dõi  
     getFollowing:(idUser) => `/user/${idUser}/following/`, // lẤY Ds người đang theo dõi   mk
     updatePostRent:(idPost) => `/post/for_rent/${idPost}/`,
+    getDetailPost:(idPost) => `/post/for_lease/${idPost}`,
     getPostOfUser:(idUser) => `/user/${idUser}/post/`, // lấy các bài đăng của user id
     vnpay:`/vnpay/payment_url/`,
-    
+    cocTro:(idMotel)=>`/motels/${idMotel}/reserve/`,
     
 };
 

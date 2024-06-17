@@ -127,8 +127,9 @@ const Comment = ({ route }) => {
             }
             console.log("Bình luận thành công")
         } catch (ex) {
-            console.error(ex);
-            console.log("comment thất bại");
+            // console.error(ex);
+            // console.log("comment thất bại");
+            Alert.alert("Lỗi"," Vui lòng thử lại sau");
         }
     };
 
@@ -213,10 +214,13 @@ const Comment = ({ route }) => {
                 <View style={{ flex: 1 }}>
                     {/* Hiển thị ảnh khi không có bình luận */}
                     {comments.length === 0 ? (
+                        <>
                         <Image
                             style={styles.image}
                             source={require('../../assets/images/nocmt.png')}
                         />
+                        <Text style={{textAlign:"center", fontWeight:"400", fontSize:16}}>Bài viết chưa có bình luận!</Text>
+                        </>
                     ) : (
                         <ScrollView style={{ marginBottom: 50 }}
                             showsVerticalScrollIndicator={false}
@@ -235,11 +239,12 @@ const Comment = ({ route }) => {
                                                 <Text style={styles.comment}>{item.content}</Text>
                                             </View>
                                         </View>
-                                        <Text style={styles.timeAgo}>{calculateTimeAgo(item.created_date)}</Text>
+                                        
 
 
                                         {item.user.id === user.id ? (
                                             <View style={styles.commentActionContainer}>
+                                                <Text style={styles.timeAgo}>{calculateTimeAgo(item.created_date)}</Text>
                                                 <TouchableOpacity style={styles.commentActionButton} onPress={() => handleEdit(item.id, item.content)}>
                                                     <Text style={styles.actionButtonText}> Chỉnh sửa</Text>
                                                 </TouchableOpacity>
@@ -249,7 +254,8 @@ const Comment = ({ route }) => {
                                             </View>
                                         ) : (
                                             <TouchableOpacity style={styles.commentActionButton} onPress={() => handleReply(item.id)}>
-                                                <Text style={styles.actionButtonText}>Phản hồi</Text>
+                                                 <Text style={styles.timeAgo}>{calculateTimeAgo(item.created_date)}</Text>
+                                                <Text style={styles.actionButtonText}>ㅤㅤㅤㅤㅤㅤㅤPhản hồi</Text>
                                             </TouchableOpacity>
                                         )}
 
@@ -493,6 +499,8 @@ const styles = StyleSheet.create({
     commentActionButton: {
         marginLeft: "auto",
         paddingLeft: 20,
+        flexDirection:"row",
+        justifyContent:"space-evenly"
     },
     actionButtonText: {
         color: COLOR.PRIMARY,

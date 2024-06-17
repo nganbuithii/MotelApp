@@ -113,6 +113,11 @@ const HomeIndex = ({ route }) => {
         }
         return post;
       }));
+      if (tinTimNhaActive == true) {
+        getAllPostForRent();
+      } else if (tinChoThueActive == true) {
+        setRender(!render);
+      }
       // console.log(ownerPostId);
       // Lưu thông báo vào Firestore
       if (user.id !== ownerPostId) {
@@ -120,11 +125,7 @@ const HomeIndex = ({ route }) => {
       }
 
 
-      if (tinTimNhaActive == true) {
-        getAllPostForRent();
-      } else if (tinChoThueActive == true) {
-        setRender(!render);
-      }
+     
     } catch (ex) {
       console.error(ex);
       console.log("Lỗi like bài");
@@ -409,10 +410,8 @@ const HomeIndex = ({ route }) => {
       newPage = newPage + 1;
       setLoading(true); // Đặt loading state thành true để hiển thị loading indicator
       const token = await AsyncStorage.getItem("access-token");
-      // Fetch dữ liệu của trang tiếp theo
       let res = await authApi(token).get(`https://motel.pythonanywhere.com/post/for_lease/?page=${newPage}`);
       const newData = res.data.results;
-      // console.log("DATTTTTTTTTTAAA PAGE MỚI", newData);
       if (res.data.next == null) {
         setHasNextPage(false);
       }
@@ -632,8 +631,8 @@ const HomeIndex = ({ route }) => {
                   <View style={{ flexDirection: "row", width: "100%", paddingHorizontal: 10 }}>
                     <Entypo name="location-pin" size={20} color="orange" />
                     <View style={{ flex: 1 }}>
-                      <Text>ID : {post.id}</Text>
-                      <Text>USERID :{post.user.id}</Text>
+                      {/* <Text>ID : {post.id}</Text>
+                      <Text>USERID :{post.user.id}</Text> */}
                       <Text style={{ color: "gray" }}>
                         {post.motel ? `${post.motel.ward}, ${post.motel.district}, ${post.motel.city}` : `${post.ward}, ${post.district}, ${post.city}`}
                       </Text>

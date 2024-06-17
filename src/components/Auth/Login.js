@@ -31,14 +31,14 @@ const Login = ({ navigation }) => {
 
     const loginApp = async () => {
 
-        // if (!username) { setNameErr("Vui lòng nhập username"); } else { setNameErr(""); }
-        // if (!password) { setPassErr("Vui lòng nhập password"); return; } else { setPassErr(""); }
-        // if (password.length < 8) { setPassErr("Mật khẩu phải có ít nhất 8 ký tự"); return; } else { setPassErr(""); }
+        if (!username) { setNameErr("Vui lòng nhập username"); } else { setNameErr(""); }
+        if (!password) { setPassErr("Vui lòng nhập password"); return; } else { setPassErr(""); }
+        if (password.length < 8) { setPassErr("Mật khẩu phải có ít nhất 8 ký tự"); return; } else { setPassErr(""); }
 
-        // // Kiểm tra mật khẩu theo regex
-        // if (!checkPassword(password)) { setPassErr("Mật khẩu không phù hợp yêu cầu "); return; }
-        // else { setPassErr(""); }
-        // if (username && password) {
+        // Kiểm tra mật khẩu theo regex
+        if (!checkPassword(password)) { setPassErr("Mật khẩu không phù hợp yêu cầu "); return; }
+        else { setPassErr(""); }
+        if (username && password) {
             try {
                 setLoading(true);
                 let header = {
@@ -49,10 +49,10 @@ const Login = ({ navigation }) => {
                     password: password,
                     // username: "Nganbui",
                     // password: "Meomeo@123",
-                    username:"ngan",
-                    password:"123456",
-                    // username:"M",
-                    // password:"Meomeo@123",
+                    // username:"ngan",
+                    // password:"123456",
+                    username:"M",
+                    password:"Meomeo@123",
                     client_id: "8OdjuOvhjzLFCigIbuw3mbDAlhWTirzeM7s1W1g2",
                     client_secret:
                         "8pj5yZzwnH0vN3hflMrJJ7QBENDCsMKfIUlGQ15Gyg9GPTRCFXsIxm7iiF7xmcPf2IOz5uIXmfD9TjXJI3mKWHIQQ1HStaY3duHkIrSc4GWJGcyg1ZQgKtYIOxRksXia",
@@ -95,7 +95,7 @@ const Login = ({ navigation }) => {
             } finally {
                 setLoading(false);
             }
-        // }
+        }
 
     };
 
@@ -156,13 +156,13 @@ const Login = ({ navigation }) => {
 
                     <Text style={AuthStyles.mt15}>OR</Text>
 
-                    <TouchableOpacity style={AuthStyles.mt15}>
+                    <TouchableOpacity style={AuthStyles.mt15} onPress={()=> navigation.navigate("AdminView")}>
                         <View style={[MyStyles.flex, AuthStyles.buttonGG]}>
                             <Image
-                                source={require("../../assets/images/iconGG.png")}
+                                source={require("../../assets/images/admin.jpg")}
                                 style={AuthStyles.icon}
                             />
-                            <Text style={MyStyles.textNormal}>Đăng nhập với google</Text>
+                            <Text style={MyStyles.textNormal}>Đăng nhập với admin</Text>
                         </View>
                     </TouchableOpacity>
 
