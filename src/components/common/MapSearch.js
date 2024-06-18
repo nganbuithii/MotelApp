@@ -19,7 +19,7 @@ const MapSearch = ({ navigation, route }) => {
     const [animation] = useState(new Animated.Value(400));
     const textInputRef = useRef(null);
     const API_key =
-        "ArvHYzlNC_zl-qapSPj9KUSjb17DNAmCTHf0Lv-_sWiptCT-R26Ss9wvW5n9ytMr ";
+        " ";
     const [data, setData] = useState([]);
     const [latitude, setLatitude] = useState(10.809929161020303);
     const [longitude, setLongitude] = useState(106.65257484882906);
