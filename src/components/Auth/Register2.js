@@ -111,7 +111,8 @@ const Register2 = ({ navigation }) => {
             }
         }catch(ex)
         {
-            console.error(ex);
+            // console.error(ex);
+            Alert.alert("Lỗi","Lỗi up ảnh");
         }
     }
 

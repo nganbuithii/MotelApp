@@ -49,8 +49,8 @@ const Login = ({ navigation }) => {
                     password: password,
                     // username: "Nganbui",
                     // password: "Meomeo@123",
-                    username:"ngan",
-                    password:"123456",
+                    // username:"ngan",
+                    // password:"123456",
                     // username:"M",
                     // password:"Meomeo@123",
                     client_id: "8OdjuOvhjzLFCigIbuw3mbDAlhWTirzeM7s1W1g2",
@@ -117,8 +117,9 @@ const Login = ({ navigation }) => {
             // Trả về giá trị kết quả
             return hasMotelData;
         } catch (error) {
-            console.error('Error checking motel owner:', error);
+            // console.error('Error checking motel owner:', error);
             // Trả về false nếu có lỗi xảy ra hoặc người dùng không có nhà trọ
+            Alert.alert("Lỗi","Lỗi kiểm tra" );
             setHasMotel(false);
             return false;
         }

@@ -53,31 +53,31 @@ const MapSearch = ({ navigation, route }) => {
         console.log(selectedCity);
         console.log(queryParts);
 
-        // getCurrentLocation();
+        getCurrentLocation();
 
 
 
     }, [selectedCity, selectedDistrict, selectedWard, other]);
-    // const getCurrentLocation = async () => {
-    //     try {
-    //         setLoading(true);
-    //         let { status } = await Location.requestForegroundPermissionsAsync();
-    //         if (status !== 'granted') {
-    //             console.log('Permission to access location was denied');
-    //             return;
-    //         }
-    //         let location = await Location.getCurrentPositionAsync({});
-    //         setAddress(location.coords.latitude + ", " + location.coords.longitude);
-    //         setLongitude(location.coords.longitude);
-    //         setLatitude(location.coords.latitude);
+    const getCurrentLocation = async () => {
+        try {
+            setLoading(true);
+            let { status } = await Location.requestForegroundPermissionsAsync();
+            if (status !== 'granted') {
+                console.log('Permission to access location was denied');
+                return;
+            }
+            let location = await Location.getCurrentPositionAsync({});
+            setAddress(location.coords.latitude + ", " + location.coords.longitude);
+            setLongitude(location.coords.longitude);
+            setLatitude(location.coords.latitude);
 
-    //         getAddressFromCoords(location.coords.latitude, location.coords.longitude);
-    //     } catch (error) {
-    //         console.error('Error getting current location:', error);
-    //     } finally {
-    //         setLoading(false);
-    //     }
-    // };
+            getAddressFromCoords(location.coords.latitude, location.coords.longitude);
+        } catch (error) {
+            console.error('Error getting current location:', error);
+        } finally {
+            setLoading(false);
+        }
+    };
 
     const getAddressFromCoords = async (latitude, longitude) => {
         const API_key = "ArvHYzlNC_zl-qapSPj9KUSjb17DNAmCTHf0Lv-_sWiptCT-R26Ss9wvW5n9ytMr";

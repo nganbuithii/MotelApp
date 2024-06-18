@@ -169,7 +169,7 @@ export default StyleSheet.create({
         backgroundColor: COLOR.color11,
         paddingVertical: 15,
         paddingLeft: 10,
-        paddingTop: 20,
+        paddingTop: 25,
         ...SHADOWS.medium,
     },
     textHead: {

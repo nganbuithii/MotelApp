@@ -209,7 +209,7 @@ const RegisterMotel = ({ navigation, route }) => {
 
                 } catch (ex) {
                     Alert.alert("lỗi", "Tạo trọ không thành công")
-                    console.error(ex);
+                    // console.error(ex);
                 } finally {
                     setLoading(false);
                 }
